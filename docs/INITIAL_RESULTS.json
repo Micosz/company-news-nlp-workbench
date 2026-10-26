@@ -1,0 +1,179 @@
+{
+  "recorded_on": "2026-10-26",
+  "scope": "Initial pipeline pilot only; no real-data role improvement claim.",
+  "records": [
+    {
+      "run_id": "20261026T080349Z_ac3fff",
+      "source": "pilot_fold_A_roles_blank.xlsx",
+      "counts": {
+        "train": 253,
+        "test": 171
+      },
+      "config": {
+        "seed": 374,
+        "role_source": "none",
+        "note": "Excel import / real-data pilot A / final algorithm"
+      },
+      "input_code_sha256": {
+        "dataset.csv": "c29abb0ae6566b71043976eaa26ec0fe9740d607f20dcd7d8c5e3fec9edce1df",
+        "algorithm.py": "4fd9d3bf50c788cbc82daad9e15a15ecd9e91031966d293c7f8700a03875dba0",
+        "config.json": "bd9addb78739d047b66f872dff6ec4e77d6a1b0f99233192c37350b26eb06010",
+        "engine.py": "d2071dfcba8564c4cf262298747e5da41f1899f83005aeed5af7e2f40c7c6660",
+        "worker.py": "4a3759eac309971453df8a8e16d94730abfe9bfd680f6f1f7817093d495c2316"
+      },
+      "environment": {
+        "python": "3.12.14 (main, Aug 25 2026, 13:50:33) [Clang 22.1.3 ]",
+        "packages": {
+          "numpy": "2.3.5",
+          "pandas": "2.2.3",
+          "scipy": "1.18.1",
+          "scikit-learn": "1.9.1",
+          "openpyxl": "3.1.5"
+        }
+      },
+      "metrics": {
+        "models": {
+          "majority_reference": {
+            "precision": 0.5087719298245614,
+            "recall": 1.0,
+            "f1": 0.6744186046511628,
+            "macro_f1": 0.3372093023255814,
+            "accuracy": 0.5087719298245614,
+            "confusion": {
+              "tn": 0,
+              "fp": 84,
+              "fn": 0,
+              "tp": 87
+            },
+            "threshold": 0.5,
+            "features": [
+              "training_majority_class"
+            ]
+          },
+          "cosine_reference": {
+            "precision": 1.0,
+            "recall": 0.12643678160919541,
+            "f1": 0.22448979591836735,
+            "macro_f1": 0.4565071930411509,
+            "accuracy": 0.5555555555555556,
+            "confusion": {
+              "tn": 84,
+              "fp": 0,
+              "fn": 76,
+              "tp": 11
+            },
+            "threshold": 0.5,
+            "features": [
+              "tfidf_cosine"
+            ]
+          },
+          "text_baseline": {
+            "precision": 0.5333333333333333,
+            "recall": 0.8275862068965517,
+            "f1": 0.6486486486486487,
+            "macro_f1": 0.49932432432432433,
+            "accuracy": 0.543859649122807,
+            "confusion": {
+              "tn": 21,
+              "fp": 63,
+              "fn": 15,
+              "tp": 72
+            },
+            "threshold": 0.5,
+            "features": [
+              "tfidf_cosine"
+            ]
+          }
+        },
+        "warnings": [
+          "Role experiment skipped: annotate roles in both splits and declare manual or predicted source."
+        ],
+        "role_coverage": {
+          "train_complete_pairs": 0,
+          "test_complete_pairs": 0
+        },
+        "method": "TF-IDF word 1-2grams → cosine → Logistic Regression; ablation adds 7 role-compatibility features.",
+        "test_pairs": 171,
+        "elapsed_seconds": 0.092
+      }
+    },
+    {
+      "run_id": "20261026T073647Z_ee3914",
+      "source": "small_B",
+      "counts": {
+        "test": 253,
+        "train": 171
+      },
+      "config": {
+        "seed": 374,
+        "role_source": "none",
+        "note": "Initial real-data pilot B; fixed settings"
+      },
+      "input_code_sha256": {
+        "dataset.csv": "9d50d6888876c3cb7fe67ddddee6449fc26d7a0710b783cc13c6bc65e84f48c5",
+        "algorithm.py": "e84d5d316293d0df1bc80df5309f17881ea39b2dc0c02b4efa1a0abaf0a810d2",
+        "config.json": "3ea6939666af2c4c15529f64fae08483be6ca6a87f75a7165ecdad5115a8f655",
+        "engine.py": "886cb74f58ed4a95c9353965ed152bbcce5960179dfcd4bc073c357815a4e3a2",
+        "worker.py": "4a3759eac309971453df8a8e16d94730abfe9bfd680f6f1f7817093d495c2316"
+      },
+      "environment": {
+        "python": "3.12.14 (main, Aug 25 2026, 13:50:33) [Clang 22.1.3 ]",
+        "packages": {
+          "numpy": "2.3.5",
+          "pandas": "2.2.3",
+          "scipy": "1.18.1",
+          "scikit-learn": "1.9.1",
+          "openpyxl": "3.1.5"
+        }
+      },
+      "metrics": {
+        "models": {
+          "cosine_reference": {
+            "precision": 0.8333333333333334,
+            "recall": 0.03759398496240601,
+            "f1": 0.07194244604316546,
+            "macro_f1": 0.36022190422049283,
+            "accuracy": 0.4901185770750988,
+            "confusion": {
+              "tn": 119,
+              "fp": 1,
+              "fn": 128,
+              "tp": 5
+            },
+            "threshold": 0.5,
+            "features": [
+              "tfidf_cosine"
+            ]
+          },
+          "text_baseline": {
+            "precision": 0.5621301775147929,
+            "recall": 0.7142857142857143,
+            "f1": 0.6291390728476821,
+            "macro_f1": 0.5400597325022725,
+            "accuracy": 0.5573122529644269,
+            "confusion": {
+              "tn": 46,
+              "fp": 74,
+              "fn": 38,
+              "tp": 95
+            },
+            "threshold": 0.5,
+            "features": [
+              "tfidf_cosine"
+            ]
+          }
+        },
+        "warnings": [
+          "Role experiment skipped: annotate roles in both splits and declare manual or predicted source."
+        ],
+        "role_coverage": {
+          "train_complete_pairs": 0,
+          "test_complete_pairs": 0
+        },
+        "method": "TF-IDF word 1-2grams → cosine → Logistic Regression; ablation adds 7 role-compatibility features.",
+        "test_pairs": 253,
+        "elapsed_seconds": 0.094
+      }
+    }
+  ]
+}
