@@ -1,0 +1,6 @@
+* text=auto eol=lf
+# Preserve prepared data bytes and original upstream notices.
+*.csv -text -whitespace
+data/pilot/licenses/** -text -whitespace
+*.xlsx binary
+*.png binary
