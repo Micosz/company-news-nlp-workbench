@@ -19,6 +19,10 @@ jobs:
       - name: Python syntax
         run: python -m compileall -q server.py engine.py worker.py run_experiment.py algorithms scripts
       - name: JavaScript syntax
-        run: node --check static/app.js
+        run: |
+          node --check static/app.js
+          node --check static/charts.js
+      - name: Chart reporting integrity
+        run: node --test test_charts.cjs
       - name: Integrity tests
         run: python -m unittest test_workbench -v

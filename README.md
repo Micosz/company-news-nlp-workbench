@@ -53,6 +53,7 @@ py -3.12 -m venv .venv
 - แก้ Python ในเว็บ นำเข้าไฟล์ `.py` หรือดาวน์โหลดโค้ดออกไป
 - รัน Majority reference, Cosine reference, Text baseline และ Text + roles เมื่อมีข้อมูลบทบาท
 - ดู Precision, Recall, F1, Macro F1 และ TP/FP/FN/TN พร้อมคู่ที่ทำนายผิด
+- ดูกราฟแท่งเปรียบเทียบคะแนนและ confusion matrix พร้อมตัวเลขจากผลรันจริง เลือกคะแนน/โมเดลและดาวน์โหลด SVG ไปใช้ในรายงานได้
 - เก็บข้อมูล โค้ด การตั้งค่า seed พารามิเตอร์ที่เรียนรู้ เวอร์ชัน dependencies และผลทำนายแยกต่อรอบ
 - ดาวน์โหลดหลักฐานของแต่ละรอบเป็น ZIP
 
@@ -109,11 +110,12 @@ Excel เริ่มต้นอยู่ที่ [data/pilot_fold_A_roles_bla
 .venv/bin/python run_experiment.py --dataset small_A
 .venv/bin/python run_experiment.py --dataset small_B
 .venv/bin/python -m unittest test_workbench -v
+node --test test_charts.cjs
 ```
 
 ใช้ Python executable แบบ Windows ตามหัวข้อติดตั้งได้เช่นกัน ผลแต่ละรอบอยู่ใน `runs/<run_id>/` รวม `manifest.json`, `algorithm.py`, `dataset.csv`, `metrics.json`, `predictions.csv`, `errors.csv` และ `report.md`
 
-GitHub Actions จะตรวจ Python syntax, JavaScript syntax และ unit tests บน Ubuntu/Python 3.12 เมื่อ push หรือเปิด PR โดยไม่ทำการทดลอง full หรือส่งข้อมูลไปบริการโมเดลภายนอก
+GitHub Actions จะตรวจ Python syntax, JavaScript syntax, unit tests และความถูกต้องของกราฟเทียบกับผลที่บันทึกไว้ บน Ubuntu/Python 3.12 เมื่อ push หรือเปิด PR โดยไม่ทำการทดลอง full หรือส่งข้อมูลไปบริการโมเดลภายนอก ใช้ Node.js 18 ขึ้นไปเพื่อรันการทดสอบกราฟ ส่วนการเปิดเว็บยังใช้ Python ตามเดิม
 
 ## โครงสร้างหลัก
 
