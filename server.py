@@ -68,7 +68,7 @@ class Handler(BaseHTTPRequestHandler):
         path=urlparse(self.path).path; query=parse_qs(urlparse(self.path).query)
         try:
             if path=='/': return self.send((ROOT/'static/index.html').read_text().replace('__TOKEN__',TOKEN),ctype='text/html; charset=utf-8')
-            if path in ('/app.js','/style.css'):
+            if path in ('/app.js','/charts.js','/style.css'):
                 return self.send((ROOT/'static'/path[1:]).read_bytes(),ctype='text/javascript' if path.endswith('js') else 'text/css')
             if path=='/api/init':
                 return self.send({'code':(ROOT/'algorithms/pair_experiment.py').read_text(),
