@@ -1,0 +1,70 @@
+{
+  "prepared_on": "2026-10-26",
+  "seed": 374,
+  "full": {
+    "ecbplus_documents": 982,
+    "ecbplus_selected_event_mentions": 6821,
+    "ecbplus_topics": 43,
+    "ecbplus_pairs": 104840,
+    "pair_labels": {
+      "0": 78630,
+      "1": 26210
+    },
+    "pairs_by_split": {
+      "train": 70280,
+      "test": 18588,
+      "dev": 15972
+    },
+    "tkgqa_records": 5721,
+    "tkgqa_unique_articles": 5390,
+    "tkgqa_pending_review_pairs": 637
+  },
+  "small": {
+    "documents": 42,
+    "primary_event_mentions": 42,
+    "focal_event_mentions": 111,
+    "focal_event_clusters": 4,
+    "pairs": 424,
+    "pair_labels": {
+      "0": 204,
+      "1": 220
+    },
+    "groups": {
+      "43ecbplus": 15,
+      "43ecb": 8,
+      "44ecbplus": 12,
+      "44ecb": 7
+    },
+    "purpose": "pipeline_pilot;not_sufficient_for_conclusive_finance_improvement"
+  },
+  "sources": {
+    "ecbplus": {
+      "url": "https://github.com/cltl/ecbPlus",
+      "download": "https://raw.githubusercontent.com/cltl/ecbPlus/master/ECB%2B_LREC2014/ECB%2B.zip",
+      "citation": "Cybulska and Vossen (2014), Using a sledgehammer to crack a nut? Lexical diversity and event coreference resolution.",
+      "annotation_license": "CC BY 3.0; original news copyright is separate"
+    },
+    "tkgqa": {
+      "url": "https://osf.io/xqwa4/",
+      "paper": "https://doi.org/10.3390/data8030061",
+      "csv_download": "https://osf.io/download/y65b9/",
+      "url_mapping_download": "https://osf.io/download/swrn9/",
+      "citation": "Ong, Sun, Serban and Guo (2023), TKGQA Dataset: Using Question Answering to Guide and Validate the Evolution of Temporal Knowledge Graph.",
+      "dataset_license_as_stated_by_authors": "CC BY 4.0"
+    }
+  },
+  "source_sha256": {
+    "ecbplus/ECB+.zip": "fe6ac2d76d8f7015f773ccc969927d7f3c33b331ed643b71efe31f28373eca90",
+    "tkgqa/new_sentence_df_0509.csv": "2ab8adb301a33f55b471511a45c7dab6ac1ce00051be3a48b07b93449a7f0e27",
+    "tkgqa/sentence_df_articleId_to_url.csv": "d50ded9961e9e0cb2269982533a0546a69ef22bea981f798c03e8e0414c1a3f2"
+  },
+  "not_downloaded": "Large TKGQA temporal-graph pickle files are unnecessary for this task; no pickle is loaded.",
+  "label_boundaries": [
+    "ECB+ coreference labels come from original event IDs, not buyer/target agreement.",
+    "TKGQA source roles/stages include model predictions and are not independent coreference gold.",
+    "No buyer-target labels were invented; roles_to_annotate.csv intentionally contains blanks.",
+    "Full ECB+ is mixed-domain; the finance subset still has only four focal deal groups.",
+    "Small pairs are within the same buyer/topic; cross-topic easy negatives are omitted.",
+    "All train/dev/test assignments in full are custom topic-grouped splits, not published benchmark splits."
+  ]
+}
