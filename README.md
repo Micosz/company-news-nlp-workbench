@@ -24,7 +24,7 @@ git clone https://github.com/Micosz/company-news-nlp-workbench.git
 cd company-news-nlp-workbench
 ```
 
-Repo เป็น private จึงต้องเข้าถึงด้วยบัญชี GitHub ที่ได้รับสิทธิ์ก่อน หากใช้ HTTPS ให้ใช้ credential manager หรือ token ตามการตั้งค่า Git ของตัวเอง ไม่ใส่ token ลงไฟล์ของโครงการ
+Repo เป็น public จึงอ่านและ clone ไปทดลองได้ทันที หากต้องการ push เข้า repo โดยตรง เจ้าของ repo ต้องเพิ่มสิทธิ์ collaborator ก่อน และไม่ใส่ token ลงไฟล์ของโครงการ
 
 ### macOS / Linux
 
