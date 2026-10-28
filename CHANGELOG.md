@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-28 — Exploratory temporal and cross-domain datasets
+
+- Add reproducible ECB+ / Event StoryLine annotation join and separate CDEC-WN positive-only inspection, source hashes, counts, and label limitations.
+- Add optional oracle/predicted event-date inputs and time-only / text-plus-time Naive Bayes ablations; date mismatch is never a hard rule for event identity.
+- Document source access, the actual preliminary run, test-split limitations, and the uncombined sources.
+
 ## 2026-10-28 — Provisional AI-assisted role data
 
 - Add pilot buyer/target metadata from same-source full articles, with source offsets and provenance; the 42 annotations need human review.

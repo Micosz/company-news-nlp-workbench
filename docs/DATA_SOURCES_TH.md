@@ -1,5 +1,7 @@
 # ที่มาข้อมูลและการเตรียมชุดเต็ม
 
+ดูผลตรวจแหล่งเพิ่มเติม Event StoryLine, CDEC-WN และชุดทดลองเวลา ECB+ ที่เชื่อม annotation จริงได้ใน [TEMPORAL_DATA_TH.md](TEMPORAL_DATA_TH.md)
+
 ## Pilot ที่อยู่ใน Git
 
 `data/pilot/` มี pairs, selected event mentions และ assignments สำหรับ Pilot A/B พร้อม notices ของ ECB+ ต้นฉบับ `data/pilot_fold_A_roles_blank.xlsx` คือคู่ข้อความพร้อมช่อง roles ว่าง ไม่ใช่ชุด annotation ของผู้ซื้อ/เป้าหมายที่ทำเสร็จแล้ว
