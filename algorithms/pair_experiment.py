@@ -175,6 +175,14 @@ def run(train, test, config):
         warnings.append('Joint role/time coverage may be sparse or correlated with topic/labels; results are exploratory and do not evaluate extraction.')
     elif config.get('joint_enabled', True):
         warnings.append('Joint role/time experiment skipped: need declared sources and at least one pair with complete roles and dates in both train and test.')
+    mode = config.get('experiment_mode', 'all')
+    selected = {'text': [], 'roles': ['text_plus_roles'], 'time': ['text_plus_time', 'text_plus_availability', 'time_only'], 'joint': ['text_plus_roles_time', 'text_plus_roles_availability']}
+    if mode in selected:
+        required = {'roles': 'text_plus_roles', 'time': 'text_plus_time', 'joint': 'text_plus_roles_time'}.get(mode)
+        if required and required not in models:
+            raise ValueError('Selected experiment requires complete feature data and declared sources in train/test.')
+        keep = {'majority_reference', 'cosine_reference', 'text_baseline', *selected[mode]}
+        models = {k: v for k, v in models.items() if k in keep}
     return {'models': models, 'warnings': warnings, 'role_coverage': coverage,
             'time_coverage': time_coverage, 'joint_coverage': joint_coverage,
             'vectorizer': {'vocabulary': {k:int(v) for k,v in vectorizer.vocabulary_.items()},

@@ -13,7 +13,7 @@ $('#load').onclick=async()=>{try{$('#load').disabled=true;const mode=$('#builtin
 $('#file').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{if(f.size>50*1024*1024)throw Error('ไฟล์ใหญ่เกิน 50 MB');dataStatus('กำลังอ่านไฟล์…');const data=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result.split(',')[1]);r.onerror=reject;r.readAsDataURL(f);});showData(await api('/api/upload',{name:f.name,data}));}catch(e){clearData('นำเข้าข้อมูลไม่สำเร็จ กรุณาเลือกไฟล์อีกครั้ง');dataStatus(e.message,true);}};
 $('#load-annotation').onclick=async()=>{const f=$('#annotation-file').files[0];if(!f){dataStatus('กรุณาเลือกแบบฟอร์มบทบาท',true);return;}try{if(f.size>50*1024*1024)throw Error('ไฟล์ใหญ่เกิน 50 MB');$('#load-annotation').disabled=true;dataStatus('กำลังตรวจหลักฐานและเตรียมคู่ข้อความ…');const data=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result.split(',')[1]);r.onerror=reject;r.readAsDataURL(f);});const prepared=await api('/api/annotations',{name:f.name,data,fold:$('#annotation-fold').value});showData(prepared);$('#roles').value='none';const warnings=prepared.annotation_warnings||[];dataStatus(warnings.length?`เตือน ${warnings.length} รายการ: ชื่อบริษัทไม่ปรากฏในข้อความหลักฐาน โปรดตรวจชื่อย่อหรือ alias: `+warnings.map(w=>`${w.mention_id} (${w.role}: ${w.name})`).join('; '):'โหลดบทบาทแล้ว โปรดเลือกที่มาของบทบาทตามจริงก่อนรัน และตรวจ coverage ค่ะ',warnings.length>0);}catch(e){clearData('โหลดบทบาทไม่สำเร็จ กรุณาตรวจไฟล์และลองอีกครั้ง');dataStatus(e.message,true);}finally{$('#load-annotation').disabled=false;}};
 const originalFlow=$('.flow').innerHTML;
-$('#reset').onclick=()=>{$('#code').value=defaults;$('.flow').innerHTML=originalFlow;};
+$('#reset').onclick=selectExperiment;
 $('#import-code').onclick=()=>$('#code-file').click();$('#code-file').onchange=async e=>{if(e.target.files[0])$('#code').value=await e.target.files[0].text();};
 $('#save-code').onclick=()=>{const url=URL.createObjectURL(new Blob([$('#code').value],{type:'text/x-python'}));const a=document.createElement('a');a.href=url;a.download='pair_experiment.py';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
 $('#code').addEventListener('keydown',e=>{if(e.key==='Tab'){e.preventDefault();const t=e.target,s=t.selectionStart;t.setRangeText('    ',s,t.selectionEnd,'end');}});
@@ -129,7 +129,7 @@ function results(data){
 }
 
 async function watch(id){try{const data=await api('/api/status?id='+id);if(data.manifest.status==='running'){status('กำลังประมวลผล… บันทึก '+id);setTimeout(()=>watch(id),1200);return;}running=false;$('#run').disabled=!dataset;status(data.manifest.status==='completed'?'บันทึกผลการทดลองแล้ว':'รันไม่สำเร็จ — เก็บโค้ดและ error log แล้ว',data.manifest.status!=='completed');results(data);await history();showView('results');}catch(e){running=false;$('#run').disabled=!dataset;status('อ่านสถานะไม่ได้: '+e.message+' ลองดูในสมุดบันทึกอีกครั้ง',true);}}
-$('#run').onclick=async()=>{try{const mapping={};document.querySelectorAll('[data-field]').forEach(s=>mapping[s.dataset.field]=s.value);if(fields.some(k=>!mapping[k]))throw Error('เลือกคอลัมน์ที่มี * ให้ครบก่อนค่ะ');if((dataset?.source?.endsWith('_ai')||dataset?.source?.endsWith('_joint'))&&$('#roles').value==='manual')throw Error('ชุดบทบาท AI ยังไม่ได้ผ่านการตรวจโดยคน โปรดเลือกโมเดลทำนาย');running=true;$('#run').disabled=true;status('กำลังตรวจข้อมูลและเตรียมการทดลอง…');const r=await api('/api/run',{dataset_id:dataset.dataset_id,mapping,code:$('#code').value,config:{seed:Number($('#seed').value),role_source:$('#roles').value,time_source:$('#time-source').value,threshold_mode:$('#threshold-mode').value,joint_enabled:$('#joint-enabled').checked,note:$('#note').value}});watch(r.run_id);}catch(e){running=false;$('#run').disabled=!dataset;status(e.message,true);}};
+$('#run').onclick=async()=>{try{const mapping={};document.querySelectorAll('[data-field]').forEach(s=>mapping[s.dataset.field]=s.value);if(fields.some(k=>!mapping[k]))throw Error('เลือกคอลัมน์ที่มี * ให้ครบก่อนค่ะ');if((dataset?.source?.endsWith('_ai')||dataset?.source?.endsWith('_joint'))&&$('#roles').value==='manual')throw Error('ชุดบทบาท AI ยังไม่ได้ผ่านการตรวจโดยคน โปรดเลือกโมเดลทำนาย');running=true;$('#run').disabled=true;status('กำลังตรวจข้อมูลและเตรียมการทดลอง…');const r=await api('/api/run',{dataset_id:dataset.dataset_id,mapping,code:$('#code').value,config:{seed:Number($('#seed').value),experiment_mode:$('#experiment-mode').value,role_source:['graph','text','time'].includes($('#experiment-mode').value)?'none':$('#roles').value,time_source:['graph','text','roles'].includes($('#experiment-mode').value)?'none':$('#time-source').value,threshold_mode:$('#threshold-mode').value,joint_enabled:$('#joint-enabled').checked,note:$('#note').value}});watch(r.run_id);}catch(e){running=false;$('#run').disabled=!dataset;status(e.message,true);}};
 async function deleteHistory(mode, id){
   const message=mode==='all'?'ลบประวัติการทดลองทั้งหมด รวมรายการเก่าที่ไม่แสดงหรือไม่?\nไฟล์ผลลัพธ์ ข้อมูล และโค้ดที่บันทึกในแต่ละรอบจะถูกลบและกู้คืนจากเว็บไม่ได้':`ลบการทดลอง ${id} หรือไม่?\nไฟล์ผลลัพธ์ ข้อมูล และโค้ดที่บันทึกในรอบนี้จะถูกลบและกู้คืนจากเว็บไม่ได้`;
   if(!window.confirm(message))return;
@@ -199,7 +199,26 @@ $('#example-stage').onclick=()=>fillClaimExample('stage');
 $('#example-dividend').onclick=()=>fillClaimExample('dividend');
 $('#example-conflict').onclick=()=>fillClaimExample('conflict');
 
-$('#load-nli').onclick=async()=>{try{const d=await api('/api/nli-code');$('#code').value=d.code;$('#threshold-mode').value='fixed';$('#roles').value='none';$('#time-source').value='none';$('.flow').textContent='Frozen NLI + TF-IDF nodes → No-message model / GNN → Held-out test';status('NLI + GNN: Pilot A/B only. First run downloads the model.');}catch(e){status(e.message,true);}};
+let modeVersion=0;
+async function selectExperiment(){
+ const mode=$('#experiment-mode').value, version=++modeVersion;
+ $('#run').disabled=true;
+ try{
+ const code=mode==='graph'?(await api('/api/nli-code')).code:defaults;
+ if(version!==modeVersion)return;
+ $('#code').value=code;
+ const graph=mode==='graph';
+ $('#threshold-mode').disabled=graph;if(graph)$('#threshold-mode').value='fixed';
+ $('#roles').closest('label').hidden=graph||mode==='text'||mode==='time';
+ $('#time-source').closest('label').hidden=graph||mode==='text'||mode==='roles';
+ $('.flow').innerHTML=originalFlow;
+ if(graph)$('.flow').textContent='NLI + TF-IDF → No-message / GNN → Held-out test';
+ $('#experiment-help').textContent=graph?'Pilot A/B · เปรียบเทียบ NLI ที่ไม่ส่งข้อมูลผ่านกราฟกับ NLI + GNN':'เปรียบเทียบกับ Text baseline · ต้องมีข้อมูลและระบุที่มาของฟีเจอร์ที่เลือก';
+ $('#run').disabled=!dataset||running;
+ }catch(e){status(e.message,true);}
+}
+$('#experiment-mode').onchange=selectExperiment;
+
 async function renderEventGraph(runId){
  let data;try{data=await api('/api/graph?id='+encodeURIComponent(runId));}catch{return;}
  if(displayedRun!==runId)return;

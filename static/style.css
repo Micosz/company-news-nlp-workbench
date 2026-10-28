@@ -42,3 +42,5 @@ body{font-family:"Noto Sans Thai",-apple-system,BlinkMacSystemFont,"Thonburi",sa
 .run-bar{justify-content:flex-end}
 
 .event-network canvas{display:block;width:100%;height:auto;background:#fff;touch-action:none;border:1px solid #efedf3;border-radius:8px}.network-controls{display:flex;gap:20px;align-items:center;flex-wrap:wrap;margin:16px 0}.network-controls label{min-width:160px}.network-summary{font-size:12px!important}.network-detail{padding:16px;background:#f6f5fa;margin-top:12px;min-height:70px;overflow-wrap:anywhere}
+
+.experiment-choice{margin-top:20px;border-left:4px solid #8b7dec}.experiment-choice>label{font-size:16px;font-weight:600}.experiment-choice select{margin:10px 0;font-size:16px}.experiment-choice p{margin:0}.settings label[hidden]{display:none}
