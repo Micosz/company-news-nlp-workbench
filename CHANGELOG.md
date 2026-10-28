@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-28 — Manual claim comparison refinements
+
+- Support comma-grouped amounts and an adjustable relative tolerance, defaulting to an illustrative 0.5% of the larger amount; different reporting dates alone do not establish an update.
+- Compare chronological acquisition status changes without requiring amounts, including same-day times, and add dividend, reporting certainty and fictional worked examples.
+- Require explicit confirmation before comparing a numeric fact and its effective period; different currencies are not converted. This remains a manual rule-based demonstration, not automatic extraction, NLI or fact verification.
+
 ## 2026-10-28 — Categorical Naive Bayes and Pilot evaluation
 
 - Replace the default Logistic Regression pair experiment with Categorical Naive Bayes using train-only cosine bins and unknown-aware role categories. Historical runs retain their recorded method.
