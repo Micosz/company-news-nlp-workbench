@@ -235,3 +235,7 @@ scripts/prepare_datasets.py     สร้าง dataset จากไฟล์ต
 - [เงื่อนไขข้อมูลภายนอก](THIRD_PARTY_NOTICES.md)
 
 Repo นี้ใช้ร่วมกันในทีมและยังไม่ได้กำหนด open-source license สำหรับโค้ดโครงการ ส่วน annotation และข้อความข่าวมีสิทธิ์ของเจ้าของแหล่งข้อมูลแยกกันตามเอกสารต้นฉบับ
+
+## NLI + GNN pilot
+
+Optional graph experiment: install `requirements-graph.txt`, restart, load Pilot A/B and select **NLI + GNN (Pilot)** in Experiment. Results include a draggable graph. See [method and limitations](docs/NLI_GRAPH.md). This is an exploratory implementation, not CohTP.

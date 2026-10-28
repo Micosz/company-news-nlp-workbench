@@ -113,6 +113,11 @@ class Handler(BaseHTTPRequestHandler):
                 return self.send((ROOT/'static'/path[1:]).read_bytes(),ctype='text/javascript' if path.endswith('js') else 'text/css')
             if path in tuple(f'/noto-sans-thai-{weight}.ttf' for weight in (400,500,600,700)):
                 return self.send((ROOT/'static'/path[1:]).read_bytes(),ctype='font/ttf')
+            if path=='/api/nli-code': return self.send({'code':(ROOT/'algorithms/nli_graph.py').read_text()})
+            if path=='/api/graph':
+                run_id=query.get('id',[''])[0]
+                if not RUN_ID.fullmatch(run_id): raise ValueError('Invalid run ID')
+                return self.send(json.loads((ROOT/'runs'/run_id/'graph.json').read_text()))
             if path=='/api/init':
                 return self.send({'code':(ROOT/'algorithms/pair_experiment.py').read_text(),
                                   'required':REQUIRED,'optional':ROLES+TIMES,'root':str(ROOT)})

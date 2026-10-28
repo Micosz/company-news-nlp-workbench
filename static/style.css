@@ -38,3 +38,7 @@ body{font-family:"Noto Sans Thai",-apple-system,BlinkMacSystemFont,"Thonburi",sa
 @media(max-width:600px){.benchmark-scroll svg{min-width:0}.benchmark-tools{margin-bottom:12px}}
 
 .joint-option{grid-column:1 / -1;display:flex;align-items:center;gap:9px;font-size:14px}.joint-option input{width:auto;margin:0}
+
+.run-bar{justify-content:flex-end}
+
+.event-network canvas{display:block;width:100%;height:auto;background:#fff;touch-action:none;border:1px solid #efedf3;border-radius:8px}.network-controls{display:flex;gap:20px;align-items:center;flex-wrap:wrap;margin:16px 0}.network-controls label{min-width:160px}.network-summary{font-size:12px!important}.network-detail{padding:16px;background:#f6f5fa;margin-top:12px;min-height:70px;overflow-wrap:anywhere}
