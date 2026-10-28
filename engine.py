@@ -1,5 +1,5 @@
 """Validation, dataset loading and research record persistence."""
-import csv, hashlib, html, io, json, os, platform, re, sys, uuid, unicodedata
+import csv, hashlib, html, io, json, os, platform, random, re, sys, uuid, unicodedata
 from datetime import date, datetime, timezone
 from pathlib import Path
 import pandas as pd
@@ -86,6 +86,11 @@ def summary(frame):
     if set(TIMES).issubset(frame.columns):
         a, b = (frame[c].fillna('').astype(str).str.strip().ne('') for c in TIMES)
         result['time_coverage'] = {'both':int((a & b).sum()), 'one':int((a ^ b).sum()), 'neither':int((~a & ~b).sum())}
+        if 'split' in frame:
+            test = frame['split'].astype(str).str.lower().eq('test')
+            complete = test & a & b
+            same = frame[TIMES[0]].astype(str).eq(frame[TIMES[1]].astype(str))
+            result['test_date_relation'] = {'same':int((complete & same).sum()), 'different':int((complete & ~same).sum())}
     return result
 
 
@@ -128,13 +133,36 @@ def load_provisional_roles(path=None):
 
 
 def builtin(mode):
-    if mode not in ('small_A','small_B','small_A_ai','small_B_ai','full','story_time','story_mixed'): raise ValueError('unknown dataset')
-    if mode in ('story_time', 'story_mixed'):
+    if mode not in ('small_A','small_B','small_A_ai','small_B_ai','full','story_time','story_resplit','story_mixed'): raise ValueError('unknown dataset')
+    if mode in ('story_time', 'story_resplit', 'story_mixed'):
         filename = 'ecb_story_mixed_pairs.csv' if mode == 'story_mixed' else 'ecb_story_pairs.csv'
         path = ROOT / 'local_data' / 'ecb_story_time' / filename
         if not path.is_file():
             raise ValueError('ยังไม่ได้เตรียมชุดเวลา: เปิด Terminal ในโฟลเดอร์โปรเจกต์ แล้วรัน .venv/bin/python scripts/setup_temporal_dataset.py (Windows: .venv\\Scripts\\python.exe scripts/setup_temporal_dataset.py) ดู README')
-        return pd.read_csv(path, dtype=str, keep_default_na=False).fillna('')
+        frame = pd.read_csv(path, dtype=str, keep_default_na=False).fillna('')
+        if mode == 'story_resplit':
+            # Fixed before examining its outcomes. Existing data were already explored:
+            # this is an exploratory repartition, not a pristine held-out test.
+            groups=sorted(frame.group_id.unique(),key=lambda x:(int(x) if x.isdigit() else x))
+            random.Random(20261028).shuffle(groups)
+            if len(groups)!=21: raise ValueError('จำนวนหัวข้อไม่ตรงกับชุด StoryLine ที่ระบุ')
+            assignment={g:('train' if i<14 else 'dev' if i<17 else 'test') for i,g in enumerate(groups)}
+            frame['split']=frame.group_id.map(assignment)
+            # Remove contexts repeated across splits rather than leak them.
+            seen={}
+            for side in ('a','b'):
+                for text,split in zip(frame['text_'+side],frame.split):
+                    norm=re.sub(r'\s+',' ',unicodedata.normalize('NFC',html.unescape(str(text)))).strip().casefold()
+                    seen.setdefault(norm,set()).add(split)
+            contaminated={text for text,splits in seen.items() if len(splits)>1}
+            if contaminated:
+                keep=pd.Series(True,index=frame.index)
+                for side in ('a','b'):
+                    norm=frame['text_'+side].map(lambda t:re.sub(r'\s+',' ',unicodedata.normalize('NFC',html.unescape(str(t)))).strip().casefold())
+                    keep &= ~norm.isin(contaminated)
+                frame=frame[keep].copy()
+            validate(frame)
+        return frame
     ai_roles = mode.endswith('_ai')
     pilot_mode = mode.removesuffix('_ai')
     # Portable pilot is bundled; full package remains alongside the app.
@@ -166,6 +194,24 @@ def prepare_run(frame, code, config, source):
     if source in ('small_A_ai', 'small_B_ai') and config.get('role_source') == 'manual':
         raise ValueError('ชุดบทบาท AI ยังไม่ได้ผ่านการตรวจโดยคน โปรดเลือกโมเดลทำนาย')
     frame = validate(frame)
+    threshold_mode = config.get('threshold_mode', 'fixed')
+    if threshold_mode not in ('fixed', 'dev_f1'): raise ValueError('Invalid threshold mode')
+    if threshold_mode == 'dev_f1':
+        dev = frame[frame.split.eq('dev')]
+        if dev.empty or set(dev.label) != {0, 1}:
+            raise ValueError('ปรับ threshold ด้วย dev ต้องมีข้อมูล dev พร้อม label ทั้ง 0 และ 1')
+    unknown = {'', 'unknown', 'unk', 'n/a', 'na', 'none', 'null', 'nan', 'ไม่ทราบ', 'ไม่ระบุ', '-'}
+    def present(column):
+        return ~frame[column].str.strip().str.casefold().isin(unknown)
+    for setting, columns, label in (
+        ('role_source', ROLES, 'บทบาทผู้ซื้อ–เป้าหมาย'),
+        ('time_source', TIMES, 'วันเหตุการณ์'),
+    ):
+        if config.get(setting, 'none') != 'none':
+            complete = pd.concat([present(c) for c in columns], axis=1).all(axis=1)
+            for split in ('train', 'test'):
+                if not (complete & frame.split.eq(split)).any():
+                    raise ValueError(f'เลือกที่มาของ{label} แต่ไม่มีคู่ที่ข้อมูลครบใน {split} กรุณาเติมข้อมูลหรือเลือกไม่ใช้ข้อมูลนี้')
     stamp = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')+'_'+uuid.uuid4().hex[:6]
     folder = ROOT/'runs'/stamp
     folder.mkdir(parents=True)
@@ -183,7 +229,7 @@ def prepare_run(frame, code, config, source):
         'status':'running', 'evaluation':'Pairwise binary classification on supplied/gold event contexts, not clustering CoNLL or end-to-end extraction.',
         'limitations':['Pilot has only 4 deals / 2 topics; no conclusive generalization claim.',
                       'Small pilot overlaps full package test topics; do not tune on pilot then claim full test is untouched.',
-                      'Dev rows are archived but default fixed-parameter algorithm does not use them.',
+                      'Threshold selection is fixed at 0.5 or chosen from dev only, as recorded in config; dev is not used for training.',
                       'Custom code has local filesystem access; frozen test labels are withheld by API contract only.']}
     if source in ('small_A_ai', 'small_B_ai'):
         manifest['limitations'].extend([

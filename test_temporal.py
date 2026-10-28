@@ -6,10 +6,26 @@ from unittest.mock import patch
 import pandas as pd
 
 from algorithms.pair_experiment import run, time_categories
-from engine import builtin, summary, validate
+from engine import builtin, summary, validate, prepare_run
+from worker import choose_dev_threshold
 
 
 class TemporalChecks(unittest.TestCase):
+    def test_unavailable_role_or_time_cannot_be_recorded_as_supplied(self):
+        frame = builtin('small_A')
+        for config in ({'role_source':'manual'}, {'role_source':'predicted'},
+                       {'role_source':'none','time_source':'oracle'},
+                       {'role_source':'none','time_source':'predicted'}):
+            with self.assertRaisesRegex(ValueError, 'ไม่มีคู่ที่ข้อมูลครบ'):
+                prepare_run(frame, '', config, 'small_A')
+
+    def test_dev_threshold_requires_both_classes_and_does_not_use_test(self):
+        frame = builtin('small_A')
+        with self.assertRaisesRegex(ValueError, 'ต้องมีข้อมูล dev'):
+            prepare_run(frame, '', {'role_source':'none','threshold_mode':'dev_f1'}, 'small_A')
+        threshold, score = choose_dev_threshold([0, 0, 1, 1], [0.1, 0.3, 0.4, 0.8])
+        self.assertEqual(threshold, 0.4)
+        self.assertEqual(score, 1.0)
     def test_coverage_distinguishes_complete_partial_and_missing(self):
         frame = pd.DataFrame([
             {'event_date_a':'2020-01-01','event_date_b':'2020-01-02'},

@@ -104,6 +104,17 @@ def evaluate_clusters(gold, pairs, predictions):
             'predicted_clusters': len(predicted_sets)}, predicted
 
 
+def choose_dev_threshold(labels, scores):
+    """Maximise positive F1 on dev only; deterministic tie closest to 0.5."""
+    from sklearn.metrics import precision_recall_curve
+    precision, recall, thresholds = precision_recall_curve(labels, scores)
+    denom=precision[:-1]+recall[:-1]
+    f1=np.divide(2*precision[:-1]*recall[:-1],denom,out=np.zeros_like(denom),where=denom!=0)
+    best=np.flatnonzero(np.isclose(f1,f1.max(),rtol=0,atol=1e-12))
+    index=best[np.argmin(np.abs(thresholds[best]-0.5))]
+    return float(thresholds[index]),float(f1[index])
+
+
 def main(folder):
     started=time.perf_counter()
     manifest=json.loads((folder/'manifest.json').read_text())
@@ -115,8 +126,26 @@ def main(folder):
         spec=importlib.util.spec_from_file_location('user_algorithm',folder/'algorithm.py')
         module=importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
         inputs=['text_a','text_b','buyer_a','target_a','buyer_b','target_b','event_date_a','event_date_b']
-        output=module.run(train[inputs+['label']].copy(),test[inputs].copy(),config)
+        dev=data[data.split=='dev'].reset_index(drop=True)
+        tune=config.get('threshold_mode','fixed') == 'dev_f1'
+        eval_inputs=pd.concat([dev[inputs],test[inputs]],ignore_index=True) if tune else test[inputs].copy()
+        output=module.run(train[inputs+['label']].copy(),eval_inputs,config)
         models=output.pop('models')
+        if tune:
+            # Algorithm saw dev + test inputs; coverage must still describe test only.
+            unknown={'','unknown','unk','n/a','na','none','null','nan','ไม่ทราบ','ไม่ระบุ','-'}
+            for key, cols in (('role_coverage',['buyer_a','target_a','buyer_b','target_b']),
+                              ('time_coverage',['event_date_a','event_date_b'])):
+                if 'test_complete_pairs' in output.get(key, {}):
+                    known=pd.concat([~test[c].astype(str).str.strip().str.casefold().isin(unknown) for c in cols],axis=1).all(axis=1)
+                    output[key]['test_complete_pairs']=int(known.sum())
+            for name, model in models.items():
+                scores=np.asarray(model['scores'],dtype=float)
+                if scores.shape!=(len(dev)+len(test),) or not np.isfinite(scores).all() or ((scores<0)|(scores>1)).any():
+                    raise ValueError(f'{name}: invalid dev/test scores')
+                model['scores']=scores[len(dev):].tolist()
+                if name == 'majority_reference': continue
+                model['threshold'],model['dev_f1']=choose_dev_threshold(dev.label.to_numpy(),scores[:len(dev)])
         fitted=output.pop('vectorizer',{})
         dump(folder/'vectorizer.json',fitted)
         result={'models':{},'warnings':output.get('warnings',[]),'role_coverage':output.get('role_coverage',{}), 'time_coverage':output.get('time_coverage',{}),
@@ -158,6 +187,7 @@ def main(folder):
             result['models'][name]={'precision':float(p),'recall':float(r),'f1':float(f),'macro_f1':float(macro),
                 'accuracy':float(accuracy_score(test.label,pred)),'confusion':{'tn':tn,'fp':fp,'fn':fn,'tp':tp},
                 'threshold':threshold,'features':model.get('features',[])}
+            if 'dev_f1' in model: result['models'][name]['dev_f1']=model['dev_f1']
             if cluster_reference:
                 pair_ids = list(zip(test.mention_a.astype(str), test.mention_b.astype(str)))
                 cluster_scores, assignments = evaluate_clusters(cluster_reference['gold'], pair_ids, pred)

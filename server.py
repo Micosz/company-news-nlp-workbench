@@ -5,7 +5,7 @@ from pathlib import Path
 from urllib.parse import urlparse, parse_qs
 import pandas as pd
 from engine import ROOT, REQUIRED, ROLES, TIMES, builtin, read_table, summary, prepare_run, dump
-from scripts.annotate_roles import blank_annotation, apply_annotations
+from scripts.annotate_roles import blank_annotation, apply_annotations, annotation_warnings
 TOKEN=secrets.token_urlsafe(32)
 TABLES={}
 LOCK=threading.Lock()
@@ -171,8 +171,13 @@ class Handler(BaseHTTPRequestHandler):
                 if len(raw)>50*1024*1024: raise ValueError('ไฟล์ใหญ่เกิน 50 MB')
                 fold=payload.get('fold')
                 if fold not in ('A','B'): raise ValueError('เลือก Pilot A หรือ B')
-                annotated=apply_annotations(read_table(raw,payload['name']),'small_'+fold)
-                return self.send(table_store(annotated,'pilot_'+fold+'_roles:'+Path(payload['name']).name,raw))
+                sheet=read_table(raw,payload['name'])
+                warnings=annotation_warnings(sheet)
+                annotated=apply_annotations(sheet,'small_'+fold)
+                result=table_store(annotated,'pilot_'+fold+'_roles:'+Path(payload['name']).name,raw)
+                TABLES[result['dataset_id']]['annotation_warnings']=warnings
+                result['annotation_warnings']=warnings
+                return self.send(result)
             if path=='/api/run':
                 entry=TABLES.get(payload['dataset_id'])
                 if not entry: raise ValueError('กรุณาโหลดข้อมูลอีกครั้ง')
@@ -193,6 +198,10 @@ class Handler(BaseHTTPRequestHandler):
                 with LOCK:
                     if ACTIVE: raise ValueError('มีการทดลองกำลังรันอยู่ กรุณารอ')
                     folder=prepare_run(frame,payload['code'],config,entry['source'])
+                    if entry.get('annotation_warnings'):
+                        manifest=json.loads((folder/'manifest.json').read_text())
+                        manifest['annotation_warnings']=entry['annotation_warnings']
+                        dump(folder/'manifest.json',manifest)
                     if entry['original'] is not None:
                         (folder/'uploaded_source.bin').write_bytes(entry['original'])
                     ACTIVE=folder.name

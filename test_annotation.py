@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 
 from engine import builtin
-from scripts.annotate_roles import apply_annotations, blank_annotation, check_annotations, read_sheet, write_sheet
+from scripts.annotate_roles import apply_annotations, annotation_warnings, blank_annotation, check_annotations, read_sheet, write_sheet
 
 
 class AnnotationWorkflowTests(unittest.TestCase):
@@ -73,6 +73,13 @@ class AnnotationWorkflowTests(unittest.TestCase):
             check_annotations(bad)
         result = apply_annotations(self.frame, 'small_A')
         self.assertTrue((result[['buyer_a', 'target_a', 'buyer_b', 'target_b']] == '').all().all())
+
+    def test_company_mismatch_warns_but_does_not_block(self):
+        self.add_synthetic_annotation()
+        warnings = annotation_warnings(self.frame)
+        self.assertEqual({w['role'] for w in warnings}, {'buyer','target'})
+        result = apply_annotations(self.frame, 'small_A')
+        self.assertGreater(len(result), 0)
 
     def test_roundtrip_xlsx_csv_and_refuse_overwrite(self):
         self.add_synthetic_annotation()

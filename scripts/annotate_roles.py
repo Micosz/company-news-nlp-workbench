@@ -105,6 +105,19 @@ def apply_annotations(frame, mode):
     return pairs
 
 
+def annotation_warnings(frame):
+    """Warn on literal name/evidence mismatch; aliases need human review."""
+    checked = check_annotations(frame)
+    warnings = []
+    for row in checked.to_dict('records'):
+        for role in ROLE_FIELDS:
+            name, evidence = row[role], row[role + '_evidence']
+            if name and normalize(name).casefold() not in normalize(evidence).casefold():
+                warnings.append({'mention_id':row['mention_id'], 'role':role, 'name':name,
+                                 'evidence':evidence})
+    return warnings
+
+
 def write_sheet(frame, path):
     path = Path(path).expanduser()
     if path.suffix.lower() not in ('.csv', '.xlsx'):
@@ -150,10 +163,13 @@ def main(argv=None):
             print(f'สร้างแบบฟอร์ม {len(frame)} mentions: {args.output}')
         else:
             annotations = read_sheet(args.input)
+            warnings = annotation_warnings(annotations)
             frame = apply_annotations(annotations, 'small_' + args.fold)
             write_sheet(frame, args.output)
             known = (frame[['buyer_a', 'buyer_b', 'target_a', 'target_b']] != '').all(axis=1)
             print(f'สร้าง {len(frame)} คู่: {args.output}')
+            for warning in warnings:
+                print(f"เตือน: {warning['mention_id']} {warning['role']} ชื่อ {warning['name']} ไม่ปรากฏในหลักฐาน; ตรวจชื่อย่อหรือ alias")
             for split in ('train', 'test'):
                 mask = frame.split == split
                 print(f'{split}: บทบาทครบ {int((known & mask).sum())} จาก {int(mask.sum())} คู่')
