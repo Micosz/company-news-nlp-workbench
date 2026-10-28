@@ -36,3 +36,5 @@ body{font-family:"Noto Sans Thai",-apple-system,BlinkMacSystemFont,"Thonburi",sa
 @media(min-width:801px){main{padding-top:28px}.section-title{margin-bottom:12px}.results-toolbar{margin-bottom:20px}.result-detail>summary{padding-top:10px;padding-bottom:10px}}
 
 @media(max-width:600px){.benchmark-scroll svg{min-width:0}.benchmark-tools{margin-bottom:12px}}
+
+.joint-option{grid-column:1 / -1;display:flex;align-items:center;gap:9px;font-size:14px}.joint-option input{width:auto;margin:0}

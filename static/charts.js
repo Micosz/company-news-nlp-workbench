@@ -8,7 +8,9 @@
     text_plus_roles: 'Text + finance roles',
     time_only: 'Time only reference',
     text_plus_availability: 'Text + date availability',
-    text_plus_time: 'Text + event date'
+    text_plus_time: 'Text + event date',
+    text_plus_roles_availability: 'Text + roles + date availability',
+    text_plus_roles_time: 'Text + roles + event date'
   };
   const metrics = {f1: 'F1', precision: 'Precision', recall: 'Recall', macro_f1: 'Macro F1'};
   const colors = {majority_reference: '#798781', cosine_reference: '#a17a30', text_baseline: '#176b58', text_plus_roles: '#5265b3', time_only: '#a16454', text_plus_availability: '#2585a1', text_plus_time: '#73599c'};

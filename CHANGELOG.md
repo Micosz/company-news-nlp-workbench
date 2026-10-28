@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-28 — Joint role and event-date ablation
+
+- Add text + roles + event-date model and roles + date-availability control on a shared split, with explicit source and complete-joint-coverage checks.
+- Report held-out joint coverage; skip joint models where no complete train/test pair exists. No suitable real overlap is currently available in the bundled datasets.
+- Add synthetic software checks; no combined research results are claimed.
+
 ## 2026-10-28 — Benchmark overview interface
 
 - Replace the long scrolling sidebar layout with top navigation and focused views.

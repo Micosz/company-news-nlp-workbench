@@ -156,12 +156,29 @@ def run(train, test, config):
             warnings.append('Time coverage is partial; missingness may influence predictions. Compare Text + availability with Text + event date before attributing gains to dates.')
     else:
         warnings.append('Time experiment skipped: provide dates in both splits and declare oracle or predicted time source.')
+    joint_coverage = {
+        'train_complete_pairs': int(((r_train[:, 2] != 0) & (t_train[:, 0] != 0)).sum()),
+        'test_complete_pairs': int(((r_test[:, 2] != 0) & (t_test[:, 0] != 0)).sum()),
+    }
+    joint_enabled = (config.get('joint_enabled', True) and 'text_plus_roles' in models and 'text_plus_time' in models
+                     and all(joint_coverage.values()))
+    if joint_enabled:
+        models['text_plus_roles_availability'] = classify(
+            np.hstack([x_train, r_train, (t_train != 0).astype(np.int64)]),
+            np.hstack([x_test, r_test, (t_test != 0).astype(np.int64)]),
+            ['tfidf_cosine_bin'] + role_names + ['both_dates_available'])
+        models['text_plus_roles_time'] = classify(
+            np.hstack([x_train, r_train, t_train]), np.hstack([x_test, r_test, t_test]),
+            ['tfidf_cosine_bin'] + role_names + ['event_day_relation'])
+        warnings.append('Joint role/time coverage may be sparse or correlated with topic/labels; results are exploratory and do not evaluate extraction.')
+    elif config.get('joint_enabled', True):
+        warnings.append('Joint role/time experiment skipped: need declared sources and at least one pair with complete roles and dates in both train and test.')
     return {'models': models, 'warnings': warnings, 'role_coverage': coverage,
-            'time_coverage': time_coverage,
+            'time_coverage': time_coverage, 'joint_coverage': joint_coverage,
             'vectorizer': {'vocabulary': {k:int(v) for k,v in vectorizer.vocabulary_.items()},
                            'idf': vectorizer.idf_.tolist(), 'train_unique_contexts': len(corpus),
                            'cosine_bin_edges': cosine_edges.tolist(),
                            'cosine_bin_quantiles': list(COSINE_QUANTILES),
                            'category_codes': {'role_relation': {'unknown': 0, 'match': 1, 'mismatch': 2},
                                               'role_reversed': {'unknown': 0, 'no': 1, 'yes': 2}}},
-            'method': 'TF-IDF word 1-2grams → training-only cosine tertile bins → Categorical Naive Bayes; ablations add buyer/target roles or event-day relation when supplied.'}
+            'method': 'TF-IDF word 1-2grams → training-only cosine tertile bins → Categorical Naive Bayes; ablations add buyer/target roles, event-day relation, or both when supplied.'}

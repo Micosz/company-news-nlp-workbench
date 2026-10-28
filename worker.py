@@ -131,6 +131,16 @@ def main(folder):
         eval_inputs=pd.concat([dev[inputs],test[inputs]],ignore_index=True) if tune else test[inputs].copy()
         output=module.run(train[inputs+['label']].copy(),eval_inputs,config)
         models=output.pop('models')
+        # Calculate joint coverage on held-out test alone, never dev+test.
+        if 'joint_coverage' in output:
+            unknown={'','unknown','unk','n/a','na','none','null','nan','ไม่ทราบ','ไม่ระบุ','-'}
+            cols=['buyer_a','target_a','buyer_b','target_b','event_date_a','event_date_b']
+            known=pd.concat([~test[c].astype(str).str.strip().str.casefold().isin(unknown) for c in cols],axis=1).all(axis=1)
+            output['joint_coverage']['test_complete_pairs']=int(known.sum())
+            if not known.any():
+                for name in ('text_plus_roles_time','text_plus_roles_availability'):
+                    models.pop(name,None)
+                output.setdefault('warnings',[]).append('Joint role/time experiment skipped: no test pair has both complete roles and dates.')
         if tune:
             # Algorithm saw dev + test inputs; coverage must still describe test only.
             unknown={'','unknown','unk','n/a','na','none','null','nan','ไม่ทราบ','ไม่ระบุ','-'}
@@ -148,7 +158,7 @@ def main(folder):
                 model['threshold'],model['dev_f1']=choose_dev_threshold(dev.label.to_numpy(),scores[:len(dev)])
         fitted=output.pop('vectorizer',{})
         dump(folder/'vectorizer.json',fitted)
-        result={'models':{},'warnings':output.get('warnings',[]),'role_coverage':output.get('role_coverage',{}), 'time_coverage':output.get('time_coverage',{}),
+        result={'models':{},'warnings':output.get('warnings',[]),'role_coverage':output.get('role_coverage',{}), 'time_coverage':output.get('time_coverage',{}), 'joint_coverage':output.get('joint_coverage',{}),
                 'method':output.get('method','custom'), 'test_pairs':len(test)}
         # The model has already produced all scores before the gold clustering
         # reference is inspected. The reference is never passed as a feature.
