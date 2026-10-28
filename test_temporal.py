@@ -1,5 +1,8 @@
 """Temporal feature contracts: fair ablation, source declaration and missingness."""
 import unittest
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from unittest.mock import patch
 import pandas as pd
 
 from algorithms.pair_experiment import run, time_categories
@@ -7,6 +10,16 @@ from engine import builtin, validate
 
 
 class TemporalChecks(unittest.TestCase):
+    def test_builtin_temporal_option_and_missing_setup(self):
+        with TemporaryDirectory() as directory, patch('engine.ROOT', Path(directory)):
+            with self.assertRaisesRegex(ValueError, 'setup_temporal_dataset'):
+                builtin('story_time')
+            target = Path(directory) / 'local_data' / 'ecb_story_time'
+            target.mkdir(parents=True)
+            pd.DataFrame([{'event_date_a':'2020-01-01', 'event_date_b':'2020-01-02'}]).to_csv(target / 'ecb_story_pairs.csv', index=False)
+            loaded = builtin('story_time')
+            self.assertEqual(loaded.iloc[0]['event_date_b'], '2020-01-02')
+
     def test_unknown_same_and_different_are_separate(self):
         frame = pd.DataFrame([
             {'event_date_a':'', 'event_date_b':'2020-01-01'},

@@ -124,7 +124,12 @@ def load_provisional_roles(path=None):
 
 
 def builtin(mode):
-    if mode not in ('small_A','small_B','small_A_ai','small_B_ai','full'): raise ValueError('unknown dataset')
+    if mode not in ('small_A','small_B','small_A_ai','small_B_ai','full','story_time'): raise ValueError('unknown dataset')
+    if mode == 'story_time':
+        path = ROOT / 'local_data' / 'ecb_story_time' / 'ecb_story_pairs.csv'
+        if not path.is_file():
+            raise ValueError('ยังไม่ได้เตรียมชุดเวลา: เปิด Terminal ในโฟลเดอร์โปรเจกต์ แล้วรัน .venv/bin/python scripts/setup_temporal_dataset.py (Windows: .venv\\Scripts\\python.exe scripts/setup_temporal_dataset.py) ดู README')
+        return pd.read_csv(path, dtype=str, keep_default_na=False).fillna('')
     ai_roles = mode.endswith('_ai')
     pilot_mode = mode.removesuffix('_ai')
     # Portable pilot is bundled; full package remains alongside the app.

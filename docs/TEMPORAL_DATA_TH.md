@@ -32,11 +32,13 @@
 
 รอบ `20261028T115953Z_a58ea6` ใช้ชุด 4,732 คู่, Text baseline, Time only และ Text + event date โดยใช้ Categorical Naive Bayes/threshold เดียวกัน ได้ pairwise F1 **69.62% ทั้งสามแบบ** และทำนาย test ทั้งหมดเป็น class 1 (TP 535, FP 467, FN 0, TN 0; Macro F1 34.81%) เหมือน majority reference ในรอบนี้ จึง **ยังไม่พบ improvement** และห้ามปรับค่าจาก test นี้แล้วอ้างว่าเป็นการทดสอบใหม่ จำนวนคู่ไม่ใช่จำนวนเหตุการณ์อิสระ
 
-ในเว็บนำเข้า `ecb_story_pairs.csv`, ตรวจ mapping ของ `event_date_a`/`event_date_b`, เลือกที่มาเวลา **ป้ายกำกับจากชุดข้อมูล (oracle)** แล้วรัน ค่า `event_day_relation` แยก unknown / วันเดียวกัน / วันต่างกัน เป็น feature แบบ soft ไม่ตัดสิน identity ด้วยกฎวันตรงกัน ค่า Text baseline, Time only และ Text + event date ถูกฝึกบนข้อมูล train เดียวกัน
+ในเว็บเลือก **ECB+ + Event StoryLine · 4,732 คู่ที่มีวันกำกับ** แล้วกดโหลด เว็บจะตั้งที่มาเวลาเป็น **ป้ายกำกับจากชุดข้อมูล (oracle)** อัตโนมัติ ค่า `event_day_relation` แยก unknown / วันเดียวกัน / วันต่างกัน เป็น feature แบบ soft ไม่ตัดสิน identity ด้วยกฎวันตรงกัน ค่า Text baseline, Time only และ Text + event date ถูกฝึกบนข้อมูล train เดียวกัน
 
 ## สร้างไฟล์ในเครื่องใหม่
 
-เริ่มจากติดตั้งตาม README แล้วเตรียม ECB+ full ตาม [DATA_SOURCES_TH.md](DATA_SOURCES_TH.md) ซึ่งตรวจ SHA-256 ของต้นฉบับ รวมทั้งดาวน์โหลด Event StoryLine และ CDEC-WN จาก release ที่ตรึงค่า:
+เริ่มจากติดตั้งตาม README แล้วใช้ `.venv/bin/python scripts/setup_temporal_dataset.py` เพื่อดาวน์โหลด ECB+ และ Event StoryLine ตรวจ hash และสร้างชุดเวลาโดยตรง ไม่ต้องใช้ TKGQA; Windows ใช้ `.venv\Scripts\python.exe scripts/setup_temporal_dataset.py` ข้อมูลสร้างที่ `local_data/ecb_story_time/` และไม่เขียนทับไฟล์เดิม
+
+หากต้องการเตรียมข้อมูล Full และ CDEC-WN เพิ่มด้วย สามารถใช้ขั้นตอนละเอียดนี้:
 
 ```sh
 .venv/bin/python scripts/download_sources.py
