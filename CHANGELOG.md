@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-28 — Categorical Naive Bayes and Pilot evaluation
+
+- Replace the default Logistic Regression pair experiment with Categorical Naive Bayes using train-only cosine bins and unknown-aware role categories. Historical runs retain their recorded method.
+- Add evidence-backed 42-mention role annotation export/import, Pilot B³ clustering evaluation with complete-pair validation, and a conservative manual claim-comparison prototype.
+- Add tests and documentation; real-data role improvement and automatic NLI/extraction remain unverified and unimplemented.
+
 ## 2026-10-26 — Visual experiment results
 
 - Add selectable score bar charts and confusion matrices alongside numeric results.

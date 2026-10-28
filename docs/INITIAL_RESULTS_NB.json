@@ -1,0 +1,237 @@
+{
+  "recorded_on": "2026-10-28",
+  "scope": "Exploratory CategoricalNB baseline only; no real-data role improvement claim. Full is mixed-domain and its test is not an untouched M&A holdout.",
+  "records": [
+    {
+      "run_id": "20261028T090654Z_ab07e1",
+      "source": "small_A",
+      "counts": {
+        "train": 253,
+        "test": 171
+      },
+      "config": {
+        "seed": 374,
+        "role_source": "none"
+      },
+      "input_code_sha256": {
+        "dataset.csv": "c29abb0ae6566b71043976eaa26ec0fe9740d607f20dcd7d8c5e3fec9edce1df",
+        "algorithm.py": "8165d585540b4816a172e2be773152496300c62ff65c54bb3b2f26fd1ef331bb",
+        "config.json": "40e72f4d68660c3db31191eba46df1b5b4d9c357e1377ec10aa5444930ec3003",
+        "engine.py": "80fbbfd3e052dfa45bcc0b89930688a46d42f7f8e319089fc60e246e176bec15",
+        "worker.py": "557b95413f5762a6e6767bc6239b049e56d1214af8569fc497703e5afdb8ee27"
+      },
+      "environment": {
+        "python": "3.12.14 (main, Aug 25 2026, 13:50:33) [Clang 22.1.3 ]",
+        "packages": {
+          "numpy": "2.3.5",
+          "pandas": "2.2.3",
+          "scipy": "1.18.1",
+          "scikit-learn": "1.9.1",
+          "openpyxl": "3.1.5"
+        }
+      },
+      "metrics": {
+        "models": {
+          "majority_reference": {
+            "precision": 0.5087719298245614,
+            "recall": 1.0,
+            "f1": 0.6744186046511628,
+            "macro_f1": 0.3372093023255814,
+            "accuracy": 0.5087719298245614,
+            "confusion": {
+              "tn": 0,
+              "fp": 84,
+              "fn": 0,
+              "tp": 87
+            },
+            "threshold": 0.5,
+            "features": [
+              "training_majority_class"
+            ]
+          },
+          "cosine_reference": {
+            "precision": 1.0,
+            "recall": 0.12643678160919541,
+            "f1": 0.22448979591836735,
+            "macro_f1": 0.4565071930411509,
+            "accuracy": 0.5555555555555556,
+            "confusion": {
+              "tn": 84,
+              "fp": 0,
+              "fn": 76,
+              "tp": 11
+            },
+            "threshold": 0.5,
+            "features": [
+              "tfidf_cosine"
+            ]
+          },
+          "text_baseline": {
+            "precision": 0.528169014084507,
+            "recall": 0.8620689655172413,
+            "f1": 0.6550218340611353,
+            "macro_f1": 0.4779533949066739,
+            "accuracy": 0.5380116959064327,
+            "confusion": {
+              "tn": 17,
+              "fp": 67,
+              "fn": 12,
+              "tp": 75
+            },
+            "threshold": 0.5,
+            "features": [
+              "tfidf_cosine_bin"
+            ]
+          }
+        },
+        "warnings": [
+          "Role experiment skipped: annotate roles in both splits and declare manual or predicted source."
+        ],
+        "role_coverage": {
+          "train_complete_pairs": 0,
+          "test_complete_pairs": 0
+        },
+        "method": "TF-IDF word 1-2grams → training-only cosine tertile bins → Categorical Naive Bayes; ablation adds buyer/target and reversed-role categories.",
+        "test_pairs": 171,
+        "clustering": {
+          "status": "available",
+          "method": "connected_components",
+          "reference": "ECB+ Pilot gold event clusters",
+          "test_topic": "44",
+          "test_mentions": 19,
+          "gold_clusters": 2,
+          "reference_sha256": {
+            "mentions": "6649ff05934c3ecd6c758d341b89fe896aac1a6a0b73dae3c8ef5c12a164908d",
+            "pairs": "bb32e5c5a64e679fe9809f120fa95cbb25c994cc94781dbdf692285da82a6ce2"
+          },
+          "models": {
+            "majority_reference": {
+              "b3_precision": 0.5346260387811634,
+              "b3_recall": 1.0,
+              "b3_f1": 0.6967509025270758,
+              "predicted_clusters": 1
+            },
+            "cosine_reference": {
+              "b3_precision": 1.0,
+              "b3_recall": 0.24561403508771926,
+              "b3_f1": 0.39436619718309857,
+              "predicted_clusters": 13
+            },
+            "text_baseline": {
+              "b3_precision": 0.5346260387811634,
+              "b3_recall": 1.0,
+              "b3_f1": 0.6967509025270758,
+              "predicted_clusters": 1
+            }
+          },
+          "limitations": [
+            "Pilot only: one test topic and two gold clusters.",
+            "Positive edges are grouped with connected components; chains can merge distinct events.",
+            "B³ is not CoNLL F1 and cannot be compared directly to CohTP without matching protocol.",
+            "Manual roles are oracle inputs and may act as shortcuts on this small Pilot."
+          ]
+        },
+        "elapsed_seconds": 0.108
+      }
+    },
+    {
+      "run_id": "20261028T091148Z_c204df",
+      "source": "full",
+      "counts": {
+        "train": 70280,
+        "test": 18588,
+        "dev": 15972
+      },
+      "config": {
+        "seed": 374,
+        "role_source": "none"
+      },
+      "input_code_sha256": {
+        "dataset.csv": "e83fb5aa7ff50c299397e1c210864657b45d32c13c0468677fff5f3cfc8b9fe1",
+        "algorithm.py": "8725147067ce92cd97b36674230c1c9c1848456a479e6595f0801282d1c149e6",
+        "config.json": "9d270d544a1375f34f1e7ce4a925165a89295c946d2e11d6d1b8ad65b02213fb",
+        "engine.py": "80fbbfd3e052dfa45bcc0b89930688a46d42f7f8e319089fc60e246e176bec15",
+        "worker.py": "557b95413f5762a6e6767bc6239b049e56d1214af8569fc497703e5afdb8ee27"
+      },
+      "environment": {
+        "python": "3.12.14 (main, Aug 25 2026, 13:50:33) [Clang 22.1.3 ]",
+        "packages": {
+          "numpy": "2.3.5",
+          "pandas": "2.2.3",
+          "scipy": "1.18.1",
+          "scikit-learn": "1.9.1",
+          "openpyxl": "3.1.5"
+        }
+      },
+      "metrics": {
+        "models": {
+          "majority_reference": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "macro_f1": 0.42857142857142855,
+            "accuracy": 0.75,
+            "confusion": {
+              "tn": 13941,
+              "fp": 0,
+              "fn": 4647,
+              "tp": 0
+            },
+            "threshold": 0.5,
+            "features": [
+              "training_majority_class"
+            ]
+          },
+          "cosine_reference": {
+            "precision": 0.48476454293628807,
+            "recall": 0.0753174090811276,
+            "f1": 0.1303780964797914,
+            "macro_f1": 0.4917932548610797,
+            "accuracy": 0.7488164407144394,
+            "confusion": {
+              "tn": 13569,
+              "fp": 372,
+              "fn": 4297,
+              "tp": 350
+            },
+            "threshold": 0.5,
+            "features": [
+              "tfidf_cosine"
+            ]
+          },
+          "text_baseline": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "macro_f1": 0.42857142857142855,
+            "accuracy": 0.75,
+            "confusion": {
+              "tn": 13941,
+              "fp": 0,
+              "fn": 4647,
+              "tp": 0
+            },
+            "threshold": 0.5,
+            "features": [
+              "tfidf_cosine_bin"
+            ]
+          }
+        },
+        "warnings": [
+          "Role experiment skipped: annotate roles in both splits and declare manual or predicted source."
+        ],
+        "role_coverage": {
+          "train_complete_pairs": 0,
+          "test_complete_pairs": 0
+        },
+        "method": "TF-IDF word 1-2grams → training-only cosine tertile bins → Categorical Naive Bayes; ablation adds buyer/target and reversed-role categories.",
+        "test_pairs": 18588,
+        "clustering": {
+          "status": "unavailable",
+          "reason": "Clustering skipped: supported only for one complete Pilot test topic, not Full or sampled pairs."
+        },
+        "elapsed_seconds": 10.449
+      }
+    }
+  ]
+}

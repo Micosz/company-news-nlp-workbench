@@ -23,7 +23,7 @@
 
 ## ดูผลเป็นกราฟและตัวเลข
 
-เมื่อรันสำเร็จ หรือกด **เปิดผล** ในสมุดบันทึก หน้า 03 จะแสดงกราฟจาก `metrics.json` ของรอบนั้น:
+เมื่อรันสำเร็จ หรือกด **เปิดผล** ในสมุดบันทึก หน้า 03 จะแสดงกราฟจาก `metrics.json` ของรอบนั้น (รอบเก่าระบุ Logistic Regression ตาม metadata เดิม; รอบใหม่ใช้ Naive Bayes):
 
 - **กราฟแท่ง:** เลือก F1, Precision, Recall หรือ Macro F1 เพื่อเทียบโมเดลบนสเกลคงที่ 0–100% มีค่าตัวเลขกำกับทุกแท่ง
 - **Confusion matrix:** เลือกโมเดลเพื่อดู TN/FP/FN/TP เป็นจำนวนคู่ แถวคือป้ายจริง คอลัมน์คือคำทำนาย สีเขียวหมายถึงถูก สีส้มหมายถึงผิด สีไม่ได้แสดงความมากน้อย
@@ -35,13 +35,13 @@
 ## โมเดลที่มี
 
 - Majority reference: ทาย class ที่พบบ่อยใน TRAIN ทุกแถว เพื่อดูว่าการเรียนรู้ดีกว่าวิธีง่ายที่สุดหรือไม่
-- Cosine reference: TF-IDF cosine ≥ 0.5 เป็น reference ไม่ได้ผ่าน Logistic Regression
-- Text baseline: TF-IDF cosine 1 feature → StandardScaler → Logistic Regression
-- Text + roles: cosine เดิม + 7 buyer/target compatibility features → scaler + Logistic Regression แบบเดียวกัน
+- Cosine reference: TF-IDF cosine ≥ 0.5 เป็น reference ไม่ผ่านตัวจำแนก
+- Text baseline: TF-IDF cosine แบ่งช่วงจาก tertiles ของ train → Categorical Naive Bayes
+- Text + roles: หมวด cosine เดิม + buyer/target และ reversed-role categories → Categorical Naive Bayes แบบเดียวกัน
 
 **คู่เปรียบเทียบ improvement คือ Text baseline vs Text + roles เท่านั้น** โดยตรึงข้อมูล split classifier hyperparameters และ threshold เหมือนกัน ตัวแรกกับตัวที่สองเป็น reference เพิ่มเติม
 
-ยังไม่ใช่ CohTP reproduction ไม่มี NLI graph, GNN, temporal partition หรือ clustering score ระบบนี้เป็นการทดลองขนาดเล็กเพื่อดูว่าฟีเจอร์บทบาทช่วย pairwise classification ได้ไหม
+ยังไม่ใช่ CohTP reproduction ไม่มี NLI graph, GNN, temporal partition หรือ CoNLL F1 แบบเต็มระบบ (Pilot มี connected-components B³ แยกต่างหาก) ระบบนี้เป็นการทดลองขนาดเล็กเพื่อดูว่าฟีเจอร์บทบาทช่วย pairwise classification ได้ไหม
 
 ## นำเข้า Excel / CSV
 
@@ -64,6 +64,10 @@
 
 **ข้อมูลไม่ครบให้เว้นว่าง ไม่ใส่ unknown/null เป็นข้อความ** ใช้ชื่อหรือ ID บริษัทที่สอดคล้องกัน แต่ไม่สร้าง mapping จาก gold event ID
 
+## ต้นแบบเปรียบเทียบข้อมูลข่าว
+
+ส่วน 05 ให้กรอกผู้ซื้อ เป้าหมาย วันที่ สถานะ มูลค่า หน่วย สกุลเงิน หลักฐานและลิงก์ด้วยตัวเอง พร้อมยืนยันว่าข่าวเป็นดีลเดียวกัน กฎจะช่วยแสดงข้อมูลตรงกัน อาจอัปเดต อาจต่างกัน หรือข้อมูลไม่พอ ไม่ใช่ NLI การสกัดข่าวหรือการตรวจสอบข้อเท็จจริง ข้อมูลในฟอร์มยังไม่บันทึกลงสมุดทดลอง
+
 ## รันส่วนเพิ่มบทบาท
 
 1. ให้คนอ่านบริบทและเติมบริษัทผู้ซื้อ/บริษัทเป้าหมายใน Excel โดยมีหลักฐานที่ตรวจสอบได้ บันทึกผู้ทำป้ายกำกับ/ข้อกำกวมไว้นอกตารางทดลองด้วย
@@ -72,7 +76,7 @@
 4. ระบบจะรัน Text + roles เมื่อมีคู่ที่รู้ทั้งสองบทบาทครบอย่างน้อยหนึ่งคู่ใน train และ test; ถ้าครบเพียงบางส่วนจะเตือนและบันทึก coverage ควรทำให้ครบก่อนสรุปผล
 5. Manual roles ต้องรายงานว่าเป็น **oracle-role experiment** ไม่ใช่ความสามารถของระบบสกัดบทบาทอัตโนมัติ
 
-ฟีเจอร์ 7 ตัว: buyer_match, target_match, buyer_mismatch, target_mismatch, reversed_roles, buyer_both_known, target_both_known เป็น 0/1 ใช้เพียง casefold/space normalization ไม่มี company entity linker หรือ alias resolver
+ฟีเจอร์บทบาท 3 ช่อง: buyer_relation และ target_relation (unknown/match/mismatch), role_reversed (unknown/no/yes) ใช้ casefold/space normalization และ marker ว่างเป็น unknown ไม่มี company entity linker หรือ alias resolver ดูคู่มือ [annotation](docs/ROLE_ANNOTATION_TH.md)
 
 ## โค้ดที่แก้เอง
 
@@ -94,7 +98,8 @@ def run(train, test, config):
 - `dataset.csv`, `config.json`, `manifest.json`: ข้อมูลที่ใช้จริง split seed note SHA-256 input/code และเวอร์ชัน Python/packages
 - `metrics.json`: Precision/Recall/F1/Macro F1/Accuracy/TP/FP/FN/TN และ ΔF1 เมื่อมีส่วนเพิ่ม
 - `predictions.csv`, `errors.csv`: ผลทุกคู่และเฉพาะคู่ที่ผิด
-- `model_*.json`, `vectorizer.json`: พารามิเตอร์ที่เรียนรู้ scaling, vocabulary และ IDF (ไม่ใช้ pickle)
+- `model_*.json`, `vectorizer.json`: พารามิเตอร์ CategoricalNB, ขอบแบ่ง cosine, vocabulary และ IDF (ไม่ใช้ pickle); รอบเก่าเก็บพารามิเตอร์ของวิธีเดิม
+- `clustering_reference.json`, `cluster_predictions.csv`: ข้อมูลอ้างอิงและผลจัดกลุ่ม เมื่อ test เป็น Pilot ที่มีคู่ครบ
 - `stdout.log`, `report.md`: log และสรุปผลต่อรอบ
 - `uploaded_source.bin`: ไฟล์ upload ต้นฉบับ เมื่อรันจากไฟล์ที่นำเข้า
 
@@ -107,7 +112,7 @@ def run(train, test, config):
 .venv/bin/python run_experiment.py --dataset small_B
 .venv/bin/python run_experiment.py --input data/my_pairs.xlsx --role-source manual --note 'annotator/version'
 .venv/bin/python run_experiment.py --dataset full
-.venv/bin/python -m unittest test_workbench -v
+.venv/bin/python -m unittest test_workbench test_nb test_cluster test_annotation -v
 ```
 
 รันซ้ำจากบันทึกเดิม: ใช้ไฟล์ dataset.csv และ algorithm.py ของรอบนั้นผ่าน `--input` และ `--algorithm` พร้อม seed/role-source/note ตาม config.json หรือรัน `python worker.py <สำเนาโฟลเดอร์บันทึก>` ด้วย environment เวอร์ชันเดียวกัน (ทำสำเนาก่อน เพราะ worker เขียนผลในโฟลเดอร์นั้น)
@@ -119,7 +124,7 @@ Pilot แนบมาในแอป: ECB+ 42 ข่าว 4 focal acquisition e
 - Full split เป็น custom topic split ไม่ใช่ paper split; negative sampling 3:1 ไม่ใช่สัดส่วนข่าวจริง
 - Pilot topics อยู่ใน full test ดังนั้น full run หลังตรวจ pilot เป็น execution check ห้ามนำเสนอว่าเป็นผล finance held-out ใหม่
 - ใช้ gold selected event contexts ไม่ได้ตรวจหา event mentions เอง full มีหลาย mention ในบริบทเดียว โค้ดตั้งต้นใช้ context cosine ไม่ได้ encode trigger ตำแหน่ง จึงแยก mention ที่บริบทเหมือนกันไม่ได้
-- ไม่ใช่ event clustering; ห้ามเทียบ pairwise F1 ตรง ๆ กับ CoNLL/MUC/B³/CEAF ของงาน coreference
+- B³ เป็นผล connected-components บน Pilot คู่ครบเท่านั้น ไม่ใช่ CoNLL F1; ห้ามเทียบ pairwise F1 ตรง ๆ กับตัววัด clustering ของงาน coreference
 - คู่จำนวนมากจากเพียง 4 events ไม่ใช่ตัวอย่างอิสระจำนวนมาก ยังไม่มี confidence interval/significance test
 - Same deal ไม่เท่ากับ same event: ข่าวประกาศซื้อกับข่าวปิดดีลอาจเป็นดีลเดียวกันแต่คนละเหตุการณ์
 - TF-IDF เป็นการวัดความเหมือนคำ ไม่มี pretrained semantic embeddings; ตัวจำแนกไม่ได้ดูชื่อบริษัทเป็น ID โดยตรง
@@ -142,5 +147,5 @@ Windows ใช้ `.venv\Scripts\python` แทน `.venv/bin/python`; timeout p
 
 - ECB+ corpus: https://github.com/cltl/ecbPlus — Cybulska & Vossen (2014), Using a sledgehammer to crack a nut? Lexical diversity and event coreference resolution. เก็บ licenses ไว้ใน data/pilot/licenses; ลิขสิทธิ์เนื้อข่าวแยกจาก annotation
 - TF-IDF implementation: https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html
-- Logistic Regression: https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html
+- Categorical Naive Bayes: https://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.CategoricalNB.html
 - CohTP เป็นบริบท/แรงจูงใจจากที่คุยกัน ไม่อ้างว่าไฟล์นี้ใช้ implementation ของผู้เขียน

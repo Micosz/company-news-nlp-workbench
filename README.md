@@ -54,6 +54,9 @@ py -3.12 -m venv .venv
 - รัน Majority reference, Cosine reference, Text baseline และ Text + roles เมื่อมีข้อมูลบทบาท
 - ดู Precision, Recall, F1, Macro F1 และ TP/FP/FN/TN พร้อมคู่ที่ทำนายผิด
 - ดูกราฟแท่งเปรียบเทียบคะแนนและ confusion matrix พร้อมตัวเลขจากผลรันจริง เลือกคะแนน/โมเดลและดาวน์โหลด SVG ไปใช้ในรายงานได้
+- ดาวน์โหลดแบบฟอร์ม annotation 42 mentions และนำกลับเข้าเว็บเพื่อสร้างคู่ Pilot A/B พร้อมตรวจหลักฐาน
+- จัดกลุ่มด้วย connected components และวัด B³ เมื่อ test ของ Pilot มีคู่ครบทุกคู่; ชุด Full ที่สุ่มคู่ลบจะข้าม
+- ทดลองเปรียบเทียบข้อมูลสองข่าวที่ผู้ใช้กรอกเองตามวัน สถานะ และมูลค่า เป็น rule-based demo ยังไม่ใช่ NLI หรือการสกัดอัตโนมัติ
 - เก็บข้อมูล โค้ด การตั้งค่า seed พารามิเตอร์ที่เรียนรู้ เวอร์ชัน dependencies และผลทำนายแยกต่อรอบ
 - ดาวน์โหลดหลักฐานของแต่ละรอบเป็น ZIP
 
@@ -69,15 +72,15 @@ HTML unescape → Unicode NFC → whitespace normalization
 TF-IDF word 1–2 grams (fit เฉพาะ train)
         ↓
 Cosine similarity
-        ├── Text baseline: cosine → Logistic Regression
-        └── Text + roles: cosine + buyer/target compatibility → Logistic Regression
+        ├── Text baseline: cosine แบ่งช่วงจาก train → Categorical Naive Bayes
+        └── Text + roles: cosine แบ่งช่วง + role categories → Categorical Naive Bayes
         ↓
 วัดกับ labels ของ test ที่เก็บไว้ภายนอกฟังก์ชันโมเดล
 ```
 
-การเปรียบเทียบส่วนเพิ่มจะใช้ **Text baseline vs Text + roles** บนข้อมูล split ตัวจำแนก และ hyperparameters เดียวกัน มี 7 role features เช่น buyer_match, target_match, mismatch, reversed_roles และตัวบอกว่ามีข้อมูลครบหรือไม่ อ่านนิยามและสูตรวัดผลใน [METHODS_TH.md](METHODS_TH.md)
+การเปรียบเทียบส่วนเพิ่มจะใช้ **Text baseline vs Text + roles** บนข้อมูล split ตัวจำแนก และ hyperparameters เดียวกัน มี 3 role categories ได้แก่ buyer_relation, target_relation และ role_reversed โดย unknown แยกจาก mismatch อ่านนิยามและสูตรวัดผลใน [METHODS_TH.md](METHODS_TH.md)
 
-CohTP เป็นงานที่ใช้ประกอบการตั้งโจทย์ โค้ดใน repo นี้เป็น baseline/ablation ที่เราเขียนเอง ยังไม่มีการทำ NLI temporal graph, GNN หรือวัดผล clustering แบบเต็มระบบ
+CohTP เป็นงานที่ใช้ประกอบการตั้งโจทย์ โค้ดใน repo นี้เป็น baseline/ablation ที่เราเขียนเอง ยังไม่มีการทำ NLI temporal graph, GNN หรือวัดผล CoNLL clustering แบบเต็มระบบ
 
 ## ข้อมูลที่แนบมา
 
@@ -93,14 +96,23 @@ Excel เริ่มต้นอยู่ที่ [data/pilot_fold_A_roles_bla
 
 คอลัมน์บังคับ: `pair_id`, `text_a`, `text_b`, `label`, `split`, `doc_a`, `doc_b`, `group_id` — `label=1` คือเหตุการณ์เดียวกัน และ `label=0` คือคนละเหตุการณ์ รายละเอียด mapping และ roles อยู่ใน [คู่มือ](README_TH.md#นำเข้า-excel--csv)
 
-## ผลเริ่มต้นที่มีหลักฐานแล้ว
+## ผลตรวจระบบ Naive Bayes เบื้องต้น
+
+| ชุด | Text baseline pairwise F1 | สิ่งที่ตรวจพบ |
+|---|---:|---|
+| Pilot A | 65.50% | B³ F1 69.68%; predicted 1 cluster จาก gold 2 clusters |
+| Full ECB+ | 0.00% | ทำนาย test ทั้ง 18,588 คู่เป็น class 0 จึงไม่พบ class 1; B³ ถูกข้ามเพราะคู่ไม่ครบ |
+
+ผลเหล่านี้เป็น **การตรวจระบบและสำรวจเบื้องต้น** ไม่ใช่ผล improvement: ยังไม่มี roles ที่ผ่านการตรวจบนข้อมูลจริง และ Full เป็น mixed-domain ไม่ใช่ held-out M&A ใหม่ รายละเอียดและ hashes อยู่ใน [docs/INITIAL_RESULTS_NB.json](docs/INITIAL_RESULTS_NB.json)
+
+## ผลเดิมที่มีหลักฐานแล้ว (Logistic Regression รุ่นก่อน)
 
 | การทดลอง | Text baseline F1 | Macro F1 | หมายเหตุ |
 |---|---:|---:|---|
 | Pilot A | 0.6486 | 0.4993 | train AMD → test HP |
 | Pilot B | 0.6291 | 0.5401 | train HP → test AMD |
 
-ค่าเหล่านี้ยืนยันว่า pipeline รันและวัดผลได้ **ยังไม่ใช่ผล improvement** และ positive-class F1 ยังต่ำกว่าการทาย class ที่พบบ่อยทุกแถวในทั้งสอง pilot คู่ที่มาจากเพียง 4 เหตุการณ์ไม่ใช่ตัวอย่างอิสระจำนวนมาก
+ค่าในตารางเป็นผล Logistic Regression รุ่นก่อน ไม่ใช่ผล Naive Bayes รุ่นปัจจุบัน และ **ยังไม่ใช่ผล improvement** positive-class F1 ยังต่ำกว่าการทาย class ที่พบบ่อยทุกแถวในทั้งสอง pilot คู่ที่มาจากเพียง 4 เหตุการณ์ไม่ใช่ตัวอย่างอิสระจำนวนมาก
 
 สรุปหลักฐานที่ตัดข้อความข่าวและ path ส่วนตัวออกอยู่ใน [docs/INITIAL_RESULTS.json](docs/INITIAL_RESULTS.json) ผลดิบเดิมบนเครื่องยังอยู่ใน `runs/` และไม่ถูก commit
 
@@ -109,8 +121,8 @@ Excel เริ่มต้นอยู่ที่ [data/pilot_fold_A_roles_bla
 ```sh
 .venv/bin/python run_experiment.py --dataset small_A
 .venv/bin/python run_experiment.py --dataset small_B
-.venv/bin/python -m unittest test_workbench -v
-node --test test_charts.cjs
+.venv/bin/python -m unittest test_workbench test_nb test_cluster test_annotation -v
+node --test test_charts.cjs test_facts.cjs
 ```
 
 ใช้ Python executable แบบ Windows ตามหัวข้อติดตั้งได้เช่นกัน ผลแต่ละรอบอยู่ใน `runs/<run_id>/` รวม `manifest.json`, `algorithm.py`, `dataset.csv`, `metrics.json`, `predictions.csv`, `errors.csv` และ `report.md`
@@ -137,7 +149,8 @@ scripts/prepare_datasets.py     สร้าง dataset จากไฟล์ต
 - ใช้ gold event contexts เป็น input; ยังไม่ได้วัดขั้นดึง event mentions อัตโนมัติ
 - บทบาทที่คนใส่ต้องเรียกว่า **manual/oracle-role experiment** ไม่ใช่ผล extractor อัตโนมัติ
 - Gold same-event ต้องเป็นอิสระจาก buyer/target agreement
-- คะแนนเป็นระดับคู่ข้อความ เปรียบเทียบตรง ๆ กับ CoNLL clustering metrics ของ CohTP ไม่ได้
+- Pairwise F1 เป็นระดับคู่; B³ ที่เพิ่มเป็นหนึ่ง metric ระดับกลุ่ม ไม่ใช่ CoNLL F1 และยังเทียบตรง ๆ กับ CohTP ไม่ได้หาก protocol ต่างกัน
+- Pilot มี 4 events จาก 4 ดีล: target อาจสัมพันธ์กับ gold โดยโครงสร้างและกลายเป็น shortcut ต้องมี gold ที่แยกเหตุการณ์ต่าง ๆ ในดีลเดียวกันก่อนสรุป
 - Pilot เป็น subset ของ full test; ถ้าใช้ pilot ปรับโมเดลแล้ว ห้ามเรียก full test ชุดเดิมว่า untouched
 - การดู test errors เพื่อปรับรอบถัดไปทำให้ test เป็นข้อมูลพัฒนา ต้องเตรียม held-out ใหม่ก่อนข้อสรุปสุดท้าย
 
@@ -145,6 +158,7 @@ scripts/prepare_datasets.py     สร้าง dataset จากไฟล์ต
 
 - [คู่มือใช้งานเต็ม](README_TH.md)
 - [วิธีการทดลองและการวัดผล](METHODS_TH.md)
+- [คู่มือ annotation และการนำไฟล์กลับเข้าเว็บ](docs/ROLE_ANNOTATION_TH.md)
 - [แผนเริ่มงานสำหรับทีม](docs/TEAM_HANDOFF_TH.md)
 - [ที่มาข้อมูลและการเตรียม full](docs/DATA_SOURCES_TH.md)
 - [แนวทางส่งงานและ PR](CONTRIBUTING.md)

@@ -22,7 +22,8 @@ jobs:
         run: |
           node --check static/app.js
           node --check static/charts.js
+          node --check static/facts.js
       - name: Chart reporting integrity
-        run: node --test test_charts.cjs
+        run: node --test test_charts.cjs test_facts.cjs
       - name: Integrity tests
-        run: python -m unittest test_workbench -v
+        run: python -m unittest test_workbench test_nb test_cluster test_annotation -v
