@@ -26,4 +26,4 @@ jobs:
       - name: Chart reporting integrity
         run: node --test test_charts.cjs test_facts.cjs
       - name: Integrity tests
-        run: python -m unittest test_workbench test_nb test_cluster test_annotation -v
+        run: python -m unittest test_workbench test_nb test_cluster test_annotation test_provisional_roles -v

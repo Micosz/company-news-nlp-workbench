@@ -82,8 +82,43 @@ def csv_rows(path):
         yield from csv.DictReader(handle)
 
 
+def load_provisional_roles(path=None):
+    """Load AI-assisted article-level role labels, not human-reviewed gold.
+
+    Offsets are half-open Unicode character indices in the source document's
+    normalized full text. The document hash permits later offline verification;
+    matching an offset alone does not establish semantic correctness.
+    """
+    pilot = ROOT / 'data' / 'pilot'
+    expected = {row['mention_id'] for row in csv_rows(pilot / 'event_mentions.csv')}
+    rows = list(csv_rows(path if path is not None else pilot / 'pilot_roles_ai_provisional.csv'))
+    roles = {}
+    for row in rows:
+        ident = row.get('mention_id', '')
+        if not ident or ident in roles:
+            raise ValueError('ข้อมูลบทบาท AI มี mention_id ว่างหรือซ้ำ')
+        if not row.get('buyer', '').strip() or not row.get('target', '').strip():
+            raise ValueError(f'ข้อมูลบทบาท AI ไม่ครบ: {ident}')
+        if row.get('provenance') != 'AI-assisted_from_ECB+_full_article_human_review_pending':
+            raise ValueError(f'ข้อมูลที่มาบทบาท AI ไม่ถูกต้อง: {ident}')
+        if not re.fullmatch(r'[0-9a-f]{64}', row.get('document_sha256', '')):
+            raise ValueError(f'ค่า checksum ของเอกสารไม่ถูกต้อง: {ident}')
+        try:
+            for role in ('buyer', 'target'):
+                start, end = int(row[role+'_evidence_start']), int(row[role+'_evidence_end'])
+                if start < 0 or end <= start: raise ValueError()
+        except (KeyError, TypeError, ValueError):
+            raise ValueError(f'ตำแหน่งหลักฐานไม่ถูกต้อง: {ident}') from None
+        roles[ident] = row
+    if set(roles) != expected:
+        raise ValueError('ข้อมูลบทบาท AI ไม่ตรงกับ mention IDs ของ Pilot')
+    return roles
+
+
 def builtin(mode):
-    if mode not in ('small_A','small_B','full'): raise ValueError('unknown dataset')
+    if mode not in ('small_A','small_B','small_A_ai','small_B_ai','full'): raise ValueError('unknown dataset')
+    ai_roles = mode.endswith('_ai')
+    pilot_mode = mode.removesuffix('_ai')
     # Portable pilot is bundled; full package remains alongside the app.
     configured = os.environ.get('NLP_DATASET_ROOT')
     base = Path(configured).expanduser().resolve() if configured else ROOT.parent / 'nlp_datasets_2026-10-26'
@@ -93,19 +128,25 @@ def builtin(mode):
         assignments = None
     else:
         dataset = ROOT / 'data' / 'pilot'
-        assignments = {r['document_id']:r['fold_'+mode[-1]] for r in csv_rows(dataset/'pilot_two_fold_assignments.csv')}
+        assignments = {r['document_id']:r['fold_'+pilot_mode[-1]] for r in csv_rows(dataset/'pilot_two_fold_assignments.csv')}
     mentions = {r['mention_id']:r for r in csv_rows(dataset/'event_mentions.csv')}
+    roles = load_provisional_roles() if ai_roles else None
     rows=[]
     for p in csv_rows(dataset/'pairs.csv'):
         a,b=mentions[p['mention_id_a']],mentions[p['mention_id_b']]
+        role_fields = ({f'{role}_{side}': roles[mention['mention_id']][role]
+                        for side, mention in (('a', a), ('b', b)) for role in ('buyer', 'target')}
+                       if roles is not None else {c:'' for c in ROLES})
         rows.append({'pair_id':p['pair_id'],'text_a':a['context_normalized'],'text_b':b['context_normalized'],
                      'label':p['label_same_event'],'split':assignments[p['document_id_a']] if assignments else p['split'],
                      'doc_a':p['document_id_a'],'doc_b':p['document_id_b'],'group_id':p['topic_id'],
-                     'mention_a':p['mention_id_a'],'mention_b':p['mention_id_b'], **{c:'' for c in ROLES}})
+                     'mention_a':p['mention_id_a'],'mention_b':p['mention_id_b'], **role_fields})
     return pd.DataFrame(rows)
 
 
 def prepare_run(frame, code, config, source):
+    if source in ('small_A_ai', 'small_B_ai') and config.get('role_source') == 'manual':
+        raise ValueError('ชุดบทบาท AI ยังไม่ได้ผ่านการตรวจโดยคน โปรดเลือกโมเดลทำนาย')
     frame = validate(frame)
     stamp = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')+'_'+uuid.uuid4().hex[:6]
     folder = ROOT/'runs'/stamp
@@ -126,5 +167,11 @@ def prepare_run(frame, code, config, source):
                       'Small pilot overlaps full package test topics; do not tune on pilot then claim full test is untouched.',
                       'Dev rows are archived but default fixed-parameter algorithm does not use them.',
                       'Custom code has local filesystem access; frozen test labels are withheld by API contract only.']}
+    if source in ('small_A_ai', 'small_B_ai'):
+        manifest['limitations'].extend([
+            'AI-assisted buyer/target annotations from full articles are not human-reviewed gold.',
+            'Role annotations can use full-article context beyond the short text given to the baseline.',
+            'In this small pilot, buyer/target identity can act as an event-label shortcut; do not generalize.'
+        ])
     dump(folder/'manifest.json',manifest)
     return folder

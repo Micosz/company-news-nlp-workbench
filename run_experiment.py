@@ -3,7 +3,7 @@ import argparse, subprocess, sys
 from pathlib import Path
 from engine import ROOT, builtin, prepare_run, read_table
 p=argparse.ArgumentParser()
-p.add_argument('--dataset',choices=['small_A','small_B','full'],default='small_A')
+p.add_argument('--dataset',choices=['small_A','small_B','small_A_ai','small_B_ai','full'],default='small_A')
 p.add_argument('--input',type=Path)
 p.add_argument('--algorithm',type=Path,default=ROOT/'algorithms/pair_experiment.py')
 p.add_argument('--seed',type=int,default=374)
