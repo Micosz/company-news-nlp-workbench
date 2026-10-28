@@ -19,3 +19,7 @@ Dependencies are installed through `requirements.txt`; their own licenses and no
 ## Project code
 
 No open-source license has been selected for this project's original code. Access for team collaboration does not change the licenses or ownership of the external data above.
+
+## Noto Sans Thai
+
+The UI bundles regular, medium, semibold and bold Noto Sans Thai fonts from [Google Fonts](https://fonts.google.com/noto/specimen/Noto+Sans+Thai), under the SIL Open Font License 1.1. License and copyright: [static/NotoSansThai-OFL.txt](static/NotoSansThai-OFL.txt). Downloaded from the official Google Fonts distribution.

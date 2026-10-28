@@ -57,3 +57,44 @@ test('SVG text and attributes escape user-defined model names', () => {
     assert.ok(svg.startsWith('<svg xmlns="http://www.w3.org/2000/svg"'));
   }
 });
+
+test('overview preserves scores, fixed scale, and missing-vs-zero distinction', () => {
+  const {benchmarkChart} = require('./static/charts.js');
+  const models={text_baseline:{f1:0},text_plus_time:{f1:0.1851},missing:{},perfect:{f1:1}};
+  const chart=benchmarkChart(models,'f1','saved-run');
+  assert.match(chart,/data-model="text_baseline"[^>]+width="0"/);
+  const width=Number(chart.match(/data-model="text_plus_time"[^>]+width="([^"]+)"/)[1]);
+  assert.ok(Math.abs(width-183.249)<1e-9);
+  assert.match(chart,/data-model="perfect"[^>]+width="990"/);
+  assert.ok(!chart.includes('data-model="missing"'));
+  assert.ok(chart.includes('ไม่มีข้อมูล')&&chart.includes('18.51%')&&chart.includes('100%'));
+  assert.ok(chart.includes('saved-run'));
+});
+
+test('overview separates only known references and keeps custom experiments', () => {
+  const {modelGroups} = require('./static/charts.js');
+  const models={majority_reference:{f1:0},cosine_reference:{f1:.1},time_only:{f1:.2},text_baseline:{f1:.3},custom:{f1:.4}};
+  const before=JSON.stringify(models),{primary,references}=modelGroups(models);
+  assert.deepEqual(Object.keys(primary),['text_baseline','custom']);
+  assert.deepEqual(Object.keys(references),['majority_reference','cosine_reference','time_only']);
+  assert.equal(JSON.stringify(models),before);
+});
+
+test('overview insight is derived from the selected run, not mockup scores', () => {
+  const {resultInsight,benchmarkChart}=require('./static/charts.js');
+  assert.match(resultInsight({text_plus_time:{f1:.2},text_plus_availability:{f1:.1}}),/สูงกว่า.*10.00/);
+  assert.match(resultInsight({text_plus_time:{f1:.1},text_plus_availability:{f1:.2}}),/ต่ำกว่า.*10.00/);
+  assert.match(resultInsight({text_plus_time:{f1:.1851},text_plus_availability:{f1:.1851}}),/ยังสรุป.*ไม่ได้/);
+  assert.ok(!resultInsight({text_plus_time:{}}).includes('เท่ากับ'));
+  assert.ok(!benchmarkChart({'<script>':{f1:.1}},'f1','<img>').includes('<script>'));
+});
+
+test('mobile overview keeps the full score range and readable stacked rows', () => {
+  const {benchmarkChart}=require('./static/charts.js');
+  const svg=benchmarkChart({text_baseline:{f1:0},text_plus_time:{f1:.5},custom:{f1:1}},'f1','mobile-run',true);
+  assert.match(svg,/viewBox="0 0 360/);
+  assert.match(svg,/data-model="text_baseline"[^>]+width="0"/);
+  assert.match(svg,/data-model="text_plus_time"[^>]+width="160"/);
+  assert.match(svg,/data-model="custom"[^>]+width="320"/);
+  assert.ok(svg.includes('100%')&&svg.includes('mobile-run'));
+});

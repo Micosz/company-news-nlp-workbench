@@ -111,6 +111,8 @@ class Handler(BaseHTTPRequestHandler):
             if path=='/': return self.send((ROOT/'static/index.html').read_text().replace('__TOKEN__',TOKEN),ctype='text/html; charset=utf-8')
             if path in ('/app.js','/charts.js','/facts.js','/style.css'):
                 return self.send((ROOT/'static'/path[1:]).read_bytes(),ctype='text/javascript' if path.endswith('js') else 'text/css')
+            if path in tuple(f'/noto-sans-thai-{weight}.ttf' for weight in (400,500,600,700)):
+                return self.send((ROOT/'static'/path[1:]).read_bytes(),ctype='font/ttf')
             if path=='/api/init':
                 return self.send({'code':(ROOT/'algorithms/pair_experiment.py').read_text(),
                                   'required':REQUIRED,'optional':ROLES+TIMES,'root':str(ROOT)})
