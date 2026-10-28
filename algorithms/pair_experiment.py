@@ -141,6 +141,10 @@ def run(train, test, config):
                      'test_complete_pairs': int((t_test[:,0] != 0).sum())}
     if all(time_coverage.values()) and config.get('time_source') in ('oracle', 'predicted'):
         models['time_only'] = classify(t_train, t_test, ['event_day_relation'])
+        models['text_plus_availability'] = classify(
+            np.hstack([x_train, (t_train != 0).astype(np.int64)]),
+            np.hstack([x_test, (t_test != 0).astype(np.int64)]),
+            ['tfidf_cosine_bin', 'both_dates_available'])
         models['text_plus_time'] = classify(np.hstack([x_train, t_train]),
                                             np.hstack([x_test, t_test]),
                                             ['tfidf_cosine_bin', 'event_day_relation'])
@@ -149,7 +153,7 @@ def run(train, test, config):
         else:
             warnings.append('Predicted event dates are supplied inputs; this does not evaluate or verify time extraction.')
         if time_coverage['train_complete_pairs'] < len(train) or time_coverage['test_complete_pairs'] < len(test):
-            warnings.append('Time coverage is partial; missingness may influence predictions.')
+            warnings.append('Time coverage is partial; missingness may influence predictions. Compare Text + availability with Text + event date before attributing gains to dates.')
     else:
         warnings.append('Time experiment skipped: provide dates in both splits and declare oracle or predicted time source.')
     return {'models': models, 'warnings': warnings, 'role_coverage': coverage,

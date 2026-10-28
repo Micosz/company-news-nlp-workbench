@@ -3,6 +3,8 @@
 import collections
 import csv
 import hashlib
+import json
+import os
 import shutil
 import tempfile
 import urllib.request
@@ -12,6 +14,8 @@ from prepare_datasets import EXPECTED_HASHES, make_pairs, parse_ecb, split_topic
 from download_sources import URLS, HASHES
 from download_research_sources import SOURCES
 from build_story_time import build
+import pandas as pd
+from engine import builtin, validate
 
 ROOT = Path(__file__).resolve().parents[1]
 RAW = ROOT / 'local_data' / 'temporal_sources'
@@ -45,9 +49,45 @@ def obtain(path, url, expected):
         raise
 
 
+def build_mixed(full_root, story_dir, output_path):
+    if output_path.exists():
+        raise FileExistsError(f'มีชุด mixed อยู่แล้ว ไม่เขียนทับ: {output_path}')
+    metadata = pd.read_csv(story_dir / 'ecb_story_mentions.csv', dtype=str, keep_default_na=False)
+    if metadata.mention_id.duplicated().any(): raise ValueError('รหัส mention ที่มีเวลาซ้ำ')
+    dates = metadata.set_index('mention_id')['event_date']
+    old = os.environ.get('NLP_DATASET_ROOT')
+    try:
+        os.environ['NLP_DATASET_ROOT'] = str(full_root.resolve())
+        frame = builtin('full')
+    finally:
+        if old is None: os.environ.pop('NLP_DATASET_ROOT', None)
+        else: os.environ['NLP_DATASET_ROOT'] = old
+    for side in ('a', 'b'):
+        frame[f'event_date_{side}'] = frame[f'mention_{side}'].map(dates).fillna('')
+    frame = validate(frame)
+    complete = frame.event_date_a.ne('') & frame.event_date_b.ne('')
+    selected = pd.read_csv(story_dir / 'ecb_story_pairs.csv', dtype=str, keep_default_na=False).set_index('pair_id')
+    check = frame.loc[complete].set_index('pair_id')
+    if set(check.index) != set(selected.index): raise ValueError('คู่วันครบไม่ตรงกับชุด StoryLine ที่ตรวจต้นฉบับแล้ว')
+    for col in ('mention_a','mention_b','event_date_a','event_date_b','split','label'):
+        if not check[col].astype(str).sort_index().equals(selected[col].astype(str).sort_index()):
+            raise ValueError(f'คู่วันครบไม่ตรงกัน: {col}')
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with output_path.open('x', encoding='utf-8-sig', newline='') as out:
+        frame.to_csv(out, index=False)
+    summary = {}
+    for split, part in frame.groupby('split'):
+        a, b = part.event_date_a.ne(''), part.event_date_b.ne('')
+        summary[split] = {'pairs':len(part), 'both':int((a & b).sum()),
+                          'one':int((a ^ b).sum()), 'neither':int((~a & ~b).sum())}
+    print('ชุด mixed แบ่งตามข้อมูลเวลา:', json.dumps(summary, ensure_ascii=False), flush=True)
+    return summary
+
+
 def main():
-    if (OUTPUT / 'ecb_story_pairs.csv').exists():
-        raise FileExistsError(f'มีชุดข้อมูลอยู่แล้ว ไม่เขียนทับ: {OUTPUT}')
+    mixed = OUTPUT / 'ecb_story_mixed_pairs.csv'
+    if mixed.exists():
+        raise FileExistsError(f'มีชุด mixed อยู่แล้ว ไม่เขียนทับ: {mixed}')
     for relative in ('ecbplus/ECB+.zip', 'ecbplus/ECBplus_coreference_sentences.csv'):
         obtain(RAW / relative, URLS[relative], HASHES[relative])
     name = 'eventstoryline-46edefee.zip'
@@ -65,8 +105,18 @@ def main():
         dataset = full_root / 'full' / 'ecbplus'
         write_csv(dataset / 'event_mentions.csv', mentions)
         write_csv(dataset / 'pairs.csv', pairs)
-        build(RAW / name, RAW / 'ecbplus/ECB+.zip', full_root, OUTPUT)
-    print('พร้อมใช้ในเว็บ: ECB+ + Event StoryLine · มีวันกำกับ', flush=True)
+        story_dir = full_root / 'story'
+        build(RAW / name, RAW / 'ecbplus/ECB+.zip', full_root, story_dir)
+        OUTPUT.mkdir(parents=True, exist_ok=True)
+        for filename in ('ecb_story_mentions.csv', 'ecb_story_pairs.csv', 'ecb_story_summary.json'):
+            src, dst = story_dir / filename, OUTPUT / filename
+            if dst.exists():
+                if hashlib.sha256(src.read_bytes()).digest() != hashlib.sha256(dst.read_bytes()).digest():
+                    raise ValueError(f'ไฟล์ชุดเวลาที่มีอยู่ไม่ตรงกับต้นทาง: {dst}')
+            else:
+                with dst.open('xb') as dest, src.open('rb') as source: shutil.copyfileobj(source, dest)
+        build_mixed(full_root, story_dir, mixed)
+    print('พร้อมใช้ในเว็บ: ชุดวันครบ และ Full + เวลาบางส่วน', flush=True)
 
 
 if __name__ == '__main__':

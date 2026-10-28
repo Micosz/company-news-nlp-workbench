@@ -180,6 +180,18 @@ def main(folder):
             result['delta_f1']=result['models']['text_plus_roles']['f1']-result['models']['text_baseline']['f1']
         if {'text_baseline','text_plus_time'}.issubset(result['models']):
             result['delta_time_f1']=result['models']['text_plus_time']['f1']-result['models']['text_baseline']['f1']
+            a, b = test.event_date_a.ne('').to_numpy(), test.event_date_b.ne('').to_numpy()
+            result['time_strata'] = {}
+            for key, mask in [('both', a & b), ('one', a ^ b), ('neither', ~a & ~b)]:
+                if not mask.any(): continue
+                labels = test.label.to_numpy()[mask]
+                scores = {}
+                for name in ('text_baseline', 'text_plus_time'):
+                    model = models[name]
+                    pred = (np.asarray(model['scores'])[mask] >= float(model.get('threshold', 0.5))).astype(int)
+                    p, r, f, _ = precision_recall_fscore_support(labels, pred, average='binary', zero_division=0)
+                    scores[name] = {'precision':float(p), 'recall':float(r), 'f1':float(f)}
+                result['time_strata'][key] = {'pairs':int(mask.sum()), 'positive_pairs':int(labels.sum()), 'models':scores}
         result['elapsed_seconds']=round(time.perf_counter()-started,3)
         dump(folder/'metrics.json',result)
         manifest.update(status='completed', elapsed_seconds=result['elapsed_seconds'])

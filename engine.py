@@ -80,9 +80,13 @@ def validate(frame):
 
 
 def summary(frame):
-    return {'rows':len(frame), 'columns':list(frame.columns),
+    result = {'rows':len(frame), 'columns':list(frame.columns),
             'preview':frame.head(6).to_dict('records'),
             'splits': {str(k):int(v) for k,v in frame.get('split',pd.Series(dtype=str)).value_counts().items()}}
+    if set(TIMES).issubset(frame.columns):
+        a, b = (frame[c].fillna('').astype(str).str.strip().ne('') for c in TIMES)
+        result['time_coverage'] = {'both':int((a & b).sum()), 'one':int((a ^ b).sum()), 'neither':int((~a & ~b).sum())}
+    return result
 
 
 def csv_rows(path):
@@ -124,9 +128,10 @@ def load_provisional_roles(path=None):
 
 
 def builtin(mode):
-    if mode not in ('small_A','small_B','small_A_ai','small_B_ai','full','story_time'): raise ValueError('unknown dataset')
-    if mode == 'story_time':
-        path = ROOT / 'local_data' / 'ecb_story_time' / 'ecb_story_pairs.csv'
+    if mode not in ('small_A','small_B','small_A_ai','small_B_ai','full','story_time','story_mixed'): raise ValueError('unknown dataset')
+    if mode in ('story_time', 'story_mixed'):
+        filename = 'ecb_story_mixed_pairs.csv' if mode == 'story_mixed' else 'ecb_story_pairs.csv'
+        path = ROOT / 'local_data' / 'ecb_story_time' / filename
         if not path.is_file():
             raise ValueError('ยังไม่ได้เตรียมชุดเวลา: เปิด Terminal ในโฟลเดอร์โปรเจกต์ แล้วรัน .venv/bin/python scripts/setup_temporal_dataset.py (Windows: .venv\\Scripts\\python.exe scripts/setup_temporal_dataset.py) ดู README')
         return pd.read_csv(path, dtype=str, keep_default_na=False).fillna('')

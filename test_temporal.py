@@ -6,10 +6,20 @@ from unittest.mock import patch
 import pandas as pd
 
 from algorithms.pair_experiment import run, time_categories
-from engine import builtin, validate
+from engine import builtin, summary, validate
 
 
 class TemporalChecks(unittest.TestCase):
+    def test_coverage_distinguishes_complete_partial_and_missing(self):
+        frame = pd.DataFrame([
+            {'event_date_a':'2020-01-01','event_date_b':'2020-01-02'},
+            {'event_date_a':'2020-01-01','event_date_b':''},
+            {'event_date_a':'','event_date_b':'2020-01-02'},
+            {'event_date_a':'','event_date_b':''},
+        ])
+        self.assertEqual(summary(frame)['time_coverage'], {'both':1,'one':2,'neither':1})
+        self.assertEqual(time_categories(frame).tolist(), [[2],[0],[0],[0]])
+
     def test_builtin_temporal_option_and_missing_setup(self):
         with TemporaryDirectory() as directory, patch('engine.ROOT', Path(directory)):
             with self.assertRaisesRegex(ValueError, 'setup_temporal_dataset'):
@@ -51,6 +61,7 @@ class TemporalChecks(unittest.TestCase):
         self.assertNotIn('text_plus_time', base['models'])
         self.assertIn('text_plus_time', timed['models'])
         self.assertIn('time_only', timed['models'])
+        self.assertIn('text_plus_availability', timed['models'])
         self.assertEqual(base['models']['text_baseline']['scores'], timed['models']['text_baseline']['scores'])
         self.assertEqual(timed['time_coverage'], {'train_complete_pairs':253, 'test_complete_pairs':171})
         self.assertTrue(any('Oracle event dates' in msg for msg in timed['warnings']))
