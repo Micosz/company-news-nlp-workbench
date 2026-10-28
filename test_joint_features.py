@@ -50,6 +50,16 @@ class JointFeatureTests(unittest.TestCase):
         self.assertEqual(out['joint_coverage']['test_complete_pairs'],0)
         self.assertNotIn('text_plus_roles_time',out['models'])
 
+    def test_builtin_proxy_dates_are_sparse_and_provenance_required(self):
+        for fold,expected in [('A',(1,3)),('B',(3,1))]:
+            data=validate(builtin('small_'+fold+'_joint'))
+            train=data[data.split=='train']; test=data[data.split=='test'].drop(columns=['label'])
+            output=run(train,test,{'role_source':'predicted','time_source':'announcement_proxy'})
+            self.assertEqual((output['joint_coverage']['train_complete_pairs'],output['joint_coverage']['test_complete_pairs']),expected)
+            self.assertIn('text_plus_roles_time',output['models'])
+            self.assertTrue(any('not gold event dates' in w for w in output['warnings']))
+            self.assertNotIn('text_plus_roles_time',run(train,test,{'role_source':'predicted','time_source':'none'})['models'])
+
     def test_source_declarations_are_required(self):
         for config in ({'role_source':'none','time_source':'oracle'}, {'role_source':'manual','time_source':'none'}):
             out=run(self.train,self.test,config)

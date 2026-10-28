@@ -194,8 +194,8 @@ class Handler(BaseHTTPRequestHandler):
                 config['seed']=int(config.get('seed',374))
                 if not 0<=config['seed']<2**32: raise ValueError('seed ต้องอยู่ระหว่าง 0 ถึง 4294967295')
                 if config.get('role_source') not in ('none','manual','predicted'): raise ValueError('Invalid role source')
-                if config.get('time_source', 'none') not in ('none','oracle','predicted'): raise ValueError('Invalid time source')
-                if entry['source'].endswith('_ai') and config['role_source']=='manual': raise ValueError('ชุดบทบาท AI ยังไม่ได้ผ่านการตรวจโดยคน โปรดเลือกโมเดลทำนาย')
+                if config.get('time_source', 'none') not in ('none','oracle','predicted','announcement_proxy'): raise ValueError('Invalid time source')
+                if entry['source'].endswith(('_ai','_joint')) and config['role_source']=='manual': raise ValueError('ชุดบทบาท AI ยังไม่ได้ผ่านการตรวจโดยคน โปรดเลือกโมเดลทำนาย')
                 if not payload['code'].strip(): raise ValueError('กรุณาใส่โค้ด')
                 with LOCK:
                     if ACTIVE: raise ValueError('มีการทดลองกำลังรันอยู่ กรุณารอ')

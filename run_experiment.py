@@ -3,12 +3,12 @@ import argparse, subprocess, sys
 from pathlib import Path
 from engine import ROOT, builtin, prepare_run, read_table
 p=argparse.ArgumentParser()
-p.add_argument('--dataset',choices=['small_A','small_B','small_A_ai','small_B_ai','full','story_time','story_resplit','story_mixed'],default='small_A')
+p.add_argument('--dataset',choices=['small_A','small_B','small_A_ai','small_B_ai','small_A_joint','small_B_joint','full','story_time','story_resplit','story_mixed'],default='small_A')
 p.add_argument('--input',type=Path)
 p.add_argument('--algorithm',type=Path,default=ROOT/'algorithms/pair_experiment.py')
 p.add_argument('--seed',type=int,default=374)
 p.add_argument('--role-source',choices=['none','manual','predicted'],default='none')
-p.add_argument('--time-source',choices=['none','oracle','predicted'],default='none')
+p.add_argument('--time-source',choices=['none','oracle','predicted','announcement_proxy'],default='none')
 p.add_argument('--threshold-mode',choices=['fixed','dev_f1'],default='fixed')
 p.add_argument('--note',default='CLI reproducibility run')
 a=p.parse_args()

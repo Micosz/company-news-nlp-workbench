@@ -139,7 +139,7 @@ def run(train, test, config):
     t_train, t_test = time_categories(train), time_categories(test)
     time_coverage = {'train_complete_pairs': int((t_train[:,0] != 0).sum()),
                      'test_complete_pairs': int((t_test[:,0] != 0).sum())}
-    if all(time_coverage.values()) and config.get('time_source') in ('oracle', 'predicted'):
+    if all(time_coverage.values()) and config.get('time_source') in ('oracle', 'predicted', 'announcement_proxy'):
         models['time_only'] = classify(t_train, t_test, ['event_day_relation'])
         models['text_plus_availability'] = classify(
             np.hstack([x_train, (t_train != 0).astype(np.int64)]),
@@ -150,6 +150,8 @@ def run(train, test, config):
                                             ['tfidf_cosine_bin', 'event_day_relation'])
         if config['time_source'] == 'oracle':
             warnings.append('Oracle event dates are supplied gold annotations; this does not evaluate automatic time extraction.')
+        elif config['time_source'] == 'announcement_proxy':
+            warnings.append('Sparse announcement-date proxy from full articles: not gold event dates; workflow demo only.')
         else:
             warnings.append('Predicted event dates are supplied inputs; this does not evaluate or verify time extraction.')
         if time_coverage['train_complete_pairs'] < len(train) or time_coverage['test_complete_pairs'] < len(test):

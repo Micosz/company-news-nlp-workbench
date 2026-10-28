@@ -133,7 +133,7 @@ def load_provisional_roles(path=None):
 
 
 def builtin(mode):
-    if mode not in ('small_A','small_B','small_A_ai','small_B_ai','full','story_time','story_resplit','story_mixed'): raise ValueError('unknown dataset')
+    if mode not in ('small_A','small_B','small_A_ai','small_B_ai','small_A_joint','small_B_joint','full','story_time','story_resplit','story_mixed'): raise ValueError('unknown dataset')
     if mode in ('story_time', 'story_resplit', 'story_mixed'):
         filename = 'ecb_story_mixed_pairs.csv' if mode == 'story_mixed' else 'ecb_story_pairs.csv'
         path = ROOT / 'local_data' / 'ecb_story_time' / filename
@@ -163,8 +163,10 @@ def builtin(mode):
                 frame=frame[keep].copy()
             validate(frame)
         return frame
-    ai_roles = mode.endswith('_ai')
-    pilot_mode = mode.removesuffix('_ai')
+    joint_proxy = mode.endswith('_joint')
+    ai_roles = mode.endswith('_ai') or joint_proxy
+    pilot_mode = mode.removesuffix('_ai').removesuffix('_joint')
+    proxy_dates = {r['mention_id']:r['date'] for r in csv_rows(ROOT/'data'/'pilot'/'announcement_date_proxy.csv')} if joint_proxy else {}
     # Portable pilot is bundled; full package remains alongside the app.
     configured = os.environ.get('NLP_DATASET_ROOT')
     base = Path(configured).expanduser().resolve() if configured else ROOT.parent / 'nlp_datasets_2026-10-26'
@@ -186,12 +188,12 @@ def builtin(mode):
         rows.append({'pair_id':p['pair_id'],'text_a':a['context_normalized'],'text_b':b['context_normalized'],
                      'label':p['label_same_event'],'split':assignments[p['document_id_a']] if assignments else p['split'],
                      'doc_a':p['document_id_a'],'doc_b':p['document_id_b'],'group_id':p['topic_id'],
-                     'mention_a':p['mention_id_a'],'mention_b':p['mention_id_b'], **role_fields})
+                     'mention_a':p['mention_id_a'],'mention_b':p['mention_id_b'], 'event_date_a':proxy_dates.get(p['mention_id_a'],''), 'event_date_b':proxy_dates.get(p['mention_id_b'],''), **role_fields})
     return pd.DataFrame(rows)
 
 
 def prepare_run(frame, code, config, source):
-    if source in ('small_A_ai', 'small_B_ai') and config.get('role_source') == 'manual':
+    if source in ('small_A_ai', 'small_B_ai', 'small_A_joint', 'small_B_joint') and config.get('role_source') == 'manual':
         raise ValueError('ชุดบทบาท AI ยังไม่ได้ผ่านการตรวจโดยคน โปรดเลือกโมเดลทำนาย')
     frame = validate(frame)
     threshold_mode = config.get('threshold_mode', 'fixed')
@@ -231,11 +233,13 @@ def prepare_run(frame, code, config, source):
                       'Small pilot overlaps full package test topics; do not tune on pilot then claim full test is untouched.',
                       'Threshold selection is fixed at 0.5 or chosen from dev only, as recorded in config; dev is not used for training.',
                       'Custom code has local filesystem access; frozen test labels are withheld by API contract only.']}
-    if source in ('small_A_ai', 'small_B_ai'):
+    if source in ('small_A_ai', 'small_B_ai', 'small_A_joint', 'small_B_joint'):
         manifest['limitations'].extend([
             'AI-assisted buyer/target annotations from full articles are not human-reviewed gold.',
             'Role annotations can use full-article context beyond the short text given to the baseline.',
             'In this small pilot, buyer/target identity can act as an event-label shortcut; do not generalize.'
         ])
+    if source.endswith('_joint'):
+        manifest['limitations'].append('Sparse announcement-date proxy; not event-date gold, needs review. Results are a workflow demonstration only.')
     dump(folder/'manifest.json',manifest)
     return folder

@@ -60,6 +60,8 @@ py -3.12 -m venv .venv
 
 ## ทดลองบทบาทร่วมกับวันเหตุการณ์
 
+**ชุดสาธิตใหม่:** เลือก `Pilot A - roles + announcement date proxy (demo)` หรือ Pilot B ในหน้า Data บทบาทจาก AI ยังรอคนตรวจ วันที่มาจากวันประกาศดีลในข่าวฉบับเต็ม 5 mentions ดูหลักฐานที่ [announcement_date_proxy.csv](data/pilot/announcement_date_proxy.csv) วันนี้เป็น proxy ไม่ใช่ gold event date และอาจไม่ตรงกับเหตุการณ์ของ mention ช่องอื่นปล่อยว่างเป็น unknown บางหลักฐานอยู่นอกข้อความสั้นที่โมเดลเห็น คู่ที่มีข้อมูลครบพร้อมกันมีเพียง Pilot A train 1 / test 3 และ Pilot B train 3 / test 1 จึงใช้สาธิตการทำงานเท่านั้น ห้ามสรุป improvement จากคะแนน
+
 อัลกอริทึมตั้งต้นรองรับการเปรียบเทียบ **Text baseline**, **Text + finance roles**, **Text + event date**, และ **Text + roles + event date** บน train/test เดียวกัน โดยเพิ่ม **Text + roles + date availability** เพื่อช่วยตรวจว่าผลอาจมาจากการมี/ไม่มีวัน มากกว่าความสัมพันธ์ของวันเองหรือไม่ การมีตัวควบคุมนี้ยังไม่พิสูจน์เหตุและผล
 
 **ข้อจำกัดข้อมูลปัจจุบัน:** บทบาท buyer/target ที่ AI ช่วยเตรียมอยู่ใน Pilot AMD/HP และยังไม่ได้ตรวจโดยคน ส่วนป้ายวันจาก Event StoryLine ที่เชื่อมได้ไม่ครอบคลุมสองหัวข้อ Pilot เหล่านั้น ชุดเวลาจึงยังไม่มีบทบาท buyer/target ที่กรอกไว้ และ Pilot ยังไม่มีป้ายวันจากแหล่งนี้ ไม่ควรสมมติวันหรือใช้วันข่าวแทนวันเหตุการณ์
