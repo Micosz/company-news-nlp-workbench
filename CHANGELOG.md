@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-28 — Provisional AI-assisted role data
+
+- Add pilot buyer/target metadata from same-source full articles, with source offsets and provenance; the 42 annotations need human review.
+- Make the role-enabled snippet Pilot A/B directly selectable, with AI provenance and experimental limitations explained. Do not redistribute newly prepared full articles in this public repository.
+
 ## 2026-10-28 — Manual claim comparison refinements
 
 - Support comma-grouped amounts and an adjustable relative tolerance, defaulting to an illustrative 0.5% of the larger amount; different reporting dates alone do not establish an update.
