@@ -63,28 +63,59 @@ async function history(){const rows=await api('/api/history');$('#history-list')
 
 // Manual comparison demo: no document fetching, AI inference, or fact verification.
 function claim(side){
-  return Object.fromEntries(['buyer','target','date','stage','amount','scale','currency','url','evidence'].map(k=>[k,$(`#${side}-${k}`).value]));
+  return Object.fromEntries(['buyer','target','company','date','time','period','stage','certainty','amount','scale','currency','url','evidence'].map(k=>[k,$(`#${side}-${k}`).value]));
 }
 function safeSource(url){
   try { const u=new URL(url); return ['http:','https:'].includes(u.protocol)?u.href:null; } catch { return null; }
 }
+let claimRendered=false;
+$('#event-type').onchange=()=>{
+  const dividend=$('#event-type').value==='dividend';
+  document.querySelectorAll('.dividend-only').forEach(e=>{e.hidden=!dividend;});
+  document.querySelectorAll('.ma-only').forEach(e=>{e.hidden=dividend;});
+};
+function clearClaimResult(){if(claimRendered){const box=$('#claim-result');box.className='empty';box.textContent='ข้อมูลเปลี่ยนแล้ว กดเปรียบเทียบอีกครั้งค่ะ';claimRendered=false;}}
+$('#claims').addEventListener('input',clearClaimResult);
+$('#claims').addEventListener('change',clearClaimResult);
 $('#compare-claims').onclick=()=>{
-  const a=claim('a'),b=claim('b'),result=WorkbenchFacts.compare(a,b,{sameDealVerified:$('#same-deal').checked});
+  const a=claim('a'),b=claim('b'),eventType=$('#event-type').value;
+  const result=WorkbenchFacts.compare(a,b,{sameDealVerified:$('#same-deal').checked,sameFactVerified:$('#same-fact').checked,tolerancePercent:$('#claim-tolerance').value,eventType});
   const box=$('#claim-result');box.className='claim-result '+result.kind;box.replaceChildren();
+  claimRendered=true;
   const title=document.createElement('strong');title.textContent=result.message;box.appendChild(title);
   const hint=document.createElement('p');hint.textContent='ผลมาจากข้อมูลที่กรอกและกฎเบื้องต้น กรุณาตรวจชนิดมูลค่า เงื่อนไข และแหล่งข่าว ไม่ใช่ผลจาก NLI หรือการตรวจสอบข้อเท็จจริง';box.appendChild(hint);
   const list=document.createElement('ol');list.className='claim-timeline';
   const entries=[{name:'ข่าว A',data:a},{name:'ข่าว B',data:b}];
-  const stages={announced:'ประกาศ',pending:'รอดำเนินการ',approved:'อนุมัติ',completed:'เสร็จสิ้น',cancelled:'ยกเลิก'};
+  const stages={negotiating:'เจรจา',announced:'ประกาศ',signed:'ลงนาม',pending:'กำลังพิจารณา / รอดำเนินการ',approved:'อนุมัติ',completed:'เสร็จสิ้น',cancelled:'ยกเลิก'};
+  const certainty={forecast:'คาดว่า / กำลังพิจารณา',confirmed:'อนุมัติ / ยืนยันแล้ว'};
   const scales={unit:'หน่วย',million:'ล้าน',billion:'พันล้าน'};
-  if(WorkbenchFacts.date(a.date)&&WorkbenchFacts.date(b.date))entries.sort((x,y)=>x.data.date.localeCompare(y.data.date));
+  if(WorkbenchFacts.date(a.date)&&WorkbenchFacts.date(b.date)){
+    if(a.date!==b.date)entries.sort((x,y)=>x.data.date.localeCompare(y.data.date));
+    else if(a.time&&b.time&&a.time!==b.time)entries.sort((x,y)=>x.data.time.localeCompare(y.data.time));
+  }
   for(const item of entries){
     const li=document.createElement('li');
-    const head=document.createElement('b');head.textContent=`${item.name} · ${item.data.date||'ไม่ระบุวัน'} · ${stages[item.data.stage]||'ไม่ทราบสถานะ'}`;li.appendChild(head);
-    const value=document.createElement('div');value.textContent=`มูลค่าที่กรอก: ${item.data.amount||'ไม่ระบุ'} ${scales[item.data.scale]||''} ${item.data.currency||''}`;li.appendChild(value);
+    const head=document.createElement('b');head.textContent=`${item.name} · ${item.data.date||'ไม่ระบุวัน'} ${item.data.time||''} · ${stages[item.data.stage]||'ไม่ทราบสถานะ'} · ${certainty[item.data.certainty]||'ไม่ทราบความแน่นอน'}`;li.appendChild(head);
+    const value=document.createElement('div');value.textContent=`มูลค่าที่กรอก: ${item.data.amount||'ไม่ระบุ'} ${scales[item.data.scale]||''} ${item.data.currency||''}${eventType==='dividend'?' ต่อหุ้น':''} · งวด/วันที่มีผล: ${item.data.period||'ไม่ระบุ'}`;li.appendChild(value);
     if(item.data.evidence.trim()){const ev=document.createElement('blockquote');ev.textContent=item.data.evidence;li.appendChild(ev);}
     const link=safeSource(item.data.url);if(link){const el=document.createElement('a');el.href=link;el.target='_blank';el.rel='noopener noreferrer';el.textContent='เปิดแหล่งข่าวที่ระบุ';li.appendChild(el);}
     list.appendChild(li);
   }
   box.appendChild(list);
 };
+function fillClaimExample(mode){
+  const dividend=mode!=='stage';
+  const a={buyer:'Company X',target:'Company Y',company:'Company X',date:'2026-01-01',time:'09:00',period:'FY2026',stage:'negotiating',certainty:'',amount:'',scale:'unit',currency:'',url:'',evidence:'ตัวอย่างสมมติ: เริ่มเจรจา'};
+  const b={...a,time:'17:30',stage:'signed',evidence:'ตัวอย่างสมมติ: ลงนาม'};
+  if(dividend){
+    Object.assign(a,{stage:mode==='dividend'?'pending':'approved',certainty:mode==='dividend'?'forecast':'confirmed',amount:mode==='dividend'?'2':'1.80',currency:'THB',evidence:'ตัวอย่างสมมติ: ปันผลต่อหุ้นจากข่าว A'});
+    Object.assign(b,{date:'2026-01-02',stage:'approved',certainty:'confirmed',amount:mode==='dividend'?'1.80':'1.50',currency:'THB',evidence:'ตัวอย่างสมมติ: ปันผลต่อหุ้นจากข่าว B'});
+  }
+  $('#event-type').value=dividend?'dividend':'acquisition';$('#event-type').onchange();
+  $('#claim-tolerance').value='0.5';$('#same-deal').checked=true;$('#same-fact').checked=dividend;
+  for(const [side,record] of [['a',a],['b',b]])for(const [key,value] of Object.entries(record))$(`#${side}-${key}`).value=value;
+  clearClaimResult();$('#compare-claims').click();
+}
+$('#example-stage').onclick=()=>fillClaimExample('stage');
+$('#example-dividend').onclick=()=>fillClaimExample('dividend');
+$('#example-conflict').onclick=()=>fillClaimExample('conflict');
