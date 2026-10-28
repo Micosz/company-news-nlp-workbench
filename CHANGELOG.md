@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-28 — Benchmark overview interface
+
+- Replace the long scrolling sidebar layout with top navigation and focused views.
+- Show saved-run selection, metric buttons, a full-width comparison chart and a compact score table first.
+- Keep reference models, methodology/provenance/warnings, errors, confusion matrices, B³, date strata and logs accessible through disclosures.
+- Open the latest completed local run without retraining. Keep imports, editable code, exports, history deletion and manual claim comparison.
+- Bundle open-license Noto Sans Thai for consistent offline typography. Algorithms, datasets and recorded scores are unchanged.
+
 ## 2026-10-28 — Exploratory temporal and cross-domain datasets
 
 - Add reproducible ECB+ / Event StoryLine annotation join and separate CDEC-WN positive-only inspection, source hashes, counts, and label limitations.
