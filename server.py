@@ -5,6 +5,7 @@ from pathlib import Path
 from urllib.parse import urlparse, parse_qs
 import pandas as pd
 from engine import ROOT, REQUIRED, ROLES, builtin, read_table, summary, prepare_run, dump
+from scripts.annotate_roles import blank_annotation, apply_annotations
 TOKEN=secrets.token_urlsafe(32)
 TABLES={}
 LOCK=threading.Lock()
@@ -68,13 +69,15 @@ class Handler(BaseHTTPRequestHandler):
         path=urlparse(self.path).path; query=parse_qs(urlparse(self.path).query)
         try:
             if path=='/': return self.send((ROOT/'static/index.html').read_text().replace('__TOKEN__',TOKEN),ctype='text/html; charset=utf-8')
-            if path in ('/app.js','/charts.js','/style.css'):
+            if path in ('/app.js','/charts.js','/facts.js','/style.css'):
                 return self.send((ROOT/'static'/path[1:]).read_bytes(),ctype='text/javascript' if path.endswith('js') else 'text/css')
             if path=='/api/init':
                 return self.send({'code':(ROOT/'algorithms/pair_experiment.py').read_text(),
                                   'required':REQUIRED,'optional':ROLES,'root':str(ROOT)})
             if path=='/api/template':
                 return self.send(excel(builtin('small_A')),ctype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',filename='pilot_fold_A_roles_blank.xlsx')
+            if path=='/api/annotation-template':
+                return self.send(excel(blank_annotation()),ctype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',filename='pilot_role_annotations_blank.xlsx')
             if path=='/api/history':
                 rows=[]
                 for f in sorted((ROOT/'runs').glob('*/manifest.json'),reverse=True)[:50]:
@@ -121,6 +124,13 @@ class Handler(BaseHTTPRequestHandler):
                 frame=read_table(raw,payload['name'])
                 if len(frame)>150000: raise ValueError('ต้นแบบรองรับไม่เกิน 150,000 คู่ต่อไฟล์')
                 return self.send(table_store(frame,Path(payload['name']).name,raw))
+            if path=='/api/annotations':
+                raw=base64.b64decode(payload['data'],validate=True)
+                if len(raw)>50*1024*1024: raise ValueError('ไฟล์ใหญ่เกิน 50 MB')
+                fold=payload.get('fold')
+                if fold not in ('A','B'): raise ValueError('เลือก Pilot A หรือ B')
+                annotated=apply_annotations(read_table(raw,payload['name']),'small_'+fold)
+                return self.send(table_store(annotated,'pilot_'+fold+'_roles:'+Path(payload['name']).name,raw))
             if path=='/api/run':
                 entry=TABLES.get(payload['dataset_id'])
                 if not entry: raise ValueError('กรุณาโหลดข้อมูลอีกครั้ง')

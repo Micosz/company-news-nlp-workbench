@@ -4,8 +4,8 @@
   const names = {
     majority_reference: 'Majority reference',
     cosine_reference: 'Cosine reference',
-    text_baseline: 'Text baseline · LR',
-    text_plus_roles: 'Text + finance roles · LR'
+    text_baseline: 'Text baseline',
+    text_plus_roles: 'Text + finance roles'
   };
   const metrics = {f1: 'F1', precision: 'Precision', recall: 'Recall', macro_f1: 'Macro F1'};
   const colors = {majority_reference: '#798781', cosine_reference: '#a17a30', text_baseline: '#176b58', text_plus_roles: '#5265b3'};
