@@ -12,7 +12,7 @@ init=json.loads(request('/api/init'))
 raw=request('/api/template')
 loaded=json.loads(request('/api/upload',{'name':'pilot_fold_A_roles_blank.xlsx','data':base64.b64encode(raw).decode()}))
 assert loaded['rows']==424
-body={'dataset_id':loaded['dataset_id'],'mapping':{k:k for k in init['required']+init['optional']},'code':init['code'],
+body={'dataset_id':loaded['dataset_id'],'mapping':{k:k for k in init['required']+init['optional'] if k in loaded['columns']},'code':init['code'],
       'config':{'seed':374,'role_source':'none','note':'Excel import / real-data pilot A / final algorithm'}}
 run=json.loads(request('/api/run',body))['run_id']
 for _ in range(90):

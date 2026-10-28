@@ -57,6 +57,19 @@ def role_categories(frame):
     return np.asarray(values, dtype=np.int64).reshape(-1, 3)
 
 
+def time_categories(frame):
+    """0 unknown, 1 same exact calendar day, 2 different exact calendar day.
+
+    The category is a soft feature, never a rule asserting event identity.
+    The caller must describe whether the dates are gold or predicted.
+    """
+    values = []
+    for row in frame.to_dict('records'):
+        a, b = str(row.get('event_date_a', '')).strip(), str(row.get('event_date_b', '')).strip()
+        values.append([0 if not a or not b else (1 if a == b else 2)])
+    return np.asarray(values, dtype=np.int64).reshape(-1, 1)
+
+
 def run(train, test, config):
     # Unique TRAIN contexts prevent repeated pairs from overweighting document IDF.
     corpus = list(dict.fromkeys(normalize(x) for col in ('text_a', 'text_b') for x in train[col]))
@@ -123,11 +136,28 @@ def run(train, test, config):
             warnings.append('Role coverage is partial; missing-role indicators may influence predictions.')
     else:
         warnings.append('Role experiment skipped: annotate roles in both splits and declare manual or predicted source.')
+    t_train, t_test = time_categories(train), time_categories(test)
+    time_coverage = {'train_complete_pairs': int((t_train[:,0] != 0).sum()),
+                     'test_complete_pairs': int((t_test[:,0] != 0).sum())}
+    if all(time_coverage.values()) and config.get('time_source') in ('oracle', 'predicted'):
+        models['time_only'] = classify(t_train, t_test, ['event_day_relation'])
+        models['text_plus_time'] = classify(np.hstack([x_train, t_train]),
+                                            np.hstack([x_test, t_test]),
+                                            ['tfidf_cosine_bin', 'event_day_relation'])
+        if config['time_source'] == 'oracle':
+            warnings.append('Oracle event dates are supplied gold annotations; this does not evaluate automatic time extraction.')
+        else:
+            warnings.append('Predicted event dates are supplied inputs; this does not evaluate or verify time extraction.')
+        if time_coverage['train_complete_pairs'] < len(train) or time_coverage['test_complete_pairs'] < len(test):
+            warnings.append('Time coverage is partial; missingness may influence predictions.')
+    else:
+        warnings.append('Time experiment skipped: provide dates in both splits and declare oracle or predicted time source.')
     return {'models': models, 'warnings': warnings, 'role_coverage': coverage,
+            'time_coverage': time_coverage,
             'vectorizer': {'vocabulary': {k:int(v) for k,v in vectorizer.vocabulary_.items()},
                            'idf': vectorizer.idf_.tolist(), 'train_unique_contexts': len(corpus),
                            'cosine_bin_edges': cosine_edges.tolist(),
                            'cosine_bin_quantiles': list(COSINE_QUANTILES),
                            'category_codes': {'role_relation': {'unknown': 0, 'match': 1, 'mismatch': 2},
                                               'role_reversed': {'unknown': 0, 'no': 1, 'yes': 2}}},
-            'method': 'TF-IDF word 1-2grams → training-only cosine tertile bins → Categorical Naive Bayes; ablation adds buyer/target and reversed-role categories.'}
+            'method': 'TF-IDF word 1-2grams → training-only cosine tertile bins → Categorical Naive Bayes; ablations add buyer/target roles or event-day relation when supplied.'}

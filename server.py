@@ -4,7 +4,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlparse, parse_qs
 import pandas as pd
-from engine import ROOT, REQUIRED, ROLES, builtin, read_table, summary, prepare_run, dump
+from engine import ROOT, REQUIRED, ROLES, TIMES, builtin, read_table, summary, prepare_run, dump
 from scripts.annotate_roles import blank_annotation, apply_annotations
 TOKEN=secrets.token_urlsafe(32)
 TABLES={}
@@ -73,7 +73,7 @@ class Handler(BaseHTTPRequestHandler):
                 return self.send((ROOT/'static'/path[1:]).read_bytes(),ctype='text/javascript' if path.endswith('js') else 'text/css')
             if path=='/api/init':
                 return self.send({'code':(ROOT/'algorithms/pair_experiment.py').read_text(),
-                                  'required':REQUIRED,'optional':ROLES,'root':str(ROOT)})
+                                  'required':REQUIRED,'optional':ROLES+TIMES,'root':str(ROOT)})
             if path=='/api/template':
                 return self.send(excel(builtin('small_A')),ctype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',filename='pilot_fold_A_roles_blank.xlsx')
             if path=='/api/annotation-template':
@@ -135,7 +135,7 @@ class Handler(BaseHTTPRequestHandler):
                 entry=TABLES.get(payload['dataset_id'])
                 if not entry: raise ValueError('กรุณาโหลดข้อมูลอีกครั้ง')
                 mapping=payload['mapping']; frame=pd.DataFrame()
-                for target in REQUIRED+ROLES:
+                for target in REQUIRED+ROLES+TIMES:
                     source=mapping.get(target)
                     if source: frame[target]=entry['frame'][source]
                 # Keep mention identities for original event-level data, never use as features.
@@ -145,6 +145,7 @@ class Handler(BaseHTTPRequestHandler):
                 config['seed']=int(config.get('seed',374))
                 if not 0<=config['seed']<2**32: raise ValueError('seed ต้องอยู่ระหว่าง 0 ถึง 4294967295')
                 if config.get('role_source') not in ('none','manual','predicted'): raise ValueError('Invalid role source')
+                if config.get('time_source', 'none') not in ('none','oracle','predicted'): raise ValueError('Invalid time source')
                 if entry['source'].endswith('_ai') and config['role_source']=='manual': raise ValueError('ชุดบทบาท AI ยังไม่ได้ผ่านการตรวจโดยคน โปรดเลือกโมเดลทำนาย')
                 if not payload['code'].strip(): raise ValueError('กรุณาใส่โค้ด')
                 with LOCK:

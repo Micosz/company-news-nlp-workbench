@@ -1,6 +1,6 @@
 """Validation, dataset loading and research record persistence."""
 import csv, hashlib, html, io, json, os, platform, re, sys, uuid, unicodedata
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 import pandas as pd
 import numpy as np
@@ -8,6 +8,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parent
 REQUIRED = ['pair_id','text_a','text_b','label','split','doc_a','doc_b','group_id']
 ROLES = ['buyer_a','target_a','buyer_b','target_b']
+TIMES = ['event_date_a', 'event_date_b']
 
 
 def digest(data):
@@ -30,9 +31,16 @@ def validate(frame):
     missing = set(REQUIRED) - set(frame.columns)
     if missing: raise ValueError('ขาดคอลัมน์: ' + ', '.join(sorted(missing)))
     frame = frame.copy().fillna('')
-    for c in REQUIRED + ROLES:
+    for c in REQUIRED + ROLES + TIMES:
         if c not in frame: frame[c] = ''
         frame[c] = frame[c].astype(str).str.strip()
+    for c in TIMES:
+        for value in frame[c].unique():
+            if not value: continue
+            try:
+                if not re.fullmatch(r'\d{4}-\d{2}-\d{2}', value) or date.fromisoformat(value).isoformat() != value: raise ValueError()
+            except ValueError:
+                raise ValueError(f'{c} ต้องว่างหรือเป็นวันที่ YYYY-MM-DD จริง: {value}') from None
     for c in REQUIRED:
         if (frame[c] == '').any(): raise ValueError(f'{c} มีค่าว่าง')
     if not frame.label.isin(['0','1']).all(): raise ValueError('label ต้องเป็น 0 หรือ 1 เท่านั้น')

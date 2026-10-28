@@ -5,10 +5,12 @@
     majority_reference: 'Majority reference',
     cosine_reference: 'Cosine reference',
     text_baseline: 'Text baseline',
-    text_plus_roles: 'Text + finance roles'
+    text_plus_roles: 'Text + finance roles',
+    time_only: 'Time only reference',
+    text_plus_time: 'Text + event date'
   };
   const metrics = {f1: 'F1', precision: 'Precision', recall: 'Recall', macro_f1: 'Macro F1'};
-  const colors = {majority_reference: '#798781', cosine_reference: '#a17a30', text_baseline: '#176b58', text_plus_roles: '#5265b3'};
+  const colors = {majority_reference: '#798781', cosine_reference: '#a17a30', text_baseline: '#176b58', text_plus_roles: '#5265b3', time_only: '#a16454', text_plus_time: '#73599c'};
   const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
   const valid = value => typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= 1;
   const percentage = value => valid(value) ? `${(value * 100).toFixed(2)}%` : 'ไม่มีข้อมูล';

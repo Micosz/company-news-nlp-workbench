@@ -114,12 +114,12 @@ def main(folder):
         config=json.loads((folder/'config.json').read_text())
         spec=importlib.util.spec_from_file_location('user_algorithm',folder/'algorithm.py')
         module=importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
-        inputs=['text_a','text_b','buyer_a','target_a','buyer_b','target_b']
+        inputs=['text_a','text_b','buyer_a','target_a','buyer_b','target_b','event_date_a','event_date_b']
         output=module.run(train[inputs+['label']].copy(),test[inputs].copy(),config)
         models=output.pop('models')
         fitted=output.pop('vectorizer',{})
         dump(folder/'vectorizer.json',fitted)
-        result={'models':{},'warnings':output.get('warnings',[]),'role_coverage':output.get('role_coverage',{}),
+        result={'models':{},'warnings':output.get('warnings',[]),'role_coverage':output.get('role_coverage',{}), 'time_coverage':output.get('time_coverage',{}),
                 'method':output.get('method','custom'), 'test_pairs':len(test)}
         # The model has already produced all scores before the gold clustering
         # reference is inspected. The reference is never passed as a feature.
@@ -178,6 +178,8 @@ def main(folder):
             pd.DataFrame(cluster_rows).to_csv(folder/'cluster_predictions.csv',index=False,encoding='utf-8-sig')
         if {'text_baseline','text_plus_roles'}.issubset(result['models']):
             result['delta_f1']=result['models']['text_plus_roles']['f1']-result['models']['text_baseline']['f1']
+        if {'text_baseline','text_plus_time'}.issubset(result['models']):
+            result['delta_time_f1']=result['models']['text_plus_time']['f1']-result['models']['text_baseline']['f1']
         result['elapsed_seconds']=round(time.perf_counter()-started,3)
         dump(folder/'metrics.json',result)
         manifest.update(status='completed', elapsed_seconds=result['elapsed_seconds'])
