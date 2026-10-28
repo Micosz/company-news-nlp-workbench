@@ -1,5 +1,5 @@
 """Single-user loopback workbench. User Python runs with current user's permissions."""
-import argparse, base64, io, json, os, secrets, signal, subprocess, sys, threading, uuid, zipfile
+import argparse, base64, io, json, os, re, secrets, shutil, signal, subprocess, sys, threading, uuid, zipfile
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlparse, parse_qs
@@ -10,6 +10,46 @@ TOKEN=secrets.token_urlsafe(32)
 TABLES={}
 LOCK=threading.Lock()
 ACTIVE=None
+RUN_ID = re.compile(r'\d{8}T\d{6}Z_[0-9a-f]{6}\Z')
+
+
+def delete_runs(mode, run_id=None):
+    """Delete only verified run directories; never delete an active run."""
+    with LOCK:
+        root = ROOT / 'runs'
+        if mode == 'one':
+            if not isinstance(run_id, str) or not RUN_ID.fullmatch(run_id):
+                raise ValueError('รหัสการทดลองไม่ถูกต้อง')
+            candidates = [root / run_id]
+        elif mode == 'all':
+            candidates = sorted(root.iterdir()) if root.is_dir() else []
+        else:
+            raise ValueError('วิธีลบไม่ถูกต้อง')
+        selected = []
+        for folder in candidates:
+            if not RUN_ID.fullmatch(folder.name) or folder.is_symlink() or not folder.is_dir():
+                if mode == 'one': raise ValueError('ไม่พบการทดลองที่ลบได้')
+                continue
+            manifest_path = folder / 'manifest.json'
+            if manifest_path.is_symlink() or not manifest_path.is_file():
+                if mode == 'one': raise ValueError('ไม่พบบันทึกการทดลอง')
+                continue
+            try: manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+            except (OSError, ValueError):
+                if mode == 'one': raise ValueError('อ่านบันทึกการทดลองไม่ได้')
+                continue
+            if manifest.get('run_id') != folder.name:
+                if mode == 'one': raise ValueError('รหัสในบันทึกไม่ตรงกัน')
+                continue
+            selected.append((folder, manifest))
+        if any(folder.name == ACTIVE or manifest.get('status') == 'running' for folder, manifest in selected):
+            raise ValueError('มีการทดลองกำลังรันอยู่ กรุณารอให้เสร็จก่อนลบ')
+        deleted = []
+        for folder, _ in selected:
+            try: shutil.rmtree(folder)
+            except OSError as exc: raise ValueError(f'ลบได้ {len(deleted)} รายการก่อนเกิดข้อผิดพลาด: {exc}') from exc
+            deleted.append(folder.name)
+        return {'deleted': deleted, 'count': len(deleted)}
 
 
 def table_store(frame, source, original=None):
@@ -117,6 +157,8 @@ class Handler(BaseHTTPRequestHandler):
             if length<=0 or length>70*1024*1024: raise ValueError('ขนาดข้อมูลต้องไม่เกิน 50 MB ก่อนเข้ารหัส')
             payload=json.loads(self.rfile.read(length))
             path=urlparse(self.path).path
+            if path=='/api/delete-runs':
+                return self.send(delete_runs(payload.get('mode'), payload.get('run_id')))
             if path=='/api/builtin': return self.send(table_store(builtin(payload['mode']),payload['mode']))
             if path=='/api/upload':
                 raw=base64.b64decode(payload['data'],validate=True)
