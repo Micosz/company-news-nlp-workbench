@@ -1,0 +1,354 @@
+[
+  {
+    "id": "20261103T092759-9320a9b4",
+    "dataset": "ann1-dev",
+    "phase": "development",
+    "config": {
+      "dataset": "ann1-dev",
+      "phase": "development",
+      "tolerance_days": 0,
+      "custom_upload": false
+    },
+    "coverage": {
+      "mentions": 1245,
+      "documents": 196,
+      "topics": 8,
+      "gold_clusters": 408,
+      "date_parsed": 1032,
+      "date_missing": 213,
+      "date_unparsed": 0,
+      "role_missing": 318
+    },
+    "metrics": {
+      "EID_N": {
+        "muc": {
+          "recall": 0.7861409796893668,
+          "precision": 0.90633608815427,
+          "f1": 0.8419705694177864
+        },
+        "b3": {
+          "recall": 0.7254536722177806,
+          "precision": 0.9039522986839184,
+          "f1": 0.8049258764248325
+        },
+        "ceafe": {
+          "recall": 0.8023855170600974,
+          "precision": 0.6307770538738338,
+          "f1": 0.706306992363581
+        },
+        "conll_f1": 0.7844011460687333,
+        "paper_rounded_conll": 78.4,
+        "clusters": 519,
+        "tp": 3613,
+        "fp": 865,
+        "fn": 2270,
+        "tn": 767642,
+        "pair_precision": 0.8068334077713265,
+        "pair_recall": 0.6141424443311235,
+        "pair_f1": 0.6974230286651868,
+        "clustering_seconds": 0.0003561249999999294
+      },
+      "EID_lt": {
+        "muc": {
+          "recall": 0.8100358422939068,
+          "precision": 0.900398406374502,
+          "f1": 0.8528301886792453
+        },
+        "b3": {
+          "recall": 0.7476297432091127,
+          "precision": 0.9232000525836925,
+          "f1": 0.826190459353499
+        },
+        "ceafe": {
+          "recall": 0.786986428005166,
+          "precision": 0.6526228915164791,
+          "f1": 0.7135343613913506
+        },
+        "conll_f1": 0.7975183364746984,
+        "paper_rounded_conll": 79.8,
+        "clusters": 492,
+        "tp": 3744,
+        "fp": 294,
+        "fn": 2139,
+        "tn": 768213,
+        "pair_precision": 0.9271916790490342,
+        "pair_recall": 0.6364099949005609,
+        "pair_f1": 0.7547626247354098,
+        "clustering_seconds": 0.0001814580000000232
+      },
+      "AND": {
+        "muc": {
+          "recall": 0.7706093189964157,
+          "precision": 0.9161931818181818,
+          "f1": 0.8371187540558078
+        },
+        "b3": {
+          "recall": 0.7139260640235058,
+          "precision": 0.9405437129394011,
+          "f1": 0.8117146415977536
+        },
+        "ceafe": {
+          "recall": 0.816234741654644,
+          "precision": 0.6155707478652399,
+          "f1": 0.7018414638463536
+        },
+        "conll_f1": 0.7835582864999716,
+        "paper_rounded_conll": 78.4,
+        "clusters": 541,
+        "tp": 3539,
+        "fp": 238,
+        "fn": 2344,
+        "tn": 768269,
+        "pair_precision": 0.9369870267407996,
+        "pair_recall": 0.6015638279789223,
+        "pair_f1": 0.7327122153209109,
+        "clustering_seconds": 0.00017883300000010038
+      },
+      "OR": {
+        "muc": {
+          "recall": 0.8255675029868578,
+          "precision": 0.8916129032258064,
+          "f1": 0.8573200992555831
+        },
+        "b3": {
+          "recall": 0.7597597610419418,
+          "precision": 0.8863007400685045,
+          "f1": 0.8181663286756207
+        },
+        "ceafe": {
+          "recall": 0.7721036036962238,
+          "precision": 0.6702516389533176,
+          "f1": 0.7175814813395428
+        },
+        "conll_f1": 0.7976893030902489,
+        "paper_rounded_conll": 79.8,
+        "clusters": 470,
+        "tp": 3821,
+        "fp": 926,
+        "fn": 2062,
+        "tn": 767581,
+        "pair_precision": 0.804929429113124,
+        "pair_recall": 0.6494985551589325,
+        "pair_f1": 0.7189087488240827,
+        "clustering_seconds": 0.00018854099999998652
+      },
+      "OR_temporal": {
+        "muc": {
+          "recall": 0.8195937873357229,
+          "precision": 0.894393741851369,
+          "f1": 0.8553615960099751
+        },
+        "b3": {
+          "recall": 0.7552096926364518,
+          "precision": 0.9053172168961641,
+          "f1": 0.8234787803626507
+        },
+        "ceafe": {
+          "recall": 0.7785721608433156,
+          "precision": 0.6645553172051731,
+          "f1": 0.7170596876389903
+        },
+        "conll_f1": 0.7986333546705385,
+        "paper_rounded_conll": 79.8,
+        "clusters": 478,
+        "tp": 3791,
+        "fp": 493,
+        "fn": 2092,
+        "tn": 768014,
+        "pair_precision": 0.8849206349206349,
+        "pair_recall": 0.6443991160972293,
+        "pair_f1": 0.7457460411134061,
+        "clustering_seconds": 0.004366833000000181
+      }
+    },
+    "blocked_merges": 159,
+    "provenance": {
+      "dataset_sha256": "a39c855868a0faac3ea223b2e7d4a864b2bf557d7bba3d7cbb759908d5345575",
+      "upstream_commit": "5639eb84f9cd32c360ff2ee715eb937ed2cc3c8e",
+      "source_sha256": {
+        "engine.py": "0a21a586e23f0e91cd69303d37bd5064b05fbe78030c71aea3fdaaeb1c508a53",
+        "vendor/coreference.py": "e16d913aa185783f5c72c51fe9148a50adf7202a66724f9a93872191ec751f9d",
+        "vendor/utils.py": "b445e07da2cada259e30e17cdf0d516ac06dd24732222ff9332926024c1e4a1e"
+      },
+      "checkout_commit": "8fe7713127ee4c6967a767b50611625b50c63b2a",
+      "python": "3.9.6 (default, Oct 19 2026, 19:18:13) \n[Clang 21.0.0 (clang-2100.4.1.1)]",
+      "platform": "macOS-27.0.1-arm64-arm-64bit"
+    }
+  },
+  {
+    "id": "20261103T092801-0a04f621",
+    "dataset": "ann2-dev",
+    "phase": "development",
+    "config": {
+      "dataset": "ann2-dev",
+      "phase": "development",
+      "tolerance_days": 0,
+      "custom_upload": false
+    },
+    "coverage": {
+      "mentions": 1245,
+      "documents": 196,
+      "topics": 8,
+      "gold_clusters": 408,
+      "date_parsed": 1244,
+      "date_missing": 1,
+      "date_unparsed": 0,
+      "role_missing": 117
+    },
+    "metrics": {
+      "EID_N": {
+        "muc": {
+          "recall": 0.7311827956989247,
+          "precision": 0.8895348837209303,
+          "f1": 0.8026229508196722
+        },
+        "b3": {
+          "recall": 0.6654713406275854,
+          "precision": 0.896873503269522,
+          "f1": 0.7640356927928451
+        },
+        "ceafe": {
+          "recall": 0.8066905479380065,
+          "precision": 0.5908972056709275,
+          "f1": 0.6821341835413609
+        },
+        "conll_f1": 0.7495976090512927,
+        "paper_rounded_conll": 75.0,
+        "clusters": 557,
+        "tp": 3052,
+        "fp": 707,
+        "fn": 2831,
+        "tn": 767800,
+        "pair_precision": 0.8119180633147114,
+        "pair_recall": 0.5187829338772735,
+        "pair_f1": 0.633063679734495,
+        "clustering_seconds": 0.00024345799999991868
+      },
+      "EID_lt": {
+        "muc": {
+          "recall": 0.6953405017921147,
+          "precision": 0.8712574850299402,
+          "f1": 0.7734219269102989
+        },
+        "b3": {
+          "recall": 0.6355815702484151,
+          "precision": 0.9059224871167028,
+          "f1": 0.7470465408559137
+        },
+        "ceafe": {
+          "recall": 0.7745584593219593,
+          "precision": 0.5476947164702936,
+          "f1": 0.6416646729002221
+        },
+        "conll_f1": 0.7207110468888116,
+        "paper_rounded_conll": 72.1,
+        "clusters": 577,
+        "tp": 2870,
+        "fp": 522,
+        "fn": 3013,
+        "tn": 767985,
+        "pair_precision": 0.8461084905660378,
+        "pair_recall": 0.48784633690294066,
+        "pair_f1": 0.6188679245283019,
+        "clustering_seconds": 0.0002538330000003697
+      },
+      "AND": {
+        "muc": {
+          "recall": 0.6320191158900836,
+          "precision": 0.9011925042589438,
+          "f1": 0.7429775280898877
+        },
+        "b3": {
+          "recall": 0.5881451125018936,
+          "precision": 0.9363527540112139,
+          "f1": 0.7224822125976368
+        },
+        "ceafe": {
+          "recall": 0.819029080411462,
+          "precision": 0.5078478188569552,
+          "f1": 0.6269490896958283
+        },
+        "conll_f1": 0.6974696101277843,
+        "paper_rounded_conll": 69.7,
+        "clusters": 658,
+        "tp": 2450,
+        "fp": 361,
+        "fn": 3433,
+        "tn": 768146,
+        "pair_precision": 0.8715759516186411,
+        "pair_recall": 0.4164541900390957,
+        "pair_f1": 0.5636070853462158,
+        "clustering_seconds": 0.00018995899999962873
+      },
+      "OR": {
+        "muc": {
+          "recall": 0.7945041816009558,
+          "precision": 0.8681462140992167,
+          "f1": 0.8296943231441049
+        },
+        "b3": {
+          "recall": 0.7255598718695537,
+          "precision": 0.8604549589584117,
+          "f1": 0.7872708093725338
+        },
+        "ceafe": {
+          "recall": 0.7572429864573877,
+          "precision": 0.6450002890910527,
+          "f1": 0.6966293990408438
+        },
+        "conll_f1": 0.7711981771858274,
+        "paper_rounded_conll": 77.1,
+        "clusters": 479,
+        "tp": 3571,
+        "fp": 982,
+        "fn": 2312,
+        "tn": 767525,
+        "pair_precision": 0.7843180320667692,
+        "pair_recall": 0.6070032296447391,
+        "pair_f1": 0.6843618244538138,
+        "clustering_seconds": 0.00018937499999971408
+      },
+      "OR_temporal": {
+        "muc": {
+          "recall": 0.7025089605734767,
+          "precision": 0.8724035608308606,
+          "f1": 0.7782925215089344
+        },
+        "b3": {
+          "recall": 0.6407450814360226,
+          "precision": 0.9048677631704125,
+          "f1": 0.7502390661732518
+        },
+        "ceafe": {
+          "recall": 0.7710908523422415,
+          "precision": 0.5509720976455946,
+          "f1": 0.6427069821361278
+        },
+        "conll_f1": 0.7237461899394381,
+        "paper_rounded_conll": 72.4,
+        "clusters": 571,
+        "tp": 2897,
+        "fp": 536,
+        "fn": 2986,
+        "tn": 767971,
+        "pair_precision": 0.8438683367317216,
+        "pair_recall": 0.4924358320584736,
+        "pair_f1": 0.6219407471017604,
+        "clustering_seconds": 0.005244916999999738
+      }
+    },
+    "blocked_merges": 913,
+    "provenance": {
+      "dataset_sha256": "3fe1164306c4f9600427571b450a5fc4e427789b651e8a6cdcddfeaf0d0c4d32",
+      "upstream_commit": "5639eb84f9cd32c360ff2ee715eb937ed2cc3c8e",
+      "source_sha256": {
+        "engine.py": "0a21a586e23f0e91cd69303d37bd5064b05fbe78030c71aea3fdaaeb1c508a53",
+        "vendor/coreference.py": "e16d913aa185783f5c72c51fe9148a50adf7202a66724f9a93872191ec751f9d",
+        "vendor/utils.py": "b445e07da2cada259e30e17cdf0d516ac06dd24732222ff9332926024c1e4a1e"
+      },
+      "checkout_commit": "8fe7713127ee4c6967a767b50611625b50c63b2a",
+      "python": "3.9.6 (default, Oct 19 2026, 19:18:13) \n[Clang 21.0.0 (clang-2100.4.1.1)]",
+      "platform": "macOS-27.0.1-arm64-arm-64bit"
+    }
+  }
+]

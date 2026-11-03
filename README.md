@@ -1,3 +1,5 @@
+> **X-AMR experimental branch** — เว็บใหม่อยู่ที่ [xamr_lab](xamr_lab/README.md) เปิดด้วย `Start_XAMR.command` ที่พอร์ต **8767** เทียบ X-AMR เดิมกับ temporal-constrained clustering พร้อม export สำหรับรายงาน ส่วนเว็บเดิมด้านล่างยังคงอยู่
+
 # Company News NLP Workbench
 
 เว็บสำหรับทดลอง NLP กับ **คู่ข้อความจากข่าวบริษัท** นำเข้า Excel/CSV แก้โค้ด Python รันเปรียบเทียบโมเดล และเก็บหลักฐานของแต่ละรอบไว้ใช้ในรายงานวิจัย
