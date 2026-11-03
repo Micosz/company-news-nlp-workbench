@@ -1,0 +1,7 @@
+numpy==1.26.4
+scipy==1.12.0
+spacy==3.7.4
+typer==0.9.0
+click==8.1.7
+tqdm==4.66.2
+CoVal @ git+https://github.com/ns-moosavi/coval.git@87071a6293dc2e786dcfe2ed78e9369c17e41b3b

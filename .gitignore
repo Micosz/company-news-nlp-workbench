@@ -29,3 +29,11 @@ Thumbs.db
 # Archives / local download bundles
 *.zip
 *.tar.gz
+
+# X-AMR downloaded annotation data and outputs
+xamr_lab/data/*
+!xamr_lab/data/.gitkeep
+xamr_lab/runs/*
+!xamr_lab/runs/.gitkeep
+
+.venv-xamr/
