@@ -7,6 +7,17 @@
 | [`pair_workbench/`](pair_workbench/) | เว็บเดิม: TF-IDF / Naive Bayes, role/date features, NLI graph | รันบนเครื่อง มีช่องแก้ Python จึงยังไม่เปิดรันสาธารณะบน Vercel |
 | [`xamr_lab/`](xamr_lab/) | X-AMR เดิม 4 วิธี เทียบ OR + temporal clustering | รันบนเครื่องหรือออนไลน์ผ่าน Vercel |
 
+## เว็บออนไลน์และงานวิจัยอ้างอิง
+
+**เปิดเว็บวิจัยใหม่: [X-AMR Research Lab](https://xamrlab-nlp.vercel.app/)**
+
+| งานวิจัย | Paper | GitHub ของผู้เขียน | ใช้ในโครงงานนี้ |
+|---|---|---|---|
+| CohTP — Incorporating Temporal Coherence to Cross-Document Event Coreference Resolution (2026) | [ACL Anthology](https://aclanthology.org/2026.acl-long.1345/) · [PDF](https://aclanthology.org/2026.acl-long.1345.pdf) | [chenxinyu-nlp/CohTP](https://github.com/chenxinyu-nlp/CohTP) | งานอ้างอิงของแนวทางเดิม ไม่ใช่ implementation ที่เว็บเดิมรัน |
+| X-AMR — Linear Cross-document Event Coreference Resolution with X-AMR (2024) | [ACL Anthology](https://aclanthology.org/2024.lrec-main.920/) · [PDF](https://aclanthology.org/2024.lrec-main.920.pdf) | [ahmeshaf/gpt_coref](https://github.com/ahmeshaf/gpt_coref) | ฐานการทดลองเว็บใหม่ ใช้โค้ดและ annotation ของผู้เขียนจาก commit ที่ตรึงไว้ |
+
+ตรวจเมื่อ 5 พฤศจิกายน 2026: repository CohTP ยังมีเพียงไฟล์ `Comming soon` จึงยังไม่ใช่โค้ดพร้อมรัน ส่วน X-AMR มีโค้ดที่ใช้ในการทดลองนี้ ดูรายละเอียดใน [NOTICE](xamr_lab/NOTICE.md)
+
 ## เปิดในเครื่อง
 
 - เว็บเดิม: เปิด `pair_workbench/Start_Workbench.command` (port 8765)

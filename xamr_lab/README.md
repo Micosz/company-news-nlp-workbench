@@ -1,3 +1,5 @@
+> [เว็บ X-AMR ออนไลน์](https://xamrlab-nlp.vercel.app/) · [Paper และ GitHub ของผู้เขียนทั้งสองงาน](../README.md#เว็บออนไลน์และงานวิจัยอ้างอิง)
+
 ## Deployment
 
 This app is now in `xamr_lab/` on `main`. See [root deployment instructions](../README.md). Online mode runs the same engine, limits inputs to 2,000 mentions, and stores returned evidence in browser IndexedDB. Local mode keeps filesystem history.

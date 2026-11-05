@@ -1,3 +1,5 @@
+> [เว็บ X-AMR ออนไลน์](https://xamrlab-nlp.vercel.app/) · [Paper และ GitHub ของผู้เขียนทั้งสองงาน](../README.md#เว็บออนไลน์และงานวิจัยอ้างอิง)
+
 # NLP Research Workbench
 
 เว็บทดลองบนเครื่องสำหรับงาน **event coreference แบบคู่ข้อความ**: นำเข้า Excel/CSV → ตรวจ split → แก้/วาง Python → รัน → ดูผล → ดาวน์โหลดบันทึกเพื่อรายงาน
