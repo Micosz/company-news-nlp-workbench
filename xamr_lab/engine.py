@@ -62,9 +62,9 @@ def coverage(tasks):
  dates=[interval(t['argT']) for t in tasks]
  return {'mentions':len(tasks),'documents':len({t['doc_id'] for t in tasks}),'topics':len({t['topic'] for t in tasks}),'gold_clusters':len({t['gold_cluster'] for t in tasks}),'date_parsed':sum(d is not None for d in dates),'date_missing':sum(not t['argT'].strip() for t in tasks),'date_unparsed':sum(bool(t['argT'].strip()) and d is None for t,d in zip(tasks,dates)),'role_missing':sum(not t['arg0'].strip() or not t['arg1'].strip() for t in tasks)}
 
-def load_dataset(name):
+def load_dataset(name,data_root=None):
  if name not in FILES:raise ValueError('Unknown dataset')
- p=BASE/'data'/f'{name}.json'
+ p=(Path(data_root) if data_root else BASE/'data')/f'{name}.json'
  if not p.exists():raise ValueError('ยังไม่มีข้อมูล กรุณารัน setup_data.py')
  b=p.read_bytes();expected=json.loads((BASE/'dataset_checksums.json').read_text())[name]
  if hashlib.sha256(b).hexdigest()!=expected:raise ValueError('ข้อมูลเปลี่ยนจาก upstream: checksum ไม่ตรง')
@@ -110,13 +110,13 @@ def scores(tasks,pred,out,method):
 def csv_text(rows):
  f=io.StringIO();w=csv.DictWriter(f,fieldnames=list(rows[0]) if rows else ['empty']);w.writeheader();w.writerows(rows);return f.getvalue()
 
-def experiment(config,tasks=None):
+def experiment(config,tasks=None,output_root=None,data_root=None):
  name=config.get('dataset','ann1-dev');tolerance=int(config.get('tolerance_days',0))
  if not 0<=tolerance<=365:raise ValueError('tolerance ต้องอยู่ระหว่าง 0–365 วัน')
  custom=tasks is not None
  if custom:
   tasks=validate(copy.deepcopy(tasks));sha=hashlib.sha256(json.dumps(tasks,sort_keys=True,ensure_ascii=False).encode()).hexdigest()
- else:tasks,sha=load_dataset(name)
+ else:tasks,sha=load_dataset(name,data_root)
  phase=config.get('phase','development')
  if phase not in ['development','heldout']:raise ValueError('Unknown phase')
  if 'test_common' in name and phase!='heldout':raise ValueError('test_common ต้องรันในโหมด held-out')
@@ -124,7 +124,7 @@ def experiment(config,tasks=None):
  if phase=='heldout' and not custom and 'test_common' not in name:raise ValueError('ชุดนี้ไม่ใช่ held-out test')
  if custom and (not config.get('source','').strip() or not config.get('annotation_source','').strip()):raise ValueError('ระบุแหล่งข้อมูลและผู้สร้าง annotation')
  run_id=datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S')+'-'+uuid.uuid4().hex[:8]
- out=BASE/'runs'/run_id;out.mkdir(parents=True)
+ out=(Path(output_root) if output_root else BASE/'runs')/run_id;out.mkdir(parents=True)
  try:
   (out/'input.json').write_text(json.dumps(tasks,ensure_ascii=False))
   config={**config,'tolerance_days':tolerance,'dataset':name,'phase':phase,'custom_upload':custom}
@@ -161,9 +161,12 @@ def experiment(config,tasks=None):
   latex='\\begin{tabular}{lrrrr}\nMethod & MUC & B$^3$ & CEAF$_e$ & CoNLL \\\\\n\\hline\n'
   for r in rows:latex+='{} & {:.2f} & {:.2f} & {:.2f} & {:.2f} \\\\\n'.format(r['method'].replace('_','\\_'),r['MUC_F1'],r['B3_F1'],r['CEAF_e_F1'],r['CoNLL_F1'])
   (out/'table.tex').write_text(latex+'\\end{tabular}\n')
-  env=subprocess.check_output([sys.executable,'-m','pip','freeze'],text=True,stderr=subprocess.DEVNULL);(out/'environment.txt').write_text(env)
+  from importlib.metadata import distributions
+  env='\n'.join(sorted(d.metadata['Name']+'=='+d.version for d in distributions() if d.metadata['Name']));(out/'environment.txt').write_text(env)
   try:revision=subprocess.check_output(['git','rev-parse','HEAD'],cwd=BASE,text=True,stderr=subprocess.DEVNULL).strip()
-  except subprocess.CalledProcessError:revision='uncommitted'
+  except (subprocess.CalledProcessError,OSError):
+   import os
+   revision=os.environ.get('VERCEL_GIT_COMMIT_SHA','unavailable')
   report={'id':run_id,'created':datetime.now(timezone.utc).isoformat(),'dataset':name,'phase':phase,'config':config,'coverage':coverage(tasks),'metrics':result,'blocked_merges':len(blocked),'blocked_examples':blocked[:30],'errors':error_rows[:30],'error_example_total':total,'error_examples_exported':len(error_rows),'provenance':{'dataset_sha256':sha,'upstream_commit':COMMIT,'source_sha256':source_hash,'checkout_commit':revision,'python':sys.version,'platform':platform.platform()},'preprocessing_seconds':preprocessing,'warnings':['Human annotation results are not end-to-end news extraction results.' if not name.startswith('gpt4') and not custom else 'Annotation provenance must be reported.','Temporal intervals reflect supplied annotations; publication date is not event date.','Deterministic edge-order heuristic; no significance or generalization claim.','Test common is a partial annotated subset, not full ECB+ test.' if 'test_common' in name else 'Development results must not be reported as untouched test results.']}
   (out/'report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
   (out/'README.txt').write_text('Metrics are percentages in metrics.csv and fractions in report.json. CoNLL = mean(MUC F1, B3 F1, CEAF_e F1). Raw scores used, not rounded intermediates. paper_rounded_CoNLL reproduces upstream rounding. All five methods share identical mentions and annotation source. No VerbNet. Temporal constraints apply to whole clusters, unknown does not veto merges. Edges processed by mention-id order. Timing is clustering only, no benchmark claim. Error examples capped at 500; confusion counts exact. Human/GPT archived annotations are not live automatic extraction. Report source, subset, split and coverage; no automatic claim of improvement or significance.\n'+json.dumps(config,ensure_ascii=False,indent=2))
@@ -171,9 +174,9 @@ def experiment(config,tasks=None):
  except Exception:
   (out/'FAILED.txt').write_text('Incomplete run; not valid for reporting.');raise
 
-def bundle(run_id):
+def bundle(run_id,output_root=None):
  if not re.fullmatch(r'\d{8}T\d{6}-[a-f0-9]{8}',run_id):raise ValueError('Invalid run id')
- folder=BASE/'runs'/run_id
+ folder=(Path(output_root) if output_root else BASE/'runs')/run_id
  if not (folder/'report.json').exists():raise ValueError('Unknown run')
  b=io.BytesIO()
  with zipfile.ZipFile(b,'w',zipfile.ZIP_DEFLATED) as z:

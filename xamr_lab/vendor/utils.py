@@ -1,6 +1,5 @@
 import json
 
-from spacy.tokens import Doc
 
 
 TASK_KEYS = ['mention_id', 'topic', 'doc_id', 'sentence_id', 'sentence',
@@ -14,6 +13,7 @@ class WhitespaceTokenizer:
         self.vocab = vocab
 
     def __call__(self, text):
+        from spacy.tokens import Doc  # Only needed by optional tokenizer, not clustering.
         words = text.split(" ")
         spaces = [True] * len(words)
         # Avoid zero-length tokens

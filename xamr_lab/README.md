@@ -1,10 +1,14 @@
+## Deployment
+
+This app is now in `xamr_lab/` on `main`. See [root deployment instructions](../README.md). Online mode runs the same engine, limits inputs to 2,000 mentions, and stores returned evidence in browser IndexedDB. Local mode keeps filesystem history.
+
 # X-AMR Research Lab
 
-เว็บทดลองแยกใน branch `experiment/xamr-temporal-clustering` พอร์ต 8767 เว็บเดิมและ server.py เดิมยังอยู่ตามเดิม ไม่ใช่ CohTP reproduction
+เว็บทดลองใน `xamr_lab/` บน `main` พอร์ต 8767 เว็บเดิมอยู่ใน `pair_workbench/` ไม่ใช่ CohTP reproduction
 
 ## เปิดเว็บ
 
-macOS: ดับเบิลคลิก `Start_XAMR.command` จาก root ของ branch นี้ ครั้งแรกต้องมีอินเทอร์เน็ตเพื่อติดตั้ง dependencies และดาวน์โหลด annotation จาก commit ที่ตรึงไว้ พร้อมตรวจ SHA-256 ทุกไฟล์ ใช้ Python 3.9–3.12
+macOS: ดับเบิลคลิก `Start_XAMR.command` จาก root ของ repository ครั้งแรกต้องมีอินเทอร์เน็ตเพื่อติดตั้ง dependencies และดาวน์โหลด annotation จาก commit ที่ตรึงไว้ พร้อมตรวจ SHA-256 ทุกไฟล์ ใช้ Python 3.9–3.12
 
 Windows / Linux หรือรันเอง:
 
