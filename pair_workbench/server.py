@@ -108,7 +108,11 @@ class Handler(BaseHTTPRequestHandler):
         if not self.allowed(): return self.send({'error':'Invalid host'},403)
         path=urlparse(self.path).path; query=parse_qs(urlparse(self.path).query)
         try:
-            if path=='/': return self.send((ROOT/'static/index.html').read_text().replace('__TOKEN__',TOKEN),ctype='text/html; charset=utf-8')
+            if path=='/':
+                html=(ROOT/'static/index.html').read_text(encoding='utf-8')
+                xamr_port=getattr(self.server,'xamr_port',None)
+                back_link=f'<a href="http://127.0.0.1:{xamr_port}/">กลับ X-AMR</a>' if xamr_port else ''
+                return self.send(html.replace('__TOKEN__',TOKEN).replace('<!-- LOCAL_XAMR_LINK -->',back_link),ctype='text/html; charset=utf-8')
             if path in ('/app.js','/charts.js','/facts.js','/style.css'):
                 return self.send((ROOT/'static'/path[1:]).read_bytes(),ctype='text/javascript' if path.endswith('js') else 'text/css')
             if path in tuple(f'/noto-sans-thai-{weight}.ttf' for weight in (400,500,600,700)):
@@ -218,8 +222,15 @@ class Handler(BaseHTTPRequestHandler):
         except Exception as e: self.send({'error':str(e)},400)
 
 if __name__=='__main__':
-    parser=argparse.ArgumentParser(); parser.add_argument('--port',type=int,default=8765); parser.add_argument('--open-browser',action='store_true'); args=parser.parse_args()
+    parser=argparse.ArgumentParser()
+    parser.add_argument('--port',type=int,default=8765)
+    parser.add_argument('--open-browser',action='store_true')
+    parser.add_argument('--xamr-port',type=int,help='Loopback port of X-AMR started by the launcher')
+    args=parser.parse_args()
+    if args.xamr_port is not None and not 1<=args.xamr_port<=65535:
+        parser.error('invalid X-AMR port')
     server=ThreadingHTTPServer(('127.0.0.1',args.port),Handler)
+    server.xamr_port=args.xamr_port
     print(f'NLP Research Workbench: http://127.0.0.1:{args.port}',flush=True)
     print('Local trusted code only. Ctrl+C to stop.',flush=True)
     if args.open_browser:

@@ -4,6 +4,7 @@ from pathlib import Path
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from starlette.concurrency import run_in_threadpool
+from demo import CUSTOM_BODY_LIMIT, run_custom_demo, run_demo
 from engine import experiment, bundle, REQUIRED
 from setup_data import BASE, FILES, COMMIT
 app = FastAPI(docs_url=None, redoc_url=None)
@@ -14,6 +15,33 @@ CATALOG = json.loads((BASE/'dataset_catalog.json').read_text())
 def home():
     html=(BASE/'static/index.html').read_text()
     return HTMLResponse(html.replace('<script>', '<script>window.CLOUD_MODE=true;</script><script src="/cloud.js"></script><script>',1))
+
+@app.get('/demo', response_class=HTMLResponse)
+def demo_page():
+    return (BASE / 'static/demo.html').read_text(encoding='utf-8')
+
+@app.get('/legacy', response_class=HTMLResponse)
+def legacy_page():
+    return (BASE / 'static/legacy.html').read_text(encoding='utf-8')
+
+@app.get('/api/demo')
+def demo_result(case: str = 'separate', tolerance_days: int = 0):
+    try:
+        return run_demo(case, tolerance_days)
+    except ValueError as error:
+        return JSONResponse({'error': str(error)}, status_code=400)
+
+@app.post('/api/demo/custom')
+async def demo_custom_result(request: Request):
+    raw = bytearray()
+    async for chunk in request.stream():
+        if len(raw) + len(chunk) > CUSTOM_BODY_LIMIT:
+            return JSONResponse({'error': 'ข้อมูลข่าวเกินขนาดที่รองรับ'}, status_code=413)
+        raw.extend(chunk)
+    try:
+        return await run_in_threadpool(run_custom_demo, json.loads(raw))
+    except ValueError as error:
+        return JSONResponse({'error': str(error)}, status_code=400)
 
 @app.get('/cloud.js')
 def cloud_js():

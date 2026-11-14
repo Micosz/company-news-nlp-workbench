@@ -1,9 +1,16 @@
 import argparse,json,re,threading,traceback,uuid
 from http.server import ThreadingHTTPServer,BaseHTTPRequestHandler
-from urllib.parse import urlparse
+from urllib.parse import parse_qs,urlparse
+from demo import CUSTOM_BODY_LIMIT,run_custom_demo,run_demo
 from engine import BASE,FILES,load_dataset,coverage,experiment,bundle
 JOBS={};LOCK=threading.Lock()
 class Handler(BaseHTTPRequestHandler):
+ def page(self,filename):
+  html=(BASE/'static'/filename).read_text(encoding='utf-8')
+  pair_port=getattr(self.server,'pair_port',None)
+  link=f'<a href="http://127.0.0.1:{pair_port}/">เว็บเก่า · Pair Workbench</a>' if pair_port else ''
+  return self.send(html.replace('<!-- LOCAL_PAIR_LINK -->',link),kind='text/html; charset=utf-8')
+
  def send(self,data,status=200,kind='application/json; charset=utf-8',attachment=None):
   if isinstance(data,(dict,list)):data=json.dumps(data,ensure_ascii=False).encode()
   elif isinstance(data,str):data=data.encode()
@@ -13,7 +20,12 @@ class Handler(BaseHTTPRequestHandler):
  def do_GET(self):
   path=urlparse(self.path).path
   try:
-   if path=='/':return self.send((BASE/'static/index.html').read_bytes(),kind='text/html; charset=utf-8')
+   if path=='/':return self.page('index.html')
+   if path=='/demo':return self.page('demo.html')
+   if path=='/legacy':return self.page('legacy.html')
+   if path=='/api/demo':
+    params=parse_qs(urlparse(self.path).query)
+    return self.send(run_demo(params.get('case',['separate'])[0],int(params.get('tolerance_days',['0'])[0])))
    if path=='/api/datasets':
     rows=[]
     for name in FILES:
@@ -40,11 +52,16 @@ class Handler(BaseHTTPRequestHandler):
   except Exception as e:self.send({'error':str(e)},400)
  def do_POST(self):
   try:
-   if urlparse(self.path).path!='/api/run':return self.send({'error':'Not found'},404)
+   path=urlparse(self.path).path
+   if path not in ('/api/run','/api/demo/custom'):return self.send({'error':'Not found'},404)
    origin=self.headers.get('Origin')
    if origin and urlparse(origin).netloc!=self.headers.get('Host'):return self.send({'error':'Origin rejected'},403)
    if not self.headers.get('Content-Type','').startswith('application/json'):raise ValueError('JSON required')
    length=int(self.headers.get('Content-Length','0'))
+   if path=='/api/demo/custom':
+    if not 0<length<=CUSTOM_BODY_LIMIT:
+     return self.send({'error':'ข้อมูลข่าวเกินขนาดที่รองรับหรือไม่มีข้อมูล'},413)
+    return self.send(run_custom_demo(json.loads(self.rfile.read(length))))
    if not 0<length<=40_000_000:raise ValueError('Request too large or empty')
    body=json.loads(self.rfile.read(length))
    if not LOCK.acquire(blocking=False):return self.send({'error':'มีการทดลองกำลังทำงานอยู่'},409)
@@ -56,6 +73,12 @@ class Handler(BaseHTTPRequestHandler):
    threading.Thread(target=work,daemon=True).start();self.send({'job':key},202)
   except Exception as e:self.send({'error':str(e)},400)
 if __name__=='__main__':
- parser=argparse.ArgumentParser();parser.add_argument('--port',type=int,default=8767);a=parser.parse_args()
+ parser=argparse.ArgumentParser()
+ parser.add_argument('--port',type=int,default=8767)
+ parser.add_argument('--pair-port',type=int,help='Loopback port of Pair Workbench started by the launcher')
+ a=parser.parse_args()
+ if a.pair_port is not None and not 1<=a.pair_port<=65535:parser.error('invalid Pair Workbench port')
+ server=ThreadingHTTPServer(('127.0.0.1',a.port),Handler)
+ server.pair_port=a.pair_port
  print(f'X-AMR Research Lab: http://127.0.0.1:{a.port}',flush=True)
- ThreadingHTTPServer(('127.0.0.1',a.port),Handler).serve_forever()
+ server.serve_forever()

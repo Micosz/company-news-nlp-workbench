@@ -10,6 +10,24 @@ class CloudTests(unittest.TestCase):
   self.assertIn('window.CLOUD_MODE=true',self.client.get('/').text)
   self.assertTrue(any(not d['ready'] for d in self.client.get('/api/datasets').json()))
   r=self.client.post('/api/run',json={'tasks':[{}]*2001});self.assertEqual(r.status_code,400)
+ def test_workbench_navigation(self):
+  home=self.client.get('/')
+  self.assertIn('X-AMR',home.text)
+  for route in ('/demo','/legacy'):
+   self.assertIn(f'href="{route}"',home.text)
+   page=self.client.get(route)
+   self.assertEqual(page.status_code,200)
+   self.assertIn('href="/"',page.text)
+  self.assertIn('20261028T090654Z_ab07e1',self.client.get('/legacy').text)
+  self.assertNotIn('workbench-token',self.client.get('/legacy').text)
+ def test_real_and_manual_demo(self):
+  real=self.client.get('/api/demo?case=real&tolerance_days=0')
+  self.assertEqual(real.status_code,200,real.text)
+  self.assertEqual(real.json()['results']['temporal']['groups'],[['A'],['B','C','D']])
+  report={'text':'Test report','action':'deploy','actor':'navy','target':'ship','date':'2011-11-11'}
+  manual=self.client.post('/api/demo/custom',json={'reports':[report,report],'tolerance_days':0})
+  self.assertEqual(manual.status_code,200,manual.text)
+  self.assertEqual(manual.json()['results']['temporal'],{'groups':[['A','B']]})
  def test_key_origin_and_invalid_json(self):
   with patch.dict(os.environ,{'XAMR_ACCESS_KEY':'test-only'}):
    self.assertEqual(self.client.post('/api/run',json={}).status_code,401)

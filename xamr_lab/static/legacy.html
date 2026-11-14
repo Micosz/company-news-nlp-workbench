@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ผลทดลองเดิม | Pair Workbench Archive</title>
+  <style>
+    :root { color-scheme: light; --ink: #1b2940; --muted: #52617a; --accent: #254aca; --line: #d8e0eb; --canvas: #f3f6fa; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--canvas); color: var(--ink); font: 15px/1.65 system-ui, sans-serif; }
+    header { background: #fff; border-bottom: 1px solid var(--line); }
+    .top, main { width: min(960px, 100% - 32px); margin-inline: auto; }
+    .top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px 20px; padding-block: 13px; }
+    nav { display: flex; gap: 16px; flex-wrap: wrap; }
+    a { color: var(--accent); text-underline-offset: .18em; }
+    :focus-visible { outline: 3px solid #6b87e3; outline-offset: 3px; }
+    main { padding-block: 24px 36px; }
+    h1 { font-size: clamp(1.75rem, 4vw, 2.6rem); line-height: 1.22; margin: 8px 0; }
+    h2 { font-size: 1.25rem; margin: 0 0 8px; }
+    p { margin: 8px 0; }
+    .muted, .run-id { color: var(--muted); }
+    .card { margin-top: 16px; padding: 18px; background: #fff; border: 1px solid var(--line); border-radius: 12px; }
+    details { border-top: 1px solid var(--line); padding: 10px 0; }
+    summary { cursor: pointer; font-weight: 700; }
+    .table-scroll { overflow: auto; }
+    table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+    th, td { padding: 6px 10px; border-bottom: 1px solid var(--line); text-align: right; }
+    th:first-child { text-align: left; }
+    thead { background: var(--canvas); }
+    .run-id { font-size: .85rem; overflow-wrap: anywhere; }
+    pre { overflow: auto; background: var(--canvas); padding: 12px; border-radius: 7px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="top">
+      <strong>Pair Workbench Archive</strong>
+      <nav aria-label="เมนูหลัก">
+        <a href="/">← X-AMR Research Lab</a>
+        <a href="/demo">เดโม X-AMR</a><!-- LOCAL_PAIR_LINK -->
+      </nav>
+    </div>
+  </header>
+  <main>
+    <h1>ผลทดลองเดิม · Pair Workbench</h1>
+    <p class="muted">อ้างอิงการทดลองที่จำแนกว่าคู่ข้อความกล่าวถึงเหตุการณ์เดียวกันหรือไม่</p>
+    <section class="card" aria-labelledby="results-heading">
+      <h2 id="results-heading">ผลทดลองที่บันทึกไว้</h2>
+      <p class="muted">ผลสำรวจ Text baseline และโมเดลอ้างอิง คะแนนคิดจากคลาสคู่ข้อความที่กล่าวถึงเหตุการณ์เดียวกัน</p>
+      <!-- Recorded scores from pair_workbench/docs/INITIAL_RESULTS*.json, rounded for display. -->
+
+      <details open>
+        <summary>Pilot A · Categorical Naive Bayes</summary>
+        <p class="muted">บันทึก 2026-10-28 · Train 253 คู่ · Test 171 คู่</p>
+        <div class="table-scroll" tabindex="0" role="region" aria-label="คะแนน Pilot A Categorical Naive Bayes">
+          <table>
+            <thead><tr><th scope="col">โมเดล</th><th scope="col">Precision</th><th scope="col">Recall</th><th scope="col">F1</th></tr></thead>
+            <tbody><tr><th scope="row">Majority reference</th><td>50.88%</td><td>100.00%</td><td>67.44%</td></tr><tr><th scope="row">Cosine reference</th><td>100.00%</td><td>12.64%</td><td>22.45%</td></tr><tr><th scope="row">Text baseline</th><td>52.82%</td><td>86.21%</td><td>65.50%</td></tr></tbody>
+          </table>
+        </div>
+
+        <p class="run-id">รอบ <code>20261028T090654Z_ab07e1</code> · <a href="https://github.com/Micosz/company-news-nlp-workbench/blob/ff38e328a8a22b8502833019b0e5799a95287fdc/pair_workbench/docs/INITIAL_RESULTS_NB.json">ข้อมูลผลต้นทาง</a></p>
+      </details>
+      <details>
+        <summary>Full ECB+ · Categorical Naive Bayes</summary>
+        <p class="muted">บันทึก 2026-10-28 · Train 70,280 คู่ · Test 18,588 คู่</p>
+        <div class="table-scroll" tabindex="0" role="region" aria-label="คะแนน Full ECB+ Categorical Naive Bayes">
+          <table>
+            <thead><tr><th scope="col">โมเดล</th><th scope="col">Precision</th><th scope="col">Recall</th><th scope="col">F1</th></tr></thead>
+            <tbody><tr><th scope="row">Majority reference</th><td>0.00%</td><td>0.00%</td><td>0.00%</td></tr><tr><th scope="row">Cosine reference</th><td>48.48%</td><td>7.53%</td><td>13.04%</td></tr><tr><th scope="row">Text baseline</th><td>0.00%</td><td>0.00%</td><td>0.00%</td></tr></tbody>
+          </table>
+        </div>
+        <p class="muted">ชุด Full ECB+ รวมหลายโดเมน ผลรอบนี้ใช้สำรวจ Text baseline</p>
+        <p class="run-id">รอบ <code>20261028T091148Z_c204df</code> · <a href="https://github.com/Micosz/company-news-nlp-workbench/blob/ff38e328a8a22b8502833019b0e5799a95287fdc/pair_workbench/docs/INITIAL_RESULTS_NB.json">ข้อมูลผลต้นทาง</a></p>
+      </details>
+      <details>
+        <summary>Pilot A (แบบฟอร์มบทบาท) · Logistic Regression</summary>
+        <p class="muted">บันทึก 2026-10-26 · Train 253 คู่ · Test 171 คู่</p>
+        <div class="table-scroll" tabindex="0" role="region" aria-label="คะแนน Pilot A (แบบฟอร์มบทบาท) Logistic Regression">
+          <table>
+            <thead><tr><th scope="col">โมเดล</th><th scope="col">Precision</th><th scope="col">Recall</th><th scope="col">F1</th></tr></thead>
+            <tbody><tr><th scope="row">Majority reference</th><td>50.88%</td><td>100.00%</td><td>67.44%</td></tr><tr><th scope="row">Cosine reference</th><td>100.00%</td><td>12.64%</td><td>22.45%</td></tr><tr><th scope="row">Text baseline</th><td>53.33%</td><td>82.76%</td><td>64.86%</td></tr></tbody>
+          </table>
+        </div>
+
+        <p class="run-id">รอบ <code>20261026T080349Z_ac3fff</code> · <a href="https://github.com/Micosz/company-news-nlp-workbench/blob/ff38e328a8a22b8502833019b0e5799a95287fdc/pair_workbench/docs/INITIAL_RESULTS.json">ข้อมูลผลต้นทาง</a></p>
+      </details>
+      <details>
+        <summary>Pilot B · Logistic Regression</summary>
+        <p class="muted">บันทึก 2026-10-26 · Train 171 คู่ · Test 253 คู่</p>
+        <div class="table-scroll" tabindex="0" role="region" aria-label="คะแนน Pilot B Logistic Regression">
+          <table>
+            <thead><tr><th scope="col">โมเดล</th><th scope="col">Precision</th><th scope="col">Recall</th><th scope="col">F1</th></tr></thead>
+            <tbody><tr><th scope="row">Cosine reference</th><td>83.33%</td><td>3.76%</td><td>7.19%</td></tr><tr><th scope="row">Text baseline</th><td>56.21%</td><td>71.43%</td><td>62.91%</td></tr></tbody>
+          </table>
+        </div>
+
+        <p class="run-id">รอบ <code>20261026T073647Z_ee3914</code> · <a href="https://github.com/Micosz/company-news-nlp-workbench/blob/ff38e328a8a22b8502833019b0e5799a95287fdc/pair_workbench/docs/INITIAL_RESULTS.json">ข้อมูลผลต้นทาง</a></p>
+      </details>
+    </section>
+    <section class="card" aria-labelledby="local-heading">
+      <h2 id="local-heading">เปิด Pair Workbench ในเครื่อง</h2>
+      <p>ใช้เวอร์ชันเต็มสำหรับนำเข้า Excel/CSV แก้โค้ด Python รันการทดลอง และเปิดผลที่เก็บไว้ในเครื่อง</p>
+      <p>บน macOS เปิด <code>pair_workbench/Start_Workbench.command</code> หลังติดตั้ง dependencies หรือรันจากโฟลเดอร์ repository ด้วย Python 3.12</p>
+      <pre><code>cd pair_workbench
+python3.12 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python server.py</code></pre>
+      <p>เมื่อเซิร์ฟเวอร์เริ่มทำงานแล้ว เปิด URL ที่แสดงใน Terminal</p>
+      <nav aria-label="เอกสารและซอร์สโค้ด">
+        <a href="https://github.com/Micosz/company-news-nlp-workbench/tree/main/pair_workbench">ซอร์สโค้ดเว็บเก่า</a>
+        <a href="https://github.com/Micosz/company-news-nlp-workbench/blob/main/pair_workbench/README_TH.md">คู่มือใช้งาน</a>
+      </nav>
+    </section>
+  </main>
+</body>
+</html>

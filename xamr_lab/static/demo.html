@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>เดโมจัดกลุ่มเหตุการณ์ | X-AMR Research Lab</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #1b2940;
+      --muted: #52617a;
+      --line: #d8e0eb;
+      --accent: #254aca;
+      --paper: #fff;
+      --canvas: #f3f6fa;
+      --blue-soft: #edf2ff;
+      --teal-soft: #e7f6f1;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; background: var(--canvas); color: var(--ink); font: 15px/1.65 system-ui, sans-serif; }
+    a { color: var(--accent); text-underline-offset: .18em; }
+    a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible { outline: 3px solid #6b87e3; outline-offset: 3px; }
+    .top { background: var(--paper); border-bottom: 1px solid var(--line); }
+    .top-inner, main { width: min(1140px, 100% - 40px); margin-inline: auto; }
+    .top-inner { display: flex; align-items: center; justify-content: space-between; gap: 10px 20px; flex-wrap: wrap; padding-block: 13px; }
+    .brand { font-weight: 750; }
+    .hero { padding: 31px 0 24px; }
+    .eyebrow { margin: 0; font-size: .77rem; font-weight: 760; letter-spacing: .12em; color: var(--accent); text-transform: uppercase; }
+    h1 { font-size: clamp(1.8rem, 4.3vw, 3.05rem); line-height: 1.28; margin: 5px 0 8px; letter-spacing: -.035em; }
+    h2 { font-size: 1.2rem; margin: 0 0 9px; line-height: 1.45; }
+    h3 { font-size: .98rem; margin: 0; line-height: 1.5; }
+    p { margin: 0; }
+    .muted, small { color: var(--muted); }
+    .layout { display: grid; grid-template-columns: minmax(285px, .86fr) minmax(0, 1.65fr); gap: 16px; align-items: start; }
+    .panel { background: var(--paper); padding: 19px; border: 1px solid var(--line); border-radius: 14px; }
+    label { display: block; font-size: .87rem; font-weight: 700; margin: 9px 0 4px; }
+    select, input, textarea, button { font: inherit; }
+    select, input, textarea { width: 100%; border: 1px solid #b4c2d6; border-radius: 7px; color: var(--ink); background: var(--paper); padding: 7px 10px; }
+    textarea { min-height: 70px; resize: vertical; }
+    button { margin-top: 12px; width: 100%; padding: 9px 14px; border: 0; border-radius: 8px; color: #fff; background: var(--accent); font-weight: 730; cursor: pointer; }
+    button:hover { background: #1c39a3; }
+    button:disabled { opacity: .7; cursor: wait; }
+    .input-list { list-style: none; padding: 0; margin: 10px 0 0; }
+    .input-list li { display: grid; grid-template-columns: 27px minmax(0, 1fr); gap: 9px; padding: 9px 0; border-top: 1px solid var(--line); }
+    .badge { display: inline-grid; place-items: center; width: 27px; height: 27px; border-radius: 6px; background: var(--blue-soft); color: #233ea2; font-weight: 730; font-size: .83rem; }
+    .sample { margin-top: 16px; border-top: 1px solid var(--line); padding-top: 12px; }
+    #custom-editor { margin: 12px 0 0; padding: 0; border: 0; min-width: 0; }
+    .report-fields { min-width: 0; margin: 12px 0 0; border: 1px solid var(--line); padding: 8px 12px 12px; border-radius: 8px; }
+    .report-fields legend { padding: 0 4px; font-weight: 700; }
+    .secondary { margin-top: 8px; padding: 5px 10px; background: var(--blue-soft); color: var(--accent); }
+    .secondary:hover { background: #dce6ff; }
+    .secondary:disabled { cursor: default; }
+    .source { display: block; font-size: .83rem; margin: 6px 0; }
+    .source[hidden] { display: none; }
+    #status { margin-top: 6px; min-height: 1.55em; font-size: .86rem; color: var(--muted); }
+    .comparison { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; margin: 13px 0; }
+    .method { padding: 13px; border: 1px solid var(--line); border-radius: 10px; }
+    .method.temporal { border-top: 3px solid #20846b; padding-top: 11px; }
+    .count { margin: 2px 0 9px; color: var(--muted); font-size: .88rem; }
+    .count strong { font-size: 1.5rem; color: var(--ink); }
+    .cluster-list { display: grid; gap: 6px; list-style: none; padding: 0; margin: 0; }
+    .cluster { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; background: var(--canvas); border-radius: 7px; padding: 6px 8px; font-size: .8rem; }
+    .cluster span:first-child { margin-right: 4px; }
+    .cluster:nth-child(even) .badge { background: var(--teal-soft); color: #145a4a; }
+    .metrics { font-size: .85rem; margin-top: 11px; color: var(--muted); }
+    .evidence { border-radius: 8px; padding: 11px 13px; background: var(--canvas); overflow-wrap: anywhere; }
+    .evidence p { margin-top: 4px; font-size: .88rem; }
+    details { margin-top: 11px; }
+    summary { cursor: pointer; font-weight: 650; color: var(--accent); }
+    footer { padding: 15px 0 24px; color: var(--muted); font-size: .83rem; }
+    @media (max-width: 800px) { .layout { grid-template-columns: 1fr; } }
+    @media (max-width: 460px) {
+      .top-inner, main { width: calc(100% - 24px); }
+      .comparison { grid-template-columns: 1fr; }
+      .panel { padding: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="top-inner">
+      <div class="brand">◈ X-AMR Research Lab</div>
+      <nav aria-label="เมนูหลัก">
+        <a href="/">X-AMR Research Lab</a> · <a href="/legacy">ผลทดลองเดิม</a><!-- LOCAL_PAIR_LINK -->
+      </nav>
+    </div>
+  </header>
+  <main>
+    <section class="hero">
+      <p class="eyebrow">Interactive demo · Event coreference</p>
+      <h1>ข่าวคนละชิ้น พูดถึงเหตุการณ์เดียวกันไหม?</h1>
+      <p class="muted">ลองเปรียบเทียบกลุ่มที่ X-AMR สร้างก่อนและหลังเพิ่มเงื่อนไขด้านเวลา</p>
+    </section>
+    <div class="layout">
+      <section class="panel" aria-labelledby="setup-heading">
+        <h2 id="setup-heading">1. เลือกเคสและรัน</h2>
+        <form id="demo-form">
+          <label for="case">ข้อมูลที่ใช้ทดสอบ</label>
+          <select id="case">
+            <option value="real">ข่าวจริง · ภารกิจทางเรือ (ECB+)</option>
+            <option value="custom">กรอกข่าวของคุณเอง</option>
+            <option value="separate">สะพานเดียวกันปิดสองครั้ง</option>
+            <option value="continuous">สะพานปิดต่อเนื่องครั้งเดียว</option>
+          </select>
+          <fieldset id="custom-editor" hidden disabled>
+            <legend>ข้อมูลเหตุการณ์จากข่าว</legend>
+            <small>กรอกหนึ่งเหตุการณ์ต่อชิ้น ใช้ชื่อผู้กระทำ สิ่งที่เกี่ยวข้อง และประเภทเหตุการณ์แบบเดียวกันเมื่อหมายถึงสิ่งเดียวกัน</small>
+            <div id="custom-rows"></div>
+            <button id="add-report" class="secondary" type="button">+ เพิ่มข่าวอีกชิ้น</button>
+          </fieldset>
+          <label for="tolerance">ระยะห่างที่ยอมได้ (วัน)</label>
+          <input id="tolerance" type="number" min="0" max="14" value="0" required>
+          <small>ที่ 0 วัน ระบบจะระงับการรวมกลุ่มถ้าพบช่วงเวลาที่ทราบและไม่ซ้อนกัน</small>
+          <button id="run" type="submit">รันเปรียบเทียบ</button>
+        </form>
+        <p id="status" role="status"></p>
+        <div id="sample" class="sample" hidden>
+          <h3>ข้อความที่ระบบใช้</h3>
+          <p id="scenario" class="muted"></p>
+          <a id="source" class="source" target="_blank" rel="noopener noreferrer" hidden>เปิด annotation ต้นทาง ↗</a>
+          <ul id="mentions" class="input-list"></ul>
+        </div>
+      </section>
+      <section class="panel" aria-labelledby="results-heading">
+        <h2 id="results-heading">2. ดูผลการจัดกลุ่ม</h2>
+        <p id="empty" class="muted">กดรันเพื่อดูว่าข้อความใดถูกจัดเป็นเหตุการณ์เดียวกัน</p>
+        <div id="results" hidden>
+          <p id="expected" class="muted"></p>
+          <div class="comparison">
+            <article class="method" id="baseline"></article>
+            <article class="method temporal" id="temporal"></article>
+          </div>
+          <div class="evidence">
+            <h3>เหตุผลจากเงื่อนไขเวลา</h3>
+            <p id="evidence"></p>
+            <p id="verdict"></p>
+          </div>
+        </div>
+        <details>
+          <summary>ข้อมูลที่ป้อนให้โมเดล</summary>
+          <p class="muted">ระบบจัดกลุ่มจากข้อมูลเหตุการณ์ที่มีผู้กำกับไว้ เช่น ผู้กระทำ ประเภทเหตุการณ์ สิ่งที่เกี่ยวข้อง และวันเกิดเหตุ เมื่อกรอกข่าวเอง ผลที่แสดงเป็นกลุ่มที่ระบบเสนอให้ตรวจสอบ</p>
+        </details>
+      </section>
+    </div>
+    <footer>อ่านที่มาของวิธีใน <a href="https://aclanthology.org/2024.lrec-main.920/" target="_blank" rel="noopener noreferrer">X-AMR paper</a></footer>
+  </main>
+  <script>
+    const byId = id => document.getElementById(id);
+    const form = byId('demo-form');
+    const runButton = byId('run');
+    const status = byId('status');
+    const caseSelect = byId('case');
+    const editor = byId('custom-editor');
+    const rows = byId('custom-rows');
+    const addReportButton = byId('add-report');
+    let reportId = 0;
+
+    function element(tag, text, className) {
+      const node = document.createElement(tag);
+      if (text !== undefined) node.textContent = text;
+      if (className) node.className = className;
+      return node;
+    }
+
+    function updateReportButtons() {
+      addReportButton.disabled = rows.children.length >= 8;
+      Array.from(rows.children).forEach((row, i) => {
+        row.querySelector('legend').textContent = 'ข่าวชิ้นที่ ' + (i + 1);
+        row.querySelector('button').hidden = rows.children.length <= 2;
+      });
+    }
+
+    function addReport() {
+      if (rows.children.length >= 8) return;
+      const row = element('fieldset', undefined, 'report-fields');
+      row.append(element('legend'));
+      const fields = [
+        ['text', 'หัวข่าวหรือประโยคจากข่าว', 'textarea', 500, true],
+        ['action', 'ประเภทเหตุการณ์ เช่น ซื้อกิจการ', 'text', 80, true],
+        ['actor', 'ผู้กระทำ เช่น บริษัทผู้ซื้อ', 'text', 100, true],
+        ['target', 'สิ่งที่เกี่ยวข้อง เช่น บริษัทเป้าหมาย', 'text', 100, true],
+        ['location', 'สถานที่ (ถ้าทราบ)', 'text', 100, false],
+        ['date', 'วันเกิดเหตุ (ถ้าทราบ)', 'date', 10, false],
+      ];
+      reportId += 1;
+      fields.forEach(([name, caption, kind, limit, required]) => {
+        const input = element(kind === 'textarea' ? 'textarea' : 'input');
+        if (kind !== 'textarea') input.type = kind;
+        input.id = 'report-' + reportId + '-' + name;
+        input.name = name;
+        input.maxLength = limit;
+        input.required = required;
+        const label = element('label', caption);
+        label.htmlFor = input.id;
+        row.append(label, input);
+      });
+      const remove = element('button', 'ลบข่าวชิ้นนี้', 'secondary');
+      remove.type = 'button';
+      remove.addEventListener('click', () => {
+        if (rows.children.length <= 2) return;
+        row.remove();
+        updateReportButtons();
+      });
+      row.append(remove);
+      rows.append(row);
+      updateReportButtons();
+    }
+
+    function showEditor() {
+      const custom = caseSelect.value === 'custom';
+      editor.hidden = !custom;
+      editor.disabled = !custom;
+    }
+
+    addReport();
+    addReport();
+    showEditor();
+    addReportButton.addEventListener('click', addReport);
+    caseSelect.addEventListener('change', () => {
+      showEditor();
+      byId('sample').hidden = true;
+      byId('results').hidden = true;
+      byId('empty').hidden = false;
+      byId('empty').textContent = 'กดรันเพื่อดูผลการจัดกลุ่มของข้อมูลชุดนี้';
+      status.textContent = '';
+    });
+
+    function showMethod(container, title, result) {
+      const count = element('p', undefined, 'count');
+      count.append(element('strong', result.groups.length), ' กลุ่ม');
+      const groups = element('ul', undefined, 'cluster-list');
+      result.groups.forEach((group, index) => {
+        const row = element('li', undefined, 'cluster');
+        row.append(element('span', 'กลุ่ม ' + (index + 1)));
+        group.forEach(id => row.append(element('span', id, 'badge')));
+        groups.append(row);
+      });
+      container.replaceChildren(element('h3', title), count, groups);
+      if ('wrong_merges' in result) {
+        container.append(element('p', `รวมผิด ${result.wrong_merges} คู่ · แยกผิด ${result.wrong_splits} คู่`, 'metrics'));
+      }
+    }
+
+    function showResult(data) {
+      const dates = new Map(data.mentions.map(mention => [mention.id, mention.date]));
+      byId('scenario').textContent = data.summary;
+      const source = byId('source');
+      source.hidden = !data.source;
+      if (data.source) source.href = data.source;
+      const mentionRows = data.mentions.map(mention => {
+        const row = element('li');
+        const text = element('div', mention.text);
+        const annotation = mention.date || 'ไม่ทราบวันเกิดเหตุ';
+        text.append(element('br'), element('small', mention.source_id ? annotation + ' · ' + mention.source_id : annotation));
+        row.append(element('span', mention.id, 'badge'), text);
+        return row;
+      });
+      byId('mentions').replaceChildren(...mentionRows);
+      const reference = data.reference ? `${data.reference} ${data.expected_groups} เหตุการณ์` : 'ผลเสนอให้ตรวจสอบ · ยังไม่มีคำตอบอ้างอิง';
+      byId('expected').textContent = `${reference} · ยอมให้ห่างกันได้ ${data.tolerance_days} วัน`;
+      showMethod(byId('baseline'), 'X-AMR OR', data.results.baseline);
+      showMethod(byId('temporal'), 'X-AMR OR + Temporal', data.results.temporal);
+
+      const blocked = data.blocked[0];
+      byId('evidence').textContent = blocked
+        ? `ระงับการรวม ${data.blocked.length} ครั้ง ตัวอย่าง เมื่อพยายามรวมกลุ่มผ่าน ${blocked.edge_a} ↔ ${blocked.edge_b} ระบบพบว่า ${blocked.witness_a} (${dates.get(blocked.witness_a)}) กับ ${blocked.witness_b} (${dates.get(blocked.witness_b)}) ห่างเกินค่าที่ตั้งไว้`
+        : 'ทุกการรวมกลุ่มในรอบนี้ผ่านเงื่อนไขเวลาที่ตั้งไว้';
+      const { baseline, temporal } = data.results;
+      let verdict = '';
+      if (data.reference) {
+        const mergeDelta = baseline.wrong_merges - temporal.wrong_merges;
+        const splitDelta = temporal.wrong_splits - baseline.wrong_splits;
+        if (mergeDelta > 0) verdict = `เมื่อเทียบคำตอบอ้างอิง คู่ที่รวมผิดลดลง ${mergeDelta} คู่`;
+        if (splitDelta > 0) verdict += ` คู่ที่แยกผิดเพิ่มขึ้น ${splitDelta} คู่`;
+        if (!verdict) verdict = 'จำนวนคู่ที่รวมผิดและแยกผิดเท่าเดิมในรอบนี้';
+      }
+      byId('verdict').textContent = verdict;
+      byId('sample').hidden = false;
+      byId('empty').hidden = true;
+      byId('results').hidden = false;
+    }
+
+    form.addEventListener('submit', async event => {
+      event.preventDefault();
+      const params = new URLSearchParams({
+        case: caseSelect.value,
+        tolerance_days: byId('tolerance').value,
+      });
+      const custom = caseSelect.value === 'custom';
+      const reports = custom ? Array.from(rows.children, row =>
+        Object.fromEntries(Array.from(row.querySelectorAll('input, textarea'), input => [input.name, input.value]))
+      ) : null;
+      runButton.disabled = true;
+      caseSelect.disabled = true;
+      editor.disabled = true;
+      byId('sample').hidden = true;
+      byId('results').hidden = true;
+      byId('empty').hidden = false;
+      byId('empty').textContent = 'กำลังจัดกลุ่มข้อความ…';
+      status.textContent = 'กำลังรันทั้งสองวิธี…';
+      try {
+        const response = custom
+          ? await fetch('/api/demo/custom', {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({tolerance_days: Number(params.get('tolerance_days')), reports}),
+            })
+          : await fetch('/api/demo?' + params);
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'รันเดโมไม่สำเร็จ');
+        showResult(data);
+        status.textContent = 'แสดงผลแล้ว';
+      } catch (error) {
+        byId('empty').textContent = 'ยังไม่มีผลลัพธ์ ลองรันอีกครั้ง';
+        status.textContent = error.message;
+      } finally {
+        runButton.disabled = false;
+        caseSelect.disabled = false;
+        showEditor();
+      }
+    });
+  </script>
+</body>
+</html>

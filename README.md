@@ -1,10 +1,10 @@
 # Company News NLP — two research workbenches
 
-แยกสองเว็บใน branch `main` โดยไม่ผสมวิธีทดลองเข้าด้วยกัน
+X-AMR Research Lab เป็นหน้าหลักของโปรเจกต์ เมนู **เดโม** เปิดตัวอย่างข่าวจริงจาก ECB+ และฟอร์มกรอกข้อมูลเหตุการณ์ เมนู **ผลทดลองเดิม** เปิดหน้าอ้างอิงของ Pair Workbench เมื่อเปิดทั้งสองเว็บในเครื่อง เมนู **เว็บเก่า · Pair Workbench** จะพาไปยังเวอร์ชันที่รันการทดลองได้
 
 | โฟลเดอร์ | หน้าที่ | การใช้งาน |
 |---|---|---|
-| [`pair_workbench/`](pair_workbench/) | เว็บเดิม: TF-IDF / Naive Bayes, role/date features, NLI graph | รันบนเครื่อง มีช่องแก้ Python จึงยังไม่เปิดรันสาธารณะบน Vercel |
+| [`pair_workbench/`](pair_workbench/) | เว็บเดิม: TF-IDF / Naive Bayes, role/date features, NLI graph | ดูผลที่ `/legacy` หรือเปิดฉบับเต็มในเครื่องเพื่อรัน Python |
 | [`xamr_lab/`](xamr_lab/) | X-AMR เดิม 4 วิธี เทียบ OR + temporal clustering | รันบนเครื่องหรือออนไลน์ผ่าน Vercel |
 
 ## เว็บออนไลน์และงานวิจัยอ้างอิง
@@ -20,9 +20,26 @@
 
 ## เปิดในเครื่อง
 
+ตั้งค่า Python แยกตามแต่ละเว็บ เพราะเวอร์ชันของ dependencies ต่างกัน
+
+```sh
+python3.12 -m venv .venv-xamr
+.venv-xamr/bin/python -m pip install -r xamr_lab/requirements.txt
+.venv-xamr/bin/python xamr_lab/setup_data.py
+python3.12 -m venv pair_workbench/.venv
+pair_workbench/.venv/bin/python -m pip install -r pair_workbench/requirements.txt
+.venv-xamr/bin/python launch_workbenches.py
+```
+
+ตัวเปิดจะพาไปหน้า X-AMR ที่ `http://127.0.0.1:8767/` เมื่อทั้งสองบริการพร้อม เมนู **เว็บเก่า · Pair Workbench** เปิดเว็บเดิมที่พอร์ต 8765 และ **กลับ X-AMR** พากลับหน้าหลัก กด Ctrl+C ใน Terminal เพื่อหยุดทั้งสองบริการ
+
+ถ้ามี environment อยู่แล้ว ให้ระบุ Python ด้วย `--xamr-python` หรือ `--pair-python` เปลี่ยนพอร์ตได้ด้วย `--xamr-port` และ `--pair-port` บน Windows ให้แทน `bin/python` ด้วย `Scripts/python.exe` และใช้ `py -3.12` สร้าง environment
+
+เปิดแยกเฉพาะเว็บที่ต้องการได้ด้วย
+
 - เว็บเดิม: เปิด `pair_workbench/Start_Workbench.command` (port 8765)
-- X-AMR: เปิด `Start_XAMR.command` (port 8767)
-- ย้ายไฟล์โค้ดเดิมเท่านั้น ผลทดลอง/virtualenv ที่เคยสร้างไว้ไม่ได้ย้ายหรือรวมอัตโนมัติ
+- X-AMR: เปิด `Start_XAMR.command` แล้วไปที่ `http://127.0.0.1:8767/`
+- เส้นทางบน X-AMR ได้แก่ `/` สำหรับ Lab, `/demo` สำหรับเดโม และ `/legacy` สำหรับผลทดลองเดิม
 
 ## Deploy X-AMR บน Vercel — รันการทดลองจริง
 
@@ -33,7 +50,7 @@
 5. ไม่ตั้ง Output Directory เป็น static และไม่ต้องกำหนด frontend build command
 6. เลือกเปิด Fluid Compute; `vercel.json` กำหนด maxDuration 300 วินาที
 7. หากต้องการจำกัดคนรัน ตั้ง environment variable `XAMR_ACCESS_KEY` แล้วกรอกรหัสบนหน้าเว็บ
-8. Deploy แล้วทดสอบ `ann1-dev_small` ก่อน `ann1-dev`
+8. เมื่อพร้อม deploy ให้ลองเปิด `/` → `/demo` → `/legacy` แล้วกดกลับหน้าหลัก ทดสอบเดโมข่าวจริงและลองรัน `ann1-dev_small` หนึ่งรอบ
 
 เอกสารทางการ: [FastAPI on Vercel](https://vercel.com/docs/frameworks/backend/fastapi), [Function limits](https://vercel.com/docs/functions/limitations)
 

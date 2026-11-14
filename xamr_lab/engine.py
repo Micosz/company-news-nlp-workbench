@@ -110,6 +110,16 @@ def scores(tasks,pred,out,method):
 def csv_text(rows):
  f=io.StringIO();w=csv.DictWriter(f,fieldnames=list(rows[0]) if rows else ['empty']);w.writeheader();w.writerows(rows);return f.getvalue()
 
+def event_graphs(tasks):
+ """Build the two X-AMR link graphs without modifying the input mentions."""
+ prepared = copy.deepcopy(tasks)
+ generate_eids(prepared, {})
+ ids = [mention['mention_id'] for mention in tasks]
+ index = {mention_id: i for i, mention_id in enumerate(ids)}
+ nested = get_sparse_matrix(index, [(mention['mention_id'], mention['EIDs']) for mention in prepared])
+ location_time = get_sparse_matrix(index, [(mention['mention_id'], mention['EID_lt']) for mention in prepared])
+ return ids, nested, location_time
+
 def experiment(config,tasks=None,output_root=None,data_root=None):
  name=config.get('dataset','ann1-dev');tolerance=int(config.get('tolerance_days',0))
  if not 0<=tolerance<=365:raise ValueError('tolerance ต้องอยู่ระหว่าง 0–365 วัน')
@@ -133,11 +143,11 @@ def experiment(config,tasks=None,output_root=None,data_root=None):
   source_hash={str(p.relative_to(BASE)):hashlib.sha256(p.read_bytes()).hexdigest() for p in source_files}
   for p in source_files:
    dest=out/'source'/p.relative_to(BASE);dest.parent.mkdir(parents=True,exist_ok=True);dest.write_bytes(p.read_bytes())
-  original=copy.deepcopy(tasks);prepared=copy.deepcopy(tasks);t0=time.perf_counter();generate_eids(prepared,{})
-  ids=[t['mention_id'] for t in tasks];m2i={m:i for i,m in enumerate(ids)}
-  n=get_sparse_matrix(m2i,[(t['mention_id'],t['EIDs']) for t in prepared]);lt=get_sparse_matrix(m2i,[(t['mention_id'],t['EID_lt']) for t in prepared]);both=n.multiply(lt);either=n+lt
+  t0=time.perf_counter()
+  ids,n,lt=event_graphs(tasks)
+  both=n.multiply(lt);either=n+lt
   preprocessing=time.perf_counter()-t0
-  dates=[interval(t['argT']) for t in original];result={};predictions={};blocked=[]
+  dates=[interval(t['argT']) for t in tasks];result={};predictions={};blocked=[]
   for method,adj in [('EID_N',n),('EID_lt',lt),('AND',both),('OR',either),('OR_temporal',either)]:
    t0=time.perf_counter()
    if method=='OR_temporal':pred,blocked=constrained(adj,ids,dates,tolerance)
