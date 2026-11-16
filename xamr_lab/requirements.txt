@@ -6,3 +6,6 @@ tqdm==4.66.2
 CoVal @ git+https://github.com/ns-moosavi/coval.git@87071a6293dc2e786dcfe2ed78e9369c17e41b3b
 fastapi==0.115.12
 uvicorn==0.34.2
+scikit-learn==1.6.1
+joblib==1.5.3
+threadpoolctl==3.7.0

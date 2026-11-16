@@ -1,0 +1,10 @@
+# Original experiment runtime: GroupKFold tie handling differs across sklearn versions.
+numpy==2.3.5
+scipy==1.18.1
+scikit-learn==1.9.1
+joblib==1.6.0
+threadpoolctl==3.7.0
+typer==0.9.0
+click==8.1.7
+tqdm==4.66.2
+CoVal @ git+https://github.com/ns-moosavi/coval.git@87071a6293dc2e786dcfe2ed78e9369c17e41b3b

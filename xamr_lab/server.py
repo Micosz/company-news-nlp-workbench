@@ -21,6 +21,12 @@ class Handler(BaseHTTPRequestHandler):
   path=urlparse(self.path).path
   try:
    if path=='/':return self.page('index.html')
+   if path=='/paper':return self.page('paper.html')
+   if path in ('/research.js','/research.css'):return self.send((BASE/'static'/path[1:]).read_text(),kind='text/css' if path.endswith('.css') else 'application/javascript')
+   if path=='/api/workbench/catalog':
+    from research_runner import catalog
+    return self.send(catalog())
+   if path=='/api/runtime':return self.send({'cloud':False,'key_required':False})
    if path=='/demo':return self.page('demo.html')
    if path=='/legacy':return self.page('legacy.html')
    if path=='/api/demo':
@@ -53,11 +59,15 @@ class Handler(BaseHTTPRequestHandler):
  def do_POST(self):
   try:
    path=urlparse(self.path).path
-   if path not in ('/api/run','/api/demo/custom'):return self.send({'error':'Not found'},404)
+   if path not in ('/api/run','/api/demo/custom','/api/workbench/run'):return self.send({'error':'Not found'},404)
    origin=self.headers.get('Origin')
    if origin and urlparse(origin).netloc!=self.headers.get('Host'):return self.send({'error':'Origin rejected'},403)
    if not self.headers.get('Content-Type','').startswith('application/json'):raise ValueError('JSON required')
    length=int(self.headers.get('Content-Length','0'))
+   if path=='/api/workbench/run':
+    if not 0<length<=4096:return self.send({'error':'Request exceeds 4 KB.'},413)
+    from research_runner import run_online
+    return self.send(run_online(json.loads(self.rfile.read(length))))
    if path=='/api/demo/custom':
     if not 0<length<=CUSTOM_BODY_LIMIT:
      return self.send({'error':'ข้อมูลข่าวเกินขนาดที่รองรับหรือไม่มีข้อมูล'},413)

@@ -13,8 +13,7 @@ CATALOG = json.loads((BASE/'dataset_catalog.json').read_text())
 
 @app.get('/')
 def home():
-    html=(BASE/'static/index.html').read_text()
-    return HTMLResponse(html.replace('<script>', '<script>window.CLOUD_MODE=true;</script><script src="/cloud.js"></script><script>',1))
+    return HTMLResponse((BASE/'static/index.html').read_text())
 
 @app.get('/demo', response_class=HTMLResponse)
 def demo_page():
@@ -104,3 +103,49 @@ async def run(request:Request):
         import logging
         logging.exception('Online experiment failed')
         return JSONResponse({'error':'รันไม่สำเร็จ ตรวจ server log หรือใช้โหมด local'},status_code=500)
+
+
+@app.get('/paper', response_class=HTMLResponse)
+def paper_page():
+    html = (BASE / 'static/paper.html').read_text()
+    return html.replace('<script>', '<script>window.CLOUD_MODE=true;</script><script src="/cloud.js"></script><script>', 1)
+
+@app.get('/research.js')
+@app.get('/research.css')
+def research_asset(request: Request):
+    from fastapi.responses import Response
+    name = request.url.path.rsplit('/', 1)[-1]
+    return Response((BASE / 'static' / name).read_text(), media_type='text/css' if name.endswith('.css') else 'application/javascript')
+
+@app.get('/api/workbench/catalog')
+def research_catalog():
+    from research_runner import catalog
+    return catalog()
+
+@app.post('/api/workbench/run')
+async def research_run(request: Request):
+    key = os.getenv('XAMR_ACCESS_KEY', '')
+    if key and not hmac.compare_digest(request.headers.get('X-Access-Key', ''), key):
+        return JSONResponse({'error': 'Access key is incorrect.'}, status_code=401)
+    from urllib.parse import urlparse
+    origin = request.headers.get('origin')
+    if origin and urlparse(origin).netloc != request.headers.get('host'):
+        return JSONResponse({'error': 'Origin rejected'}, status_code=403)
+    if not request.headers.get('content-type', '').startswith('application/json'):
+        return JSONResponse({'error': 'JSON required'}, status_code=415)
+    raw = bytearray()
+    async for chunk in request.stream():
+        if len(raw) + len(chunk) > 4096:
+            return JSONResponse({'error': 'Request exceeds 4 KB.'}, status_code=413)
+        raw.extend(chunk)
+    try:
+        from research_runner import run_online, RunBusyError
+        return await run_in_threadpool(run_online, json.loads(raw))
+    except RunBusyError as error:
+        return JSONResponse({'error': str(error)}, status_code=409)
+    except (ValueError, TypeError, KeyError) as error:
+        return JSONResponse({'error': str(error)}, status_code=400)
+    except Exception:
+        import logging
+        logging.exception('Research run failed')
+        return JSONResponse({'error': 'Run failed. Retry or use the local runner.'}, status_code=500)

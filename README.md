@@ -1,6 +1,10 @@
 # Company News NLP — two research workbenches
 
-X-AMR Research Lab เป็นหน้าหลักของโปรเจกต์ เมนู **เดโม** เปิดตัวอย่างข่าวจริงจาก ECB+ และฟอร์มกรอกข้อมูลเหตุการณ์ เมนู **ผลทดลองเดิม** เปิดหน้าอ้างอิงของ Pair Workbench เมื่อเปิดทั้งสองเว็บในเครื่อง เมนู **เว็บเก่า · Pair Workbench** จะพาไปยังเวอร์ชันที่รันการทดลองได้
+หน้าหลักใหม่เป็น **X-AMR Research Workbench** สำหรับ OR, TF-IDF, OR + TF-IDF และ OR + TF-IDF + Naive Bayes ที่รันจริงจาก preset ที่เลือกด้วย train CV พร้อมดาวน์โหลด ZIP/CSV/JSON และ replay ได้ ดู [วิธีใช้งานและข้อจำกัด](docs/WEBSITE_RELEASE_2026-11-16.md)
+
+หน้า temporal เดิมอยู่ที่ `/paper` โดยเก็บ HTML เดิม ส่วน `/legacy` และ Pair Workbench เดิมยังคงเดิม
+
+X-AMR Research Lab เมนู **เดโม** เปิดตัวอย่างข่าวจริงจาก ECB+ และฟอร์มกรอกข้อมูลเหตุการณ์ เมนู **ผลทดลองเดิม** เปิดหน้าอ้างอิงของ Pair Workbench เมื่อเปิดทั้งสองเว็บในเครื่อง เมนู **เว็บเก่า · Pair Workbench** จะพาไปยังเวอร์ชันที่รันการทดลองได้
 
 | โฟลเดอร์ | หน้าที่ | การใช้งาน |
 |---|---|---|
@@ -39,7 +43,7 @@ pair_workbench/.venv/bin/python -m pip install -r pair_workbench/requirements.tx
 
 - เว็บเดิม: เปิด `pair_workbench/Start_Workbench.command` (port 8765)
 - X-AMR: เปิด `Start_XAMR.command` แล้วไปที่ `http://127.0.0.1:8767/`
-- เส้นทางบน X-AMR ได้แก่ `/` สำหรับ Lab, `/demo` สำหรับเดโม และ `/legacy` สำหรับผลทดลองเดิม
+- เส้นทางบน X-AMR ได้แก่ `/` สำหรับ workbench ใหม่, `/paper` สำหรับ temporal lab เดิม, `/demo` สำหรับเดโม และ `/legacy` สำหรับผลทดลองเดิม
 
 ## Deploy X-AMR บน Vercel — รันการทดลองจริง
 
@@ -50,16 +54,16 @@ pair_workbench/.venv/bin/python -m pip install -r pair_workbench/requirements.tx
 5. ไม่ตั้ง Output Directory เป็น static และไม่ต้องกำหนด frontend build command
 6. เลือกเปิด Fluid Compute; `vercel.json` กำหนด maxDuration 300 วินาที
 7. หากต้องการจำกัดคนรัน ตั้ง environment variable `XAMR_ACCESS_KEY` แล้วกรอกรหัสบนหน้าเว็บ
-8. เมื่อพร้อม deploy ให้ลองเปิด `/` → `/demo` → `/legacy` แล้วกดกลับหน้าหลัก ทดสอบเดโมข่าวจริงและลองรัน `ann1-dev_small` หนึ่งรอบ
+8. เมื่อพร้อม deploy ให้ลองเปิด `/` → `/paper` → `/demo` → `/legacy` แล้วกดกลับหน้าหลัก ลอง Compare บน Ann1/Ann2 dev และตรวจ source hashes จาก `/api/workbench/catalog`
 
 เอกสารทางการ: [FastAPI on Vercel](https://vercel.com/docs/frameworks/backend/fastapi), [Function limits](https://vercel.com/docs/functions/limitations)
 
 ### การทำงานออนไลน์และข้อจำกัด
 
-- `app.py` ใช้ engine เดียวกับ local และรันทั้ง 5 วิธีจริงภายในคำขอเดียว ไม่มี mock scores
-- ดาวน์โหลดเฉพาะชุดที่เลือกจาก commit ของผู้เขียน ตรวจ SHA-256 ก่อนรัน ไม่ต้องเตรียม dataset ในเครื่องผู้ชม
+- `/` ใช้ fixed research runner สำหรับ 4 วิธี และเทียบ OR ทุกครั้ง ส่วน `/paper` รัน temporal engine เดิมทั้ง 5 วิธี ไม่มี mock scores
+- ดาวน์โหลดเฉพาะชุดที่เลือกจาก commit ของผู้เขียน ตรวจ SHA-256 ก่อนรัน โมเดล JSON ฝึกจาก train และแนบผล CV ที่ตรึงไว้ ไม่ต้องเตรียม dataset ในเครื่องผู้ชม
 - รับข้อมูลที่มี annotation แล้ว ไม่ได้เรียก LLM อ่านข่าวดิบ
-- จำกัด 2,000 mentions / คำขอ 3 MB / ผลตอบกลับ 4 MB ชุด train ที่เกินขนาดยังใช้ local ได้
+- จำกัด 2,000 mentions / คำขอหน้าใหม่ 4 KB (หน้า temporal เดิม 3 MB) / ผลตอบกลับ 4 MB ชุด train ใช้สำหรับเตรียมโมเดลแยกจากหน้า inference
 - ผลและ ZIP ถูกส่งกลับทันที ประวัติอยู่ใน IndexedDB ของเบราว์เซอร์ ไม่ใช่ฐานข้อมูลร่วม ไม่มีการเก็บไฟล์ถาวรบน Vercel
 - ล้าง browser storage หรือเปลี่ยนเครื่องจะไม่เห็นประวัติเดิม ดาวน์โหลด ZIP เพื่อใช้ในรายงานทุกครั้ง
 - ปิดหน้าเว็บ/เครือข่ายหลุดก่อนคำขอจบอาจไม่ได้รับผล ไม่มี queue/resume หรือ background worker

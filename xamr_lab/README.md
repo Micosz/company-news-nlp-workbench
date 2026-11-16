@@ -1,3 +1,9 @@
+# Main website update · November 2026
+
+The main `/` now runs fixed OR / TF-IDF / OR + TF-IDF / OR + TF-IDF + Naive Bayes presets. The NB menu refers to the original OR edge guard with TF-IDF cosine features, not a cascade after TF-IDF additions. Train CV selected unchanged OR on both annotation versions. See [release and reproduction notes](../docs/WEBSITE_RELEASE_2026-11-16.md).
+
+The original temporal interface is preserved at `/paper`; `/legacy` and the local Pair Workbench remain unchanged. The documentation below describes that original temporal lab.
+
 > [เว็บ X-AMR ออนไลน์](https://xamrlab-nlp.vercel.app/) · [Paper และ GitHub ของผู้เขียนทั้งสองงาน](../README.md#เว็บออนไลน์และงานวิจัยอ้างอิง)
 
 ## Deployment
