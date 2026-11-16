@@ -62,7 +62,9 @@ class ResearchTests(unittest.TestCase):
             frozen, vectorizer, restored, digest = model(annotation)
             original, _ = nb.fit(train)
             self.assertEqual(vectorizer.vocabulary_, original[0].vocabulary_)
-            np.testing.assert_array_equal(vectorizer.idf_, original[0].idf_)
+            # ARM64 and x86 libm may differ by one ULP when recomputing log-IDF.
+            # Frozen inference partitions and metrics remain exact in the parity test.
+            np.testing.assert_allclose(vectorizer.idf_, original[0].idf_, rtol=0, atol=1e-14)
             np.testing.assert_array_equal(restored[2].category_count_[0], original[2].category_count_[0])
             dev, _ = load_dataset(annotation + '-dev_small')
             edges, _, _ = nb.graph_data(dev)
