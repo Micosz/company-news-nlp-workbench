@@ -6,7 +6,7 @@
 
 จาก root ของ repository: `python3 -m http.server 8767 --bind 127.0.0.1`
 
-เปิด http://127.0.0.1:8767/slide/ หรือเปิด `slide/index.html` โดยตรง ไม่มี build หรือ dependency ใหม่ ฟอนต์ Noto Sans Thai แนบไว้พร้อม OFL
+เปิด http://127.0.0.1:8767/slide/ หรือเปิด `slide/index.html` โดยตรง ไม่มี build หรือ dependency ใหม่ ฟอนต์ Sarabun แนบไว้พร้อม OFL (ไฟล์ Noto Sans Thai เดิมเก็บไว้แต่ไม่ได้เรียกใช้)
 
 - ลูกศร / Space: เดินเรื่อง; Esc หรือ O: ภาพรวม; N: บทพูด; F: เต็มจอ
 - เลือกสถานีหรือสารบัญเพื่อข้ามหมวด; URL `#slide-11` เปิดหน้าผลทดลอง
