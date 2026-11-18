@@ -10,7 +10,7 @@ import sys
 from pathlib import Path
 
 from analysis import compare_topics, load_predictions
-from significance import SEED, significance_rows
+from significance import SEED, significance_rows, summary_markdown
 
 
 def write_csv(rows, path):
@@ -59,11 +59,18 @@ def significance(args):
     chosen = pick_methods(methods, args.method, args.baseline)
     if not chosen:
         sys.exit('Nothing to compare: the run only has the baseline.')
+    table = []
     print(f'{"method":<14}{"metric":<9}{"delta":>8}  {"95% interval":<18}{"p":>7}')
     for method in chosen:
         for row in significance_rows(rows, method, args.baseline, args.rounds, args.seed):
             interval = f"[{row['ci_low']:+.2f}, {row['ci_high']:+.2f}]"
             print(f"{method:<14}{row['metric']:<9}{row['delta']:>+8.2f}  {interval:<18}{row['p_value']:>7.4f}")
+            table.append(row)
+    run = Path(args.run)
+    folder = run if run.is_dir() else run.parent
+    write_csv(table, folder / 'significance.csv')
+    (folder / 'significance.md').write_text(summary_markdown(table, folder.name), encoding='utf-8')
+    print(f'\nwrote {folder / "significance.csv"} and significance.md')
 
 
 def main(argv=None):

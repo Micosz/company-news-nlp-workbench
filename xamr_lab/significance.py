@@ -128,3 +128,31 @@ def significance_rows(rows, method, baseline='OR', rounds=1000, seed=SEED):
             'rounds': rounds, 'seed': seed,
         })
     return table
+
+
+def verdict(row, alpha=0.05):
+    if row['p_value'] >= alpha:
+        return 'no clear difference'
+    return 'better' if row['delta'] > 0 else 'worse'
+
+
+def summary_markdown(table, run_name, alpha=0.05):
+    """Short report of significance rows, ready to paste into notes."""
+    first = table[0]
+    lines = [
+        f'# Significance against {first["baseline"]} · {run_name}',
+        '',
+        f'Topics: {first["topics"]}. Bootstrap: {first["rounds"]} rounds over topics, seed {first["seed"]}.',
+        f'Permutation: every per-topic swap ({2 ** first["topics"]} in total).',
+        f'Smallest possible p-value: {2 / 2 ** first["topics"]:.4f}.',
+        '',
+        '| method | metric | change (points) | 95% interval | p | reading |',
+        '|---|---|---:|---|---:|---|',
+    ]
+    for row in table:
+        lines.append(f"| {row['method']} | {row['metric']} | {row['delta']:+.2f} | "
+                     f"[{row['ci_low']:+.2f}, {row['ci_high']:+.2f}] | {row['p_value']:.4f} | "
+                     f"{verdict(row, alpha)} |")
+    lines += ['', f'"no clear difference" means p >= {alpha}: the change could come from',
+              'which topics happen to be in the set.', '']
+    return '\n'.join(lines)
