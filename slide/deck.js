@@ -1,10 +1,10 @@
 'use strict';
 const SOURCE='https://github.com/Micosz/company-news-nlp-workbench/blob/598ea06926df664d439fc1e9f082ac30ec1f0d55/docs/';
 const groups=[
-{name:'Introduction',thai:'ปัญหาและขอบเขต',tags:['โจทย์','วัตถุประสงค์','งานอ้างอิง'],x:80,y:80,start:0},
-{name:'Approach',thai:'วิธีที่นำมาศึกษา',tags:['OR','เวลา','TF-IDF / NB'],x:1740,y:80,start:3},
-{name:'Data & Methods',thai:'ข้อมูลและการทดลอง',tags:['ECB+','Train CV','การวัดผล'],x:1740,y:1040,start:7},
-{name:'Results & Wrap',thai:'ผลที่พบและข้อสรุป',tags:['ผลเปรียบเทียบ','ข้อผิดพลาด','ระบบสาธิต'],x:80,y:1040,start:10}
+{name:'Introduction',thai:'ปัญหาและขอบเขต',tags:['โจทย์','วัตถุประสงค์','งานอ้างอิง'],x:80,y:80},
+{name:'Approach',thai:'วิธีที่นำมาศึกษา',tags:['OR','เวลา','TF-IDF / NB'],x:1740,y:80},
+{name:'Data & Methods',thai:'ข้อมูลและการทดลอง',tags:['ECB+','Train CV','การวัดผล'],x:1740,y:1040},
+{name:'Results & Wrap',thai:'ผลที่พบและข้อสรุป',tags:['ผลเปรียบเทียบ','ข้อผิดพลาด','ระบบสาธิต'],x:80,y:1040}
 ];
 const panel=(title,body)=>'<div class="panel"><h3>'+title+'</h3>'+body+'</div>';
 const p=t=>'<p>'+t+'</p>';
@@ -13,7 +13,10 @@ const flow=items=>'<div class="flow">'+items.map((t,i)=>(i?'<span class="arrow">
 function eventMotion(separate){return '<div class="eventmotion '+(separate?'separate':'together')+'" role="img" aria-label="'+(separate?'การกล่าวถึง A และ B เคลื่อนแยกเป็นสองกลุ่ม':'การกล่าวถึง A B และ C เคลื่อนรวมเป็นกลุ่มเดียว')+'"><span class="eventhalo one"></span>'+(separate?'<span class="eventhalo two"></span>':'')+'<span class="mention ma">A</span><span class="mention mb">B</span>'+(separate?'':'<span class="mention mc">C</span>')+'</div>';}
 const resultRows=[['OR',79.77,71.89,77.12,68.44],['OR + Temporal',79.86,74.57,72.37,62.19],['TF-IDF',52.78,13.54,52.78,13.54],['OR + TF-IDF',79.07,68.00,77.43,65.07],['OR + NB guard',79.77,71.89,77.12,68.44]];
 function resultChart(){return '<div class="resultscope">DEV ที่ผ่านการสำรวจแล้ว · ไม่ใช่ held-out final test · คะแนน F1 (%)</div><div class="resultlegend"><span><i></i>CoNLL F1</span><span><i></i>Pair F1</span><span>แกนทุกกราฟ 0–100</span></div><div class="resultcharts">'+[0,1].map(a=>'<section class="resultpanel"><h3>Ann'+(a+1)+'</h3><div class="resultaxis"><span>0</span><span>50</span><span>100</span></div>'+resultRows.map((r,i)=>'<div class="resultrow '+(i===0?'baseline':'')+'"><div class="resultname">'+r[0]+(i===1?' <small>(0 วัน)</small>':i===2?' <small>standalone</small>':i===4?' <small>เลือกไม่ตัดเส้น</small>':'')+'</div><div class="resultbars">'+[0,1].map(m=>'<div class="resultbar '+(m?'pair':'')+'"><span style="width:'+r[1+a*2+m]+'%"></span><b>'+r[1+a*2+m].toFixed(2)+'</b></div>').join('')+'</div></div>').join('')+'</section>').join('')+'</div>';}
+const members=[['ปพนพัชร์ มีวน','6709650458'],['ชนกานต์ คงรัชตภิญโญ','6709650235']];
+function titleSlide(){return '<div class="titlecopy"><h1><span>การศึกษากฎเวลาและสัญญาณข้อความ</span><span>สำหรับการจัดกลุ่มเหตุการณ์ข้ามเอกสาร</span><span class="accent">บนฐาน X-AMR</span></h1><p class="titleen">Temporal rules and text signals for cross-document event coreference with X-AMR</p><div class="memberlist">'+members.map(m=>'<div><span>'+m[0]+'</span><span>'+m[1]+'</span></div>').join('')+'</div><p class="course">โครงงานวิชา CS374</p></div><svg class="titleart" viewBox="0 0 360 420" aria-hidden="true"><circle cx="130" cy="120" r="92"/><circle class="warm" cx="250" cy="300" r="82"/><path d="M95 95L160 150M160 150L120 175M250 300L215 330M250 300L290 270M160 150L250 300"/><g class="dots"><circle cx="95" cy="95" r="11"/><circle cx="160" cy="150" r="11"/><circle cx="120" cy="175" r="11"/><circle class="warm" cx="250" cy="300" r="11"/><circle class="warm" cx="215" cy="330" r="11"/><circle class="warm" cx="290" cy="270" r="11"/></g></svg>';}
 const slides=[
+{g:0,cover:true,title:"การศึกษากฎเวลาและสัญญาณข้อความสำหรับการจัดกลุ่มเหตุการณ์ข้ามเอกสารบนฐาน X-AMR",body:titleSlide(),note:'สวัสดีครับ โครงงานของเราศึกษาว่ากฎด้านเวลาและความคล้ายของข้อความช่วยจัดกลุ่มข่าวที่พูดถึงเหตุการณ์เดียวกันได้แค่ไหน โดยต่อยอดจาก X-AMR ผู้นำเสนอคือปพนพัชร์ มีวน และชนกานต์ คงรัชตภิญโญ ครับ',source:'NLP_PROJECT_HANDOFF_TH.md'},
 {g:0,title:"โจทย์และวัตถุประสงค์ของโครงงาน",sub:"ศึกษาการจัดกลุ่มเหตุการณ์ข้ามเอกสารด้วย X-AMR และประเมินแนวทางเสริมด้านเวลา ข้อความ และ Naive Bayes",
 body:'<div class="cols">'+panel('โจทย์การศึกษา','<div class="lede">การระบุและจัดกลุ่ม<br><span class="accent">เหตุการณ์เดียวกัน</span><br>ที่กล่าวถึงในหลายเอกสาร</div>')+panel('วัตถุประสงค์',p('เปรียบเทียบ OR กับแนวทางเสริมด้านเวลา ข้อความ และ NB')+p('ประเมินผลบนคำกำกับสองเวอร์ชันและวิเคราะห์ข้อผิดพลาด')+p('พัฒนาเครื่องมือทดลองและตรวจสอบผลย้อนกลับ')+'<span class="pill">CS374 · Final Presentation</span>')+'</div>',note:'โครงงานนี้ศึกษาการจัดกลุ่มการกล่าวถึงเหตุการณ์เดียวกันข้ามเอกสาร โดยใช้ X-AMR เป็นฐาน แล้วทดลองเพิ่มข้อมูลเวลา ความคล้ายคลึงข้อความ และ Naive Bayes ครับ การนำเสนอจะเล่าทั้งสิ่งที่พัฒนา ผลที่ได้ และข้อจำกัด โดยไม่ได้ตั้งต้นว่าทุกวิธีที่เพิ่มต้องดีกว่าเดิม',source:'NLP_PROJECT_HANDOFF_TH.md'},
 {g:0,title:"ปัญหาการจัดกลุ่มเหตุการณ์ข้ามเอกสาร",sub:"การระบุเหตุการณ์เดียวกันต้องแยกความคล้ายคลึงของข้อความออกจากความเป็นเหตุการณ์เดียวกัน",
@@ -45,6 +48,7 @@ body:'<div class="cols">'+panel('ผลการดำเนินงาน',p('
 {g:3,title:"เอกสารอ้างอิงและหลักฐานของโครงงาน",sub:"รวบรวมงานวิจัยต้นทาง เอกสารการพัฒนาระบบ และหลักฐานผลการทดลองที่ตรวจสอบย้อนกลับได้",
 body:'<div class="refs"><a class="ref" href="https://aclanthology.org/2024.lrec-main.920/" target="_blank" rel="noopener">X-AMR · งานวิจัยและวิธีอ้างอิง<small>ACL Anthology · LREC-COLING 2024</small></a><a class="ref" href="https://aclanthology.org/2026.acl-long.1345/" target="_blank" rel="noopener">CohTP · แนวคิดเรื่องความสอดคล้องของเวลา<small>ใช้เป็นแรงบันดาลใจ ไม่ใช่การทำซ้ำครบระบบ</small></a><a class="ref" href="'+SOURCE+'NLP_PROJECT_HANDOFF_TH.md" target="_blank" rel="noopener">บันทึกการตัดสินใจและผลทดลองของโครงงาน<small>ตรึงเอกสารที่ commit 598ea069</small></a><a class="ref" href="'+SOURCE+'WEBSITE_RELEASE_2026-11-16.md" target="_blank" rel="noopener">Release, metric values และ protocol สำหรับ replay<small>เชื่อมไปยังรายละเอียด TF-IDF และ NB ใน repository</small></a></div>',note:'แหล่งอ้างอิงแยกเป็นงาน X-AMR และ CohTP ต้นทาง กับเอกสาร implementation ของโครงงานครับ ตัวเลขในสไลด์อ้างผลที่บันทึกไว้ ไม่ได้รัน benchmark ใหม่เพื่อสร้างสไลด์ และข้อจำกัดของแต่ละการทดลองยังคงเดิม',source:'WEBSITE_RELEASE_2026-11-16.md'}
 ];
+groups.forEach((g,i)=>{g.start=slides.findIndex(s=>s.g===i);});
 let current=-1,last=0,transitionTimer;
 const world=document.getElementById('world'),viewport=document.getElementById('viewport');
 const reduced=matchMedia('(prefers-reduced-motion: reduce)');
@@ -58,7 +62,7 @@ function render(){
  if(el.dataset.view===view)return;
  el.dataset.view=view;
  if(!active){el.innerHTML=cover(groups[g],g);return;}
- const s=slides[current];el.innerHTML='<article class="slide"><div class="slidehead"><span>'+groups[g].name.toUpperCase()+'</span><span>'+String(current+1).padStart(2,'0')+' / '+slides.length+'</span></div><h1>'+s.title+'</h1><div class="slidebody">'+s.body+'</div><div class="slidefooter"><span>X-AMR RESEARCH · CS374</span><a target="_blank" rel="noopener" href="'+SOURCE+s.source+'">หลักฐานและรายละเอียด ↗</a></div></article>';
+ const s=slides[current];if(s.cover){el.innerHTML='<article class="slide titleslide">'+s.body+'</article>';return;}el.innerHTML='<article class="slide"><div class="slidehead"><span>'+groups[g].name.toUpperCase()+'</span><span>'+String(current+1).padStart(2,'0')+' / '+slides.length+'</span></div><h1>'+s.title+'</h1><div class="slidebody">'+s.body+'</div><div class="slidefooter"><span>X-AMR RESEARCH · CS374</span><a target="_blank" rel="noopener" href="'+SOURCE+s.source+'">หลักฐานและรายละเอียด ↗</a></div></article>';
  });
  document.getElementById('position').textContent=current<0?'ภาพรวม':String(current+1).padStart(2,'0')+' / '+slides.length;
  document.getElementById('progressFill').style.width=current<0?'0%':((current+1)/slides.length*100)+'%';

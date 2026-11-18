@@ -86,3 +86,20 @@ table{border-collapse:collapse;width:100%;font-size:23px;font-variant-numeric:ta
 .resultrow{min-height:44px;padding:4px 0}.resultbar{height:13px;margin:2px 0}.resultbar b{font-size:13px;line-height:15px}.resultpanel{padding:10px 16px}.resultname{font-size:16px}.resultname small{font-size:11px}.resultpanel h3{font-size:20px}
 
 .eventmotion{height:190px;margin:0 0 8px}.eventhalo{top:16px}.mention{top:72px}.separate .one,.separate .two{top:25px}.caption strong{color:#bcefff;font-weight:600}
+
+/* Title slide: project name and members, no chapter label or footer. */
+.titleslide{flex-direction:row;align-items:center;gap:40px;padding:60px 64px}
+.titlecopy{flex:1;min-width:0}
+.titleslide h1{font-size:42px;line-height:1.45;margin:0 0 18px}
+.titleslide h1 span{display:block;white-space:nowrap}
+.titleen{font:400 21px/1.5 system-ui;color:#8fb0c8;margin:0 0 40px;max-width:640px}
+.memberlist{display:grid;gap:12px;max-width:560px;padding-top:26px;border-top:1px solid #2c5470}
+.memberlist div{display:flex;justify-content:space-between;gap:24px;font-size:26px;color:#e3f2ff}
+.memberlist span:last-child{font:500 24px system-ui;color:#9fc4da;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.course{margin:30px 0 0;font-size:21px;color:#8fb0c8}
+.titleart{width:250px;flex-shrink:0;align-self:center}
+.titleart>circle{fill:#10314744;stroke:#4fb9de;stroke-dasharray:6 8}
+.titleart>circle.warm{fill:#58382b26;stroke:#e59c80}
+.titleart path{fill:none;stroke:#5f8fae;stroke-width:2}
+.titleart .dots circle{fill:#79edff;filter:drop-shadow(0 0 8px #3fc6ff88)}
+.titleart .dots circle.warm{fill:#ffb59a;filter:drop-shadow(0 0 8px #ff9a7a66)}
