@@ -1,10 +1,10 @@
 'use strict';
 const SOURCE='https://github.com/Micosz/company-news-nlp-workbench/blob/598ea06926df664d439fc1e9f082ac30ec1f0d55/docs/';
 const groups=[
-{name:'Introduction',thai:'ปัญหาและขอบเขต',tags:['โจทย์','วัตถุประสงค์','งานอ้างอิง'],x:80,y:80},
-{name:'Approach',thai:'วิธีที่นำมาศึกษา',tags:['OR','เวลา','TF-IDF / NB'],x:1740,y:80},
-{name:'Data & Methods',thai:'ข้อมูลและการทดลอง',tags:['ECB+','Train CV','การวัดผล'],x:1740,y:1040},
-{name:'Results & Wrap',thai:'ผลที่พบและข้อสรุป',tags:['ผลเปรียบเทียบ','ข้อผิดพลาด','ระบบสาธิต'],x:80,y:1040}
+{name:'Introduction',thai:'ปัญหาและขอบเขต',x:80,y:80},
+{name:'Approach',thai:'วิธีที่นำมาศึกษา',x:1740,y:80},
+{name:'Data & Methods',thai:'ข้อมูลและการทดลอง',x:1740,y:1040},
+{name:'Results & Wrap',thai:'ผลที่พบและข้อสรุป',x:80,y:1040}
 ];
 const panel=(title,body)=>'<div class="panel"><h3>'+title+'</h3>'+body+'</div>';
 const p=t=>'<p>'+t+'</p>';
@@ -18,7 +18,7 @@ function titleSlide(){return '<div class="titlecopy"><h1><span>การศึ�
 const slides=[
 {g:0,cover:true,title:"การศึกษากฎเวลาและสัญญาณข้อความสำหรับการจัดกลุ่มเหตุการณ์ข้ามเอกสารบนฐาน X-AMR",body:titleSlide(),note:'สวัสดีครับ โครงงานของเราศึกษาว่ากฎด้านเวลาและความคล้ายของข้อความช่วยจัดกลุ่มข่าวที่พูดถึงเหตุการณ์เดียวกันได้แค่ไหน โดยต่อยอดจาก X-AMR ผู้นำเสนอคือปพนพัชร์ มีวน และชนกานต์ คงรัชตภิญโญ ครับ',source:'NLP_PROJECT_HANDOFF_TH.md'},
 {g:0,title:"โจทย์และวัตถุประสงค์ของโครงงาน",sub:"ศึกษาการจัดกลุ่มเหตุการณ์ข้ามเอกสารด้วย X-AMR และประเมินแนวทางเสริมด้านเวลา ข้อความ และ Naive Bayes",
-body:'<div class="cols">'+panel('โจทย์การศึกษา','<div class="lede">การระบุและจัดกลุ่ม<br><span class="accent">เหตุการณ์เดียวกัน</span><br>ที่กล่าวถึงในหลายเอกสาร</div>')+panel('วัตถุประสงค์',p('เปรียบเทียบ OR กับแนวทางเสริมด้านเวลา ข้อความ และ NB')+p('ประเมินผลบนคำกำกับสองเวอร์ชันและวิเคราะห์ข้อผิดพลาด')+p('พัฒนาเครื่องมือทดลองและตรวจสอบผลย้อนกลับ')+'<span class="pill">CS374 · Final Presentation</span>')+'</div>',note:'โครงงานนี้ศึกษาการจัดกลุ่มการกล่าวถึงเหตุการณ์เดียวกันข้ามเอกสาร โดยใช้ X-AMR เป็นฐาน แล้วทดลองเพิ่มข้อมูลเวลา ความคล้ายคลึงข้อความ และ Naive Bayes ครับ การนำเสนอจะเล่าทั้งสิ่งที่พัฒนา ผลที่ได้ และข้อจำกัด โดยไม่ได้ตั้งต้นว่าทุกวิธีที่เพิ่มต้องดีกว่าเดิม',source:'NLP_PROJECT_HANDOFF_TH.md'},
+body:'<div class="cols">'+panel('โจทย์การศึกษา','<div class="lede">การระบุและจัดกลุ่ม<br><span class="accent">เหตุการณ์เดียวกัน</span><br>ที่กล่าวถึงในหลายเอกสาร</div>')+panel('วัตถุประสงค์',p('เปรียบเทียบ OR กับแนวทางเสริมด้านเวลา ข้อความ และ NB')+p('ประเมินผลบนคำกำกับสองเวอร์ชันและวิเคราะห์ข้อผิดพลาด')+p('พัฒนาเครื่องมือทดลองและตรวจสอบผลย้อนกลับ'))+'</div>',note:'โครงงานนี้ศึกษาการจัดกลุ่มการกล่าวถึงเหตุการณ์เดียวกันข้ามเอกสาร โดยใช้ X-AMR เป็นฐาน แล้วทดลองเพิ่มข้อมูลเวลา ความคล้ายคลึงข้อความ และ Naive Bayes ครับ การนำเสนอจะเล่าทั้งสิ่งที่พัฒนา ผลที่ได้ และข้อจำกัด โดยไม่ได้ตั้งต้นว่าทุกวิธีที่เพิ่มต้องดีกว่าเดิม',source:'NLP_PROJECT_HANDOFF_TH.md'},
 {g:0,title:"ปัญหาการจัดกลุ่มเหตุการณ์ข้ามเอกสาร",sub:"การระบุเหตุการณ์เดียวกันต้องแยกความคล้ายคลึงของข้อความออกจากความเป็นเหตุการณ์เดียวกัน",
 body:'<div class="cols">'+panel('ตัวอย่างสมมติ: เหตุการณ์เดียวกัน',eventMotion(false)+'<div class="caption">ข่าว A · B · C รายงานการปรับบริษัทครั้งเดียวกัน<br><strong>รวมเป็น 1 กลุ่มเหตุการณ์</strong></div>')+panel('ตัวอย่างสมมติ: คนละเหตุการณ์',eventMotion(true)+'<div class="caption">ข่าว A และ B กล่าวถึงการปรับบริษัทคนละครั้ง<br><strong>แยกเป็น 2 กลุ่มเหตุการณ์</strong></div>')+'</div>'+call('ภาพจำลองแนวคิด ไม่ใช่ผลจากโมเดล · จุดแทนการกล่าวถึงในข่าว ไม่ใช่บริษัทหรือบุคคล'),note:'ตัวอย่างนี้เป็นสถานการณ์สมมติสำหรับอธิบายปัญหาครับ หลายข่าวอาจรายงานการปรับบริษัทครั้งเดียวกัน จึงควรอยู่กลุ่มเดียว แต่ถ้าบริษัทเดิมถูกปรับอีกครั้ง แม้ชื่อและคำในข่าวจะคล้ายกัน ก็ควรแยกเหตุการณ์ ความยากคือทั้งการรวมผิดและการแยกผิดล้วนเกิดได้',source:'NLP_PROJECT_HANDOFF_TH.md'},
 {g:0,title:"ขอบเขตการศึกษาและงานวิจัยอ้างอิง",sub:"ศึกษาการจัดกลุ่มจากคำกำกับเหตุการณ์ โดยใช้ X-AMR เป็นฐานและ CohTP เป็นแนวคิดอ้างอิงด้านเวลา",
@@ -54,7 +54,7 @@ const world=document.getElementById('world'),viewport=document.getElementById('v
 const reduced=matchMedia('(prefers-reduced-motion: reduce)');
 const stations=[...document.querySelectorAll('.station')];
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function cover(g,i){return '<button class="cover" data-open="'+g.start+'" aria-label="'+esc(g.name)+' '+esc(g.thai)+'"><span class="number">0'+(i+1)+'</span><span class="eyebrow">CHAPTER 0'+(i+1)+'</span><h2>'+g.name+'</h2><p>'+g.thai+'</p><div class="previewtags">'+g.tags.map(t=>'<span>'+t+'</span>').join('')+'</div><span class="enter">↗</span></button>';}
+function cover(g,i){return '<button class="cover" data-open="'+g.start+'" aria-label="'+esc(g.name)+' '+esc(g.thai)+'"><span class="number">0'+(i+1)+'</span><h2>'+g.name+'</h2><p>'+g.thai+'</p><span class="enter">↗</span></button>';}
 function render(){
  document.body.classList.toggle("focused",current>=0);
  stations.forEach((el,g)=>{const active=current>=0&&slides[current].g===g;el.classList.toggle('active',active);el.inert=current>=0&&!active;
@@ -62,7 +62,7 @@ function render(){
  if(el.dataset.view===view)return;
  el.dataset.view=view;
  if(!active){el.innerHTML=cover(groups[g],g);return;}
- const s=slides[current];if(s.cover){el.innerHTML='<article class="slide titleslide">'+s.body+'</article>';return;}el.innerHTML='<article class="slide"><div class="slidehead"><span>'+groups[g].name.toUpperCase()+'</span><span>'+String(current+1).padStart(2,'0')+' / '+slides.length+'</span></div><h1>'+s.title+'</h1><div class="slidebody">'+s.body+'</div><div class="slidefooter"><span>X-AMR RESEARCH · CS374</span><a target="_blank" rel="noopener" href="'+SOURCE+s.source+'">หลักฐานและรายละเอียด ↗</a></div></article>';
+ const s=slides[current];if(s.cover){el.innerHTML='<article class="slide titleslide">'+s.body+'</article>';return;}el.innerHTML='<article class="slide"><h1>'+s.title+'</h1><div class="slidebody">'+s.body+'</div><div class="pagenum">'+(current+1)+'</div></article>';
  });
  document.getElementById('position').textContent=current<0?'ภาพรวม':String(current+1).padStart(2,'0')+' / '+slides.length;
  document.getElementById('progressFill').style.width=current<0?'0%':((current+1)/slides.length*100)+'%';
