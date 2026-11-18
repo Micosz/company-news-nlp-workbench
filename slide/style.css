@@ -156,3 +156,21 @@ table{border-collapse:collapse;width:100%;font-size:23px;font-variant-numeric:ta
 .mergeviz .blob.warm{border-color:#ffb59a;background:#58382b44;color:#ffd8c8}
 .mergeviz .op{font:400 30px system-ui;color:#8fb0c8}
 .mergeviz b{font:600 44px system-ui;color:#ffcf9e;letter-spacing:-.02em}
+
+/* Date audit: parser coverage per split and the month/day evidence. */
+.cols.dates{grid-template-columns:1.35fr 1fr}
+.coverage{display:grid;gap:14px;margin-top:10px}
+.covrow{display:grid;grid-template-columns:170px 1fr 130px;gap:14px;align-items:center;font-size:19px;color:#e3f2ff}
+.covrow b{font:500 18px system-ui;text-align:right;font-variant-numeric:tabular-nums;color:#c9e6f5}
+.covtrack{height:18px;border-radius:9px;background:#14293a;overflow:hidden}
+.covtrack i{display:block;height:100%;background:#79edff}
+.covrow.none span,.covrow.none b{color:#ffcf9e}
+.covrow.none .covtrack{background:repeating-linear-gradient(135deg,#3a2a24 0 8px,#2a201c 8px 16px)}
+.order{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:8px 0 6px}
+.order b{display:block;font:500 64px/1.1 system-ui;color:var(--cyan);letter-spacing:-.03em}
+.order .no b{color:#6f8aa0}
+.order span{font-size:18px;line-height:1.4;color:#afc6d9}
+.cols.dates>.panel{display:flex;flex-direction:column}
+.cols.dates .coverage{flex:1;align-content:center;gap:26px}
+.cols.dates .covrow{font-size:21px;grid-template-columns:190px 1fr 140px}.cols.dates .covrow b{font-size:20px}.cols.dates .covtrack{height:24px;border-radius:12px}
+.cols.dates .order{flex:1;align-content:center}.cols.dates .order b{font-size:84px}.cols.dates .order span{display:block;margin-top:8px;font-size:19px}
