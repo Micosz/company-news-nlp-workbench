@@ -2,6 +2,7 @@
 
     python analyze.py topics runs/<run_id>
     python analyze.py topics runs/<run_id> --method OR_TFIDF --out or_tfidf_topics.csv
+    python analyze.py significance runs/<run_id>
 """
 import argparse
 import csv
@@ -9,6 +10,7 @@ import sys
 from pathlib import Path
 
 from analysis import compare_topics, load_predictions
+from significance import SEED, significance_rows
 
 
 def write_csv(rows, path):
@@ -28,11 +30,15 @@ def pick_methods(methods, chosen, baseline):
     return [m for m in methods if m != baseline]
 
 
-def topics(args):
+def load_run(path):
     try:
-        rows, methods = load_predictions(args.run)
+        return load_predictions(path)
     except ValueError as err:
         sys.exit(str(err))
+
+
+def topics(args):
+    rows, methods = load_run(args.run)
     chosen = pick_methods(methods, args.method, args.baseline)
     if not chosen:
         sys.exit('Nothing to compare: the run only has the baseline.')
@@ -48,6 +54,18 @@ def topics(args):
                 print(f"  topic {row['topic']:>4}: FP {row['FP_change']:+}, FN {row['FN_change']:+}")
 
 
+def significance(args):
+    rows, methods = load_run(args.run)
+    chosen = pick_methods(methods, args.method, args.baseline)
+    if not chosen:
+        sys.exit('Nothing to compare: the run only has the baseline.')
+    print(f'{"method":<14}{"metric":<9}{"delta":>8}  {"95% interval":<18}{"p":>7}')
+    for method in chosen:
+        for row in significance_rows(rows, method, args.baseline, args.rounds, args.seed):
+            interval = f"[{row['ci_low']:+.2f}, {row['ci_high']:+.2f}]"
+            print(f"{method:<14}{row['metric']:<9}{row['delta']:>+8.2f}  {interval:<18}{row['p_value']:>7.4f}")
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     commands = parser.add_subparsers(dest='command', required=True)
@@ -57,6 +75,14 @@ def main(argv=None):
     p.add_argument('--baseline', default='OR')
     p.add_argument('--out', help='csv path, only with --method (default: <run>/topics_<method>_vs_<baseline>.csv)')
     p.set_defaults(func=topics)
+
+    p = commands.add_parser('significance', help='bootstrap interval and permutation p-value against a baseline')
+    p.add_argument('run', help='run folder or predictions.csv')
+    p.add_argument('--method', help='test only this method (default: every method in the run)')
+    p.add_argument('--baseline', default='OR')
+    p.add_argument('--rounds', type=int, default=1000, help='bootstrap rounds (default: 1000)')
+    p.add_argument('--seed', type=int, default=SEED)
+    p.set_defaults(func=significance)
     args = parser.parse_args(argv)
     args.func(args)
 

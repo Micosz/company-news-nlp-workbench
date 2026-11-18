@@ -109,3 +109,22 @@ def permutation_pair_f1(rows, method, baseline='OR'):
 
 def permutation_b3_f1(rows, method, baseline='OR'):
     return permutation_test(topic_b3(rows, baseline), topic_b3(rows, method), pooled_b3_f1)
+
+
+def significance_rows(rows, method, baseline='OR', rounds=1000, seed=SEED):
+    """Bootstrap interval and permutation p-value for both metrics, one row each."""
+    table = []
+    for metric, boot, perm in [('pair_F1', bootstrap_pair_f1, permutation_pair_f1),
+                               ('B3_F1', bootstrap_b3_f1, permutation_b3_f1)]:
+        interval = boot(rows, method, baseline, rounds, seed)
+        test = perm(rows, method, baseline)
+        table.append({
+            'method': method, 'baseline': baseline, 'metric': metric,
+            'delta': round(interval['delta'] * 100, 2),
+            'ci_low': round(interval['low'] * 100, 2),
+            'ci_high': round(interval['high'] * 100, 2),
+            'p_value': round(test['p'], 4),
+            'topics': len({row['topic'] for row in rows}),
+            'rounds': rounds, 'seed': seed,
+        })
+    return table
