@@ -37,6 +37,12 @@ def load_run(path):
         sys.exit(str(err))
 
 
+def run_folder(path):
+    """Folder where reports go: the run folder itself, or the folder of a csv path."""
+    path = Path(path)
+    return path if path.is_dir() else path.parent
+
+
 def topics(args):
     rows, methods = load_run(args.run)
     chosen = pick_methods(methods, args.method, args.baseline)
@@ -46,7 +52,7 @@ def topics(args):
         sys.exit('--out needs --method (each method gets its own csv otherwise)')
     for method in chosen:
         table = compare_topics(rows, method, args.baseline)
-        out = Path(args.out) if args.out else Path(args.run) / f'topics_{method}_vs_{args.baseline}.csv'
+        out = Path(args.out) if args.out else run_folder(args.run) / f'topics_{method}_vs_{args.baseline}.csv'
         write_csv(table, out)
         print(f'{method}: {len(table)} topics -> {out}')
         for row in table:
@@ -66,8 +72,7 @@ def significance(args):
             interval = f"[{row['ci_low']:+.2f}, {row['ci_high']:+.2f}]"
             print(f"{method:<14}{row['metric']:<9}{row['delta']:>+8.2f}  {interval:<18}{row['p_value']:>7.4f}")
             table.append(row)
-    run = Path(args.run)
-    folder = run if run.is_dir() else run.parent
+    folder = run_folder(args.run)
     write_csv(table, folder / 'significance.csv')
     (folder / 'significance.md').write_text(summary_markdown(table, folder.name), encoding='utf-8')
     print(f'\nwrote {folder / "significance.csv"} and significance.md')

@@ -39,6 +39,11 @@ class TopicsCommandTest(unittest.TestCase):
         self.assertEqual(table[1]['FP_change'], '0')
         self.assertIn('topic    1: FP +2, FN +0', printed)
 
+    def test_csv_path_writes_beside_it(self):
+        path = write(self.folder, SMALL_RUN)
+        run('topics', str(path))
+        self.assertTrue((Path(self.folder) / 'topics_OR_TFIDF_vs_OR.csv').exists())
+
     def test_out_path_with_method(self):
         write(self.folder, SMALL_RUN)
         target = Path(self.folder) / 'mine.csv'
