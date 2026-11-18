@@ -109,3 +109,14 @@ table{border-collapse:collapse;width:100%;font-size:23px;font-variant-numeric:ta
 .slide>h1{margin-top:0}
 .pagenum{position:absolute;right:30px;bottom:18px;font:500 15px system-ui;color:#5f7f98;font-variant-numeric:tabular-nums}
 .cover h2{margin-top:150px}
+
+/* Proposal comparison: one row per decision, old on the left and actual work on the right. */
+.compare{display:grid;grid-template-columns:230px 1fr 34px 1.25fr;column-gap:16px;align-items:start;flex-shrink:0}
+.compare>b{font-size:20px;font-weight:600;color:#8fb0c8;padding:0 0 8px}
+.compare>b.accent{color:var(--cyan)}
+.compare>.rowname,.compare>.was,.compare>.now,.compare>.arrow{border-top:1px solid #24465e;padding:11px 0}
+.compare>.rowname{font-size:19px;color:#8fb0c8;line-height:1.4}
+.compare>.was{font-size:21px;color:#9fb3c5;line-height:1.4}
+.compare>.now{font-size:21px;color:#e6f4ff;line-height:1.4}
+.compare>.now small{display:block;font-size:17px;color:#93b4c9;margin-top:4px;line-height:1.4}
+.compare>.arrow{color:var(--cyan);font-size:20px;text-align:center}
