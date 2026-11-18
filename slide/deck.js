@@ -57,7 +57,6 @@ function render(){
  document.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>go(Number(b.dataset.open))));
  document.getElementById('position').textContent=current<0?'ภาพรวม':String(current+1).padStart(2,'0')+' / '+slides.length;
  document.getElementById('progressFill').style.width=current<0?'0%':((current+1)/slides.length*100)+'%';
- document.getElementById('overviewHint').hidden=current>=0;
  document.getElementById('next').innerHTML=current<0?'เริ่ม <b>→</b>':current===slides.length-1?'ภาพรวม <b>◈</b>':'ถัดไป <b>→</b>';
  document.getElementById('noteTitle').textContent=current<0?'ภาพรวมเส้นทาง':slides[current].title.replace(/<[^>]+>/g,'');
  document.getElementById('noteText').textContent=current<0?'เริ่มจาก Introduction แล้วเดินตามเส้นทางผ่าน Approach, Data & Methods และ Results & Wrap ใช้ลูกศรขวาเพื่อเล่าตามลำดับ หรือเลือกสถานีที่ต้องการ':slides[current].note;
