@@ -33,24 +33,56 @@ table{border-collapse:collapse;width:100%;font-size:23px;font-variant-numeric:ta
 @media(prefers-reduced-motion:reduce){.roadpulse{display:none}}
 
 /* Sarabun reading layout: keep Thai word boundaries and room for diacritics. */
-.slide h1{font-weight:600;font-size:44px;line-height:1.3;margin:18px 0 14px;letter-spacing:0;text-wrap:balance}
-.slide .sub{font-size:24px;line-height:1.45;margin-bottom:18px;text-wrap:pretty}
-.panel h3{font-size:27px;line-height:1.35;text-wrap:balance}
-.panel p,.panel li{font-size:24px;line-height:1.45;text-wrap:pretty}
+.slide h1{font-weight:600;font-size:40px;line-height:1.3;margin:18px 0 14px;letter-spacing:0;text-wrap:balance}
+.slide .sub{font-size:22px;line-height:1.45;margin-bottom:18px;text-wrap:pretty}
+.panel h3{font-size:25px;line-height:1.35;text-wrap:balance}
+.panel p,.panel li{font-size:22px;line-height:1.45;text-wrap:pretty}
 .panel,.flow .box,.cols>*{min-width:0}
 .slidebody{gap:12px}
 .slidebody>.cols>.panel{padding:18px 20px}
 .slidebody>.flow .box{padding:14px 16px}
-.slidebody>.callout{font-size:25px;line-height:1.4;padding:14px 20px}
-.slidebody>table{font-size:24px;line-height:1.3}
+.slidebody>.callout{font-size:23px;line-height:1.4;padding:14px 20px}
+.slidebody>table{font-size:22px;line-height:1.3}
 .slidebody>table td{padding:8px 18px}
-.slidebody>table+.callout{font-size:24px}
-.ref{font-size:24px;padding:14px 20px;line-height:1.35}
+.slidebody>table+.callout{font-size:22px}
+.ref{font-size:22px;padding:14px 20px;line-height:1.35}
 .ref small{font-size:18px}
 .refs{gap:12px}
 .caption{font-size:22px;line-height:1.4}
-.flow .box{font-size:25px;line-height:1.35}
+.flow .box{font-size:23px;line-height:1.35}
 .flow .box small{font-size:20px;line-height:1.35}
 .slidefooter{font-size:15px}
 .slide .sub,.panel p,.panel li{text-wrap:balance;word-break:normal;overflow-wrap:normal}
 .refs{gap:10px}.ref{padding:10px 20px;line-height:1.25}.ref small{line-height:1.35;margin-top:4px}
+
+/* Slightly smaller display type, retaining a readable body hierarchy. */
+.lede{font-size:32px}.big{font-size:70px}
+
+/* Direct compositor transform; avoid repainting glow filters during camera travel. */
+#world{transition:transform 580ms cubic-bezier(.2,.75,.25,1)}
+.station{contain:layout paint}
+#world.moving .station{box-shadow:none}
+#world.moving .roadpulse{animation-play-state:paused;filter:none}
+#world.moving .road{filter:none}
+@media(prefers-reduced-motion:reduce){#world{transition:none!important}}
+
+/* Annotation revision: no title subtitles, explanatory event motion, truthful common-scale charts. */
+.slide h1{margin-bottom:24px}
+.eventmotion{height:240px;position:relative;margin:8px 0 20px;isolation:isolate}
+.mention{position:absolute;top:92px;left:calc(50% - 20px);width:40px;height:40px;border-radius:50%;background:#79edff;color:#05243b;display:grid;place-items:center;font:600 18px system-ui;box-shadow:0 0 24px #44caff40;animation-duration:1800ms;animation-timing-function:cubic-bezier(.22,.7,.2,1);animation-fill-mode:both}
+.eventhalo{position:absolute;top:36px;left:calc(50% - 85px);width:170px;height:170px;border:1px dashed #6dd9f3;background:#123a5044;border-radius:50%}
+.together .ma{animation-name:mention-a}.together .mb{animation-name:mention-b}.together .mc{animation-name:mention-c}
+@keyframes mention-a{from{transform:translate(-140px,-45px)}to{transform:translate(-34px,0)}}
+@keyframes mention-b{from{transform:translate(140px,-45px)}to{transform:translate(34px,0)}}
+@keyframes mention-c{from{transform:translate(0,90px)}to{transform:translate(0,48px)}}
+.separate .one{left:calc(50% - 170px);width:140px;height:140px;top:45px}.separate .two{left:calc(50% + 30px);width:140px;height:140px;top:45px;border-color:#ffb59a;background:#58382b33}
+.separate .ma{animation-name:mention-apart-a}.separate .mb{background:#ffb59a;animation-name:mention-apart-b}
+@keyframes mention-apart-a{from{transform:translate(-24px,0)}to{transform:translate(-100px,0)}}
+@keyframes mention-apart-b{from{transform:translate(24px,0)}to{transform:translate(100px,0)}}
+.resultscope{font-size:18px;color:#b5c9dc}.resultlegend{display:flex;gap:24px;font-size:15px;color:#a9c3d5;align-items:center}.resultlegend i{display:inline-block;width:20px;height:8px;background:#79edff;margin-right:8px;border-radius:4px}.resultlegend span:nth-child(2) i{background:#859cff}.resultlegend span:last-child{margin-left:auto}
+.resultcharts{display:grid;grid-template-columns:1fr 1fr;gap:24px;flex:1;min-height:0}.resultpanel{background:#0b1c2e;border:1px solid #24465e;border-radius:16px;padding:14px 18px}.resultpanel h3{margin:0;color:#def4ff;font:600 22px Sarabun}.resultaxis{display:flex;justify-content:space-between;margin:2px 50px 5px 175px;font:11px system-ui;color:#839cb4}.resultrow{display:grid;grid-template-columns:165px 1fr;gap:10px;align-items:center;padding:9px 0;border-top:1px solid #244057;min-height:53px}.resultrow.baseline{background:#153149}.resultname{font-size:17px;padding-left:6px}.resultname small{display:block;font-size:12px;color:#8fafc5}.resultbars{padding-right:50px;background:linear-gradient(90deg,#34506a33 1px,transparent 1px);background-size:50% 100%}.resultbar{height:16px;position:relative;margin:3px 0;background:#14293a}.resultbar>span{display:block;height:100%;border-radius:0 4px 4px 0;background:#79edff}.resultbar.pair>span{background:#859cff}.resultbar b{position:absolute;left:calc(100% + 8px);top:-1px;font:500 14px/18px system-ui;font-variant-numeric:tabular-nums;color:#e8f4ff}
+@media(prefers-reduced-motion:reduce){.together .ma{transform:translate(-34px,0)}.together .mb{transform:translate(34px,0)}.together .mc{transform:translate(0,48px)}.separate .ma{transform:translate(-100px,0)}.separate .mb{transform:translate(100px,0)}}
+
+.resultrow{min-height:44px;padding:4px 0}.resultbar{height:13px;margin:2px 0}.resultbar b{font-size:13px;line-height:15px}.resultpanel{padding:10px 16px}.resultname{font-size:16px}.resultname small{font-size:11px}.resultpanel h3{font-size:20px}
+
+.eventmotion{height:190px;margin:0 0 8px}.eventhalo{top:16px}.mention{top:72px}.separate .one,.separate .two{top:25px}.caption strong{color:#bcefff;font-weight:600}
