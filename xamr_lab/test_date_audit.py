@@ -1,6 +1,6 @@
 import unittest
 
-from date_audit import audit, shape
+from date_audit import audit, shape, slash_order
 
 
 def iso_only(value):
@@ -39,6 +39,20 @@ class AuditTest(unittest.TestCase):
     def test_everything_read(self):
         result = audit(['2013-09-13', '2008-12-12'], iso_only)
         self.assertEqual((result['unread'], result['shapes']), (0, []))
+
+
+class SlashOrderTest(unittest.TestCase):
+    def test_each_case(self):
+        values = ['12/18/2008', '18/12/2008', '02/01/2008', '31/31/2008', '00/05/2008']
+        self.assertEqual(slash_order(values),
+                         {'month_first': 1, 'day_first': 1, 'either': 1, 'invalid': 2})
+
+    def test_ignores_other_formats(self):
+        values = ['2008-12-18', '13 September 2013', 'XX/XX/1974', '12/13', '']
+        self.assertEqual(sum(slash_order(values).values()), 0)
+
+    def test_single_digits(self):
+        self.assertEqual(slash_order(['7/22/2008'])['month_first'], 1)
 
 
 if __name__ == '__main__':

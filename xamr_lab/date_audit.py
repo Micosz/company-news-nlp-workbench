@@ -9,6 +9,8 @@ parser.
 import re
 from collections import Counter
 
+SLASH = re.compile(r'(\d{1,2})/(\d{1,2})/(\d{4})')
+
 
 def shape(value):
     """Rough pattern of a date string: digits -> 9, words -> A.
@@ -47,3 +49,27 @@ def audit(values, parse):
         'unread': sum(unread.values()),
         'shapes': [(key, n, example[key]) for key, n in shapes.most_common()],
     }
+
+
+def slash_order(values):
+    """Evidence for month/day versus day/month in nn/nn/yyyy values.
+
+    A number above 12 can only be a day, so '12/18/2008' must be
+    month first and '18/12/2008' must be day first. Values where both
+    numbers are 12 or less ('02/01/2008') could be read either way.
+    """
+    counts = Counter({'month_first': 0, 'day_first': 0, 'either': 0, 'invalid': 0})
+    for value in values:
+        match = SLASH.fullmatch(str(value).strip())
+        if not match:
+            continue
+        first, second = int(match[1]), int(match[2])
+        if first == 0 or second == 0 or (first > 12 and second > 12):
+            counts['invalid'] += 1
+        elif first > 12:
+            counts['day_first'] += 1
+        elif second > 12:
+            counts['month_first'] += 1
+        else:
+            counts['either'] += 1
+    return dict(counts)
