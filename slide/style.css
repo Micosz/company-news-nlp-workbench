@@ -174,3 +174,17 @@ table{border-collapse:collapse;width:100%;font-size:23px;font-variant-numeric:ta
 .cols.dates .coverage{flex:1;align-content:center;gap:26px}
 .cols.dates .covrow{font-size:21px;grid-template-columns:190px 1fr 140px}.cols.dates .covrow b{font-size:20px}.cols.dates .covtrack{height:24px;border-radius:12px}
 .cols.dates .order{flex:1;align-content:center}.cols.dates .order b{font-size:84px}.cols.dates .order span{display:block;margin-top:8px;font-size:19px}
+
+/* Final readability pass: larger body text so panels read from the back of the room. */
+.slidebody>.cols>.panel h3{font-size:28px;margin-bottom:18px}
+.slidebody>.cols>.panel p{font-size:25px;line-height:1.5;margin:0 0 16px}
+.slidebody>.cols>.panel .big{margin:4px 0 14px}
+.slidebody>.cols>.panel .lede{font-size:36px;line-height:1.55}
+.slidebody>.flow .box{font-size:24px}
+.slidebody>.flow .box small{font-size:19px}
+.slidebody>.callout{font-size:24px}
+.cols.sig .panel p,.cols.dates .panel p,.cols.sig .sigread{font-size:20px}
+.goals{list-style:none;counter-reset:goal;margin:0;padding:0;display:grid;gap:10px}
+.goals li{counter-increment:goal;display:grid;grid-template-columns:44px 1fr;gap:10px;font-size:25px;line-height:1.45;color:#c8dceb}
+.goals li::before{content:counter(goal);font:500 30px/1.2 system-ui;color:var(--cyan)}
+.slidebody>.cols>.panel .lede{margin-top:40px}
