@@ -74,5 +74,36 @@ class TopicsCommandTest(unittest.TestCase):
             run('topics', self.folder, '--out', 'x.csv')
 
 
+class SignificanceCommandTest(unittest.TestCase):
+    def setUp(self):
+        self.folder = tempfile.mkdtemp()
+        write(self.folder, THREE_METHODS)
+
+    def test_writes_csv_and_summary(self):
+        printed = run('significance', self.folder, '--rounds', '50')
+        table = read_csv(Path(self.folder) / 'significance.csv')
+        self.assertEqual([(r['method'], r['metric']) for r in table], [
+            ('OR_TFIDF', 'pair_F1'), ('OR_TFIDF', 'B3_F1'),
+            ('OR_temporal', 'pair_F1'), ('OR_temporal', 'B3_F1')])
+        # OR_TFIDF matches OR here, OR_temporal splits the only gold pair.
+        self.assertEqual(table[0]['p_value'], '1.0')
+        self.assertEqual(table[2]['delta'], '-100.0')
+        self.assertEqual(table[0]['rounds'], '50')
+        summary = (Path(self.folder) / 'significance.md').read_text(encoding='utf-8')
+        self.assertIn('| OR_temporal | pair_F1 | -100.00 |', summary)
+        self.assertIn('Topics: 1.', summary)
+        self.assertIn('OR_temporal', printed)
+
+    def test_same_seed_same_files(self):
+        run('significance', self.folder, '--rounds', '50', '--seed', '9')
+        first = (Path(self.folder) / 'significance.csv').read_text()
+        run('significance', self.folder, '--rounds', '50', '--seed', '9')
+        self.assertEqual((Path(self.folder) / 'significance.csv').read_text(), first)
+
+    def test_unknown_baseline(self):
+        with self.assertRaises(SystemExit):
+            run('significance', self.folder, '--baseline', 'AND')
+
+
 if __name__ == '__main__':
     unittest.main()
