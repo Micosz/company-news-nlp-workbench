@@ -149,3 +149,10 @@ table{border-collapse:collapse;width:100%;font-size:23px;font-variant-numeric:ta
 .forestp{font:500 19px system-ui;text-align:right;font-variant-numeric:tabular-nums;color:#ffcf9e}
 .sigread{font-size:18px!important;color:#9fbdd0!important;margin-top:14px!important}
 .cols.sig .big{font-size:62px}
+
+/* Error analysis: one merge of two groups multiplies into many wrong pairs. */
+.mergeviz{display:flex;align-items:center;gap:14px;margin:8px 0 6px}
+.mergeviz .blob{display:grid;place-items:center;width:78px;height:78px;border-radius:50%;border:1px dashed #6dd9f3;background:#123a5066;font:600 28px system-ui;color:#c9f6ff}
+.mergeviz .blob.warm{border-color:#ffb59a;background:#58382b44;color:#ffd8c8}
+.mergeviz .op{font:400 30px system-ui;color:#8fb0c8}
+.mergeviz b{font:600 44px system-ui;color:#ffcf9e;letter-spacing:-.02em}
