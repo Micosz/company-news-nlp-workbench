@@ -81,3 +81,29 @@ def b3_f1(sums):
     p = sum(s['b3_p'] for s in sums) / n
     r = sum(s['b3_r'] for s in sums) / n
     return 2 * p * r / (p + r) if p + r else 0.0
+
+
+def pair_f1(tp, fp, fn):
+    return 2 * tp / (2 * tp + fp + fn) if tp else 0.0
+
+
+def compare_topics(rows, method, baseline='OR'):
+    """One row per topic: how `method` changes pair errors and B3 against `baseline`."""
+    base_pairs, new_pairs = topic_pair_counts(rows, baseline), topic_pair_counts(rows, method)
+    base_b3, new_b3 = topic_b3(rows, baseline), topic_b3(rows, method)
+    table = []
+    for topic in sorted(base_pairs, key=lambda t: (len(t), t)):
+        old, new = base_pairs[topic], new_pairs[topic]
+        old_f1 = pair_f1(old['tp'], old['fp'], old['fn'])
+        new_f1 = pair_f1(new['tp'], new['fp'], new['fn'])
+        old_b3, b3 = b3_f1([base_b3[topic]]), b3_f1([new_b3[topic]])
+        table.append({
+            'topic': topic, 'mentions': old['mentions'],
+            'FP_' + baseline: old['fp'], 'FP_' + method: new['fp'], 'FP_change': new['fp'] - old['fp'],
+            'FN_' + baseline: old['fn'], 'FN_' + method: new['fn'], 'FN_change': new['fn'] - old['fn'],
+            'pair_F1_' + baseline: round(old_f1 * 100, 2), 'pair_F1_' + method: round(new_f1 * 100, 2),
+            'pair_F1_change': round((new_f1 - old_f1) * 100, 2),
+            'B3_F1_' + baseline: round(old_b3 * 100, 2), 'B3_F1_' + method: round(b3 * 100, 2),
+            'B3_F1_change': round((b3 - old_b3) * 100, 2),
+        })
+    return table
