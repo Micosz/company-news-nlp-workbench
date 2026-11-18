@@ -120,3 +120,14 @@ table{border-collapse:collapse;width:100%;font-size:23px;font-variant-numeric:ta
 .compare>.now{font-size:21px;color:#e6f4ff;line-height:1.4}
 .compare>.now small{display:block;font-size:17px;color:#93b4c9;margin-top:4px;line-height:1.4}
 .compare>.arrow{color:var(--cyan);font-size:20px;text-align:center}
+
+/* Results chart: fill the panels and keep every number readable from the back of a room. */
+.resultlegend{font-size:18px}.resultlegend i{width:24px;height:10px}
+.resultpanel{padding:14px 18px;display:flex;flex-direction:column}
+.resultpanel h3{font-size:24px;margin-bottom:4px}
+.resultaxis{font-size:14px;margin:0 60px 6px 185px}
+.resultrow{grid-template-columns:175px 1fr;flex:1;min-height:0;padding:6px 0}
+.resultname{font-size:19px;line-height:1.25}.resultname small{font-size:14px;color:#9fbdd0;margin-top:2px}
+.resultbars{padding-right:60px}
+.resultbar{height:17px;margin:4px 0}
+.resultbar b{font-size:16px;line-height:17px}
