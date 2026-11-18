@@ -131,3 +131,21 @@ table{border-collapse:collapse;width:100%;font-size:23px;font-variant-numeric:ta
 .resultbars{padding-right:60px}
 .resultbar{height:17px;margin:4px 0}
 .resultbar b{font-size:16px;line-height:17px}
+
+/* Significance slide: interval plot on a shared axis around zero. */
+.cols.sig{grid-template-columns:1.55fr 1fr}
+.forest{display:grid;gap:6px;margin-top:6px}
+.forestaxis,.forestrow{display:grid;grid-template-columns:150px 1fr 150px 56px;gap:14px;align-items:center}
+.forestaxis{font-size:15px;color:#7f9cb4}.forestaxis>span:nth-child(n+3){text-align:right}
+.forestaxis .foresttrack{height:20px}.forestaxis .foresttrack span{position:absolute;transform:translateX(-50%)}
+.foresttrack{position:relative;height:46px}
+.forestrow{border-top:1px solid #213d53;padding:4px 0}
+.forestname{font-size:19px;color:#e3f2ff}.forestname em{font-style:normal;color:#9fbdd0}
+.foresttrack .zero{position:absolute;top:-6px;bottom:-6px;width:2px;margin-left:-1px;background:#e9f6ff66}
+.foresttrack .ci{position:absolute;top:21px;height:5px;border-radius:3px;background:#79edff99}
+.foresttrack .point{position:absolute;top:15px;width:17px;height:17px;margin-left:-8px;border-radius:50%;background:#79edff;box-shadow:0 0 12px #3fc6ff88}
+.forestnum{font:500 19px system-ui;text-align:right;font-variant-numeric:tabular-nums;color:#e3f2ff}
+.forestnum small{display:block;font-size:14px;color:#8fb0c8;font-weight:400}
+.forestp{font:500 19px system-ui;text-align:right;font-variant-numeric:tabular-nums;color:#ffcf9e}
+.sigread{font-size:18px!important;color:#9fbdd0!important;margin-top:14px!important}
+.cols.sig .big{font-size:62px}
