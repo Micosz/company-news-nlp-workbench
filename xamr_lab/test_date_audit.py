@@ -1,8 +1,11 @@
+import json
+import tempfile
 import unittest
+from pathlib import Path
 
 from datetime import date
 
-from date_audit import audit, cross_check, read_slash, shape, slash_order
+from date_audit import audit, cross_check, read_slash, report, shape, slash_order
 
 
 def iso_only(value):
@@ -80,6 +83,43 @@ class CrossCheckTest(unittest.TestCase):
         self.assertEqual(cross_check(slash, reference, iso_day), {
             'month_first_only': 2, 'day_first_only': 1, 'same_either_way': 1,
             'neither': 1, 'no_day_reference': 1})
+
+
+def save(folder, name, data):
+    (Path(folder) / f'{name}.json').write_text(json.dumps(data), encoding='utf-8')
+
+
+class ReportTest(unittest.TestCase):
+    def setUp(self):
+        self.folder = tempfile.mkdtemp()
+        save(self.folder, 'ann1-train', [
+            {'mention_id': 'm1', 'argT': '2008-12-18'},
+            {'mention_id': 'm2', 'argT': ''}])
+        save(self.folder, 'ann2-train', [
+            {'mention_id': 'm1', 'argT': '12/18/2008'},
+            {'mention_id': 'm2', 'argT': '02/01/2008'}])
+        save(self.folder, 'notes', {'not': 'a split'})
+        save(self.folder, 'models', [{'name': 'no argT here'}])
+
+    def test_coverage_rows(self):
+        text = report(self.folder, iso_day)
+        self.assertIn('| ann1-train | 2 | 1 | 1 | 0 |  |', text)
+        # Both slash values appear once, so the example is the first one seen.
+        self.assertIn("| ann2-train | 2 | 0 | 0 | 2 | `99/99/9999` ×2 (e.g. `12/18/2008`) |", text)
+
+    def test_skips_files_without_argt(self):
+        text = report(self.folder, iso_day)
+        self.assertNotIn('notes', text)
+        self.assertNotIn('models', text)
+
+    def test_pairs_annotators_by_split(self):
+        # m1 matches ann1 only when read month first; m2 has no ann1 date.
+        text = report(self.folder, iso_day)
+        self.assertIn('| ann2-train | 1 | 0 | 1 | 0 | 1 / 0 |', text)
+
+    def test_empty_folder(self):
+        with self.assertRaises(ValueError):
+            report(tempfile.mkdtemp(), iso_day)
 
 
 if __name__ == '__main__':
