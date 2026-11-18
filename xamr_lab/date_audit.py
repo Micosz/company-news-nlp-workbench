@@ -8,6 +8,7 @@ parser.
 """
 import re
 from collections import Counter
+from datetime import date
 
 SLASH = re.compile(r'(\d{1,2})/(\d{1,2})/(\d{4})')
 
@@ -72,4 +73,44 @@ def slash_order(values):
             counts['month_first'] += 1
         else:
             counts['either'] += 1
+    return dict(counts)
+
+
+def read_slash(value, month_first):
+    """Read nn/nn/yyyy one way, or None if it is not a real date that way."""
+    match = SLASH.fullmatch(str(value).strip())
+    if not match:
+        return None
+    first, second, year = map(int, match.groups())
+    month, day = (first, second) if month_first else (second, first)
+    try:
+        return date(year, month, day)
+    except ValueError:
+        return None
+
+
+def cross_check(slash_by_id, reference_by_id, parse):
+    """Compare slash dates with another annotation of the same mentions.
+
+    For every mention that has a slash date and a single-day reference
+    date, record which reading of the slash date matches the reference.
+    A reading that agrees far more often is the order the annotator used.
+    """
+    counts = Counter({'month_first_only': 0, 'day_first_only': 0, 'same_either_way': 0,
+                      'neither': 0, 'no_day_reference': 0})
+    for mention, value in slash_by_id.items():
+        md, dm = read_slash(value, True), read_slash(value, False)
+        if md is None and dm is None:
+            continue
+        ref = parse(str(reference_by_id.get(mention, '')).strip() or ' ')
+        if ref is None or ref[0] != ref[1]:
+            counts['no_day_reference'] += 1
+        elif md == dm == ref[0]:
+            counts['same_either_way'] += 1
+        elif md == ref[0]:
+            counts['month_first_only'] += 1
+        elif dm == ref[0]:
+            counts['day_first_only'] += 1
+        else:
+            counts['neither'] += 1
     return dict(counts)

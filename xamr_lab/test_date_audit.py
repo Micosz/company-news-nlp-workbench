@@ -1,6 +1,8 @@
 import unittest
 
-from date_audit import audit, shape, slash_order
+from datetime import date
+
+from date_audit import audit, cross_check, read_slash, shape, slash_order
 
 
 def iso_only(value):
@@ -53,6 +55,31 @@ class SlashOrderTest(unittest.TestCase):
 
     def test_single_digits(self):
         self.assertEqual(slash_order(['7/22/2008'])['month_first'], 1)
+
+
+def iso_day(value):
+    try:
+        d = date.fromisoformat(value.strip())
+    except ValueError:
+        return None
+    return d, d
+
+
+class CrossCheckTest(unittest.TestCase):
+    def test_read_slash_both_ways(self):
+        self.assertEqual(read_slash('02/01/2008', True), date(2008, 2, 1))
+        self.assertEqual(read_slash('02/01/2008', False), date(2008, 1, 2))
+        self.assertIsNone(read_slash('12/18/2008', False))
+        self.assertIsNone(read_slash('2008-12-18', True))
+
+    def test_counts_each_outcome(self):
+        slash = {'m1': '12/18/2008', 'm2': '02/01/2008', 'm3': '02/01/2008',
+                 'm4': '05/05/2008', 'm5': '03/04/2008', 'm6': '03/04/2008', 'm7': 'NA'}
+        reference = {'m1': '2008-12-18', 'm2': '2008-02-01', 'm3': '2008-01-02',
+                     'm4': '2008-05-05', 'm5': '2009-01-01', 'm6': 'NA'}
+        self.assertEqual(cross_check(slash, reference, iso_day), {
+            'month_first_only': 2, 'day_first_only': 1, 'same_either_way': 1,
+            'neither': 1, 'no_day_reference': 1})
 
 
 if __name__ == '__main__':
