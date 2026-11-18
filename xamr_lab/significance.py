@@ -5,10 +5,12 @@ not independent. Every test here treats the topic as the unit: a
 bootstrap sample is a list of topics drawn with replacement.
 """
 import random
+from itertools import product
 
 from analysis import b3_f1, pair_f1, topic_b3, topic_pair_counts
 
 SEED = 374
+MAX_EXACT_TOPICS = 20
 
 
 def resample_topics(topics, rounds, seed=SEED):
@@ -76,3 +78,34 @@ def bootstrap_b3_f1(rows, method, baseline='OR', rounds=1000, seed=SEED):
     """Paired bootstrap of the B3 F1 gain of `method` over `baseline`."""
     return paired_bootstrap(topic_b3(rows, baseline), topic_b3(rows, method),
                             pooled_b3_f1, rounds, seed)
+
+
+def permutation_test(base, new, score):
+    """Two-sided p-value for score(new) - score(base) by swapping systems per topic.
+
+    Under the null hypothesis the two systems are interchangeable inside
+    each topic, so every way of swapping their outputs topic by topic is
+    equally likely. With k topics there are 2**k ways, and all of them
+    are scored (no sampling), so the p-value is exact for this data.
+    The smallest possible p-value is 2 / 2**k: with 8 topics, 0.0078.
+    """
+    topics = sorted(base, key=lambda t: (len(t), t))
+    if len(topics) > MAX_EXACT_TOPICS:
+        raise ValueError(f'{len(topics)} topics is too many to try every swap')
+    observed = score(new, topics) - score(base, topics)
+    extreme = 0
+    for swaps in product((False, True), repeat=len(topics)):
+        a = {t: new[t] if swap else base[t] for t, swap in zip(topics, swaps)}
+        b = {t: base[t] if swap else new[t] for t, swap in zip(topics, swaps)}
+        if abs(score(b, topics) - score(a, topics)) >= abs(observed) - 1e-12:
+            extreme += 1
+    return {'delta': observed, 'p': extreme / 2 ** len(topics), 'swaps': 2 ** len(topics)}
+
+
+def permutation_pair_f1(rows, method, baseline='OR'):
+    return permutation_test(topic_pair_counts(rows, baseline),
+                            topic_pair_counts(rows, method), pooled_pair_f1)
+
+
+def permutation_b3_f1(rows, method, baseline='OR'):
+    return permutation_test(topic_b3(rows, baseline), topic_b3(rows, method), pooled_b3_f1)
