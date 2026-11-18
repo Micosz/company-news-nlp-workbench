@@ -4,7 +4,7 @@ import unittest
 from itertools import combinations
 from pathlib import Path
 
-from analysis import b3_f1, load_predictions, topic_b3, topic_pair_counts
+from analysis import b3_f1, compare_topics, load_predictions, pair_f1, topic_b3, topic_pair_counts
 
 SMALL_RUN = """mention_id,topic,gold_cluster,OR,OR_TFIDF
 m1,1,a,0,0
@@ -98,6 +98,23 @@ class TopicScoreTest(unittest.TestCase):
         counts = topic_pair_counts(rows, 'OR').values()
         fast = tuple(sum(c[k] for c in counts) for k in ('tp', 'fp', 'fn'))
         self.assertEqual(fast, slow_counts(rows))
+
+
+class NoLinkTopicTest(unittest.TestCase):
+    def test_pair_f1_edge_cases(self):
+        self.assertEqual(pair_f1(0, 0, 0), 1.0)
+        self.assertEqual(pair_f1(0, 3, 0), 0.0)
+        self.assertEqual(pair_f1(0, 0, 3), 0.0)
+
+    def test_singleton_topic_matches_b3(self):
+        # Every mention is its own event and both systems agree, so the
+        # topic is solved: pair F1 and B3 F1 should both say 100.
+        rows = [{'topic': '9', 'gold_cluster': g, 'OR': p, 'OR_TFIDF': p}
+                for g, p in [('a', 0), ('b', 1), ('c', 2)]]
+        row = compare_topics(rows, 'OR_TFIDF')[0]
+        self.assertEqual(row['pair_F1_OR'], 100.0)
+        self.assertEqual(row['B3_F1_OR'], 100.0)
+        self.assertEqual(row['pair_F1_change'], 0.0)
 
 
 if __name__ == '__main__':

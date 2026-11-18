@@ -86,7 +86,10 @@ def b3_f1(sums):
 
 
 def pair_f1(tp, fp, fn):
-    return 2 * tp / (2 * tp + fp + fn) if tp else 0.0
+    """Pair F1. A topic with no gold links and no predicted links is perfect, not 0."""
+    if not (tp or fp or fn):
+        return 1.0
+    return 2 * tp / (2 * tp + fp + fn)
 
 
 def compare_topics(rows, method, baseline='OR'):
