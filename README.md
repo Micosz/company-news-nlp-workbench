@@ -11,6 +11,12 @@ X-AMR Research Lab เมนู **เดโม** เปิดตัวอย่�
 | [`pair_workbench/`](pair_workbench/) | เว็บเดิม: TF-IDF / Naive Bayes, role/date features, NLI graph | ดูผลที่ `/legacy` หรือเปิดฉบับเต็มในเครื่องเพื่อรัน Python |
 | [`xamr_lab/`](xamr_lab/) | X-AMR เดิม 4 วิธี เทียบ OR + temporal clustering | รันบนเครื่องหรือออนไลน์ผ่าน Vercel |
 
+## สไลด์นำเสนอโครงงาน
+
+เปิด [X-AMR Final Presentation](https://xamr-nlp-slides.vercel.app/) หรืออ่าน [คู่มือสไลด์](slide/README.md) สำหรับวิธีเปิดในเครื่อง ปุ่มควบคุม การแก้เนื้อหา และขอบเขตผลทดลอง
+
+สไลด์ HTML 15 หน้าอยู่ใน `slide/` มีภาพรวม 4 หมวด บทพูดภาษาไทย ภาพจำลองการจัดกลุ่มเหตุการณ์ และกราฟผล development ของ Ann1/Ann2 ผลดังกล่าวไม่ใช่ held-out final test และไม่ได้รัน benchmark ใหม่จากการปรับสไลด์ เผยแพร่เป็น Vercel project แยกจากเว็บวิจัย โดยใช้ Root Directory `slide` และ branch `main`
+
 ## เว็บออนไลน์และงานวิจัยอ้างอิง
 
 **เปิดเว็บวิจัยใหม่: [X-AMR Research Lab](https://xamrlab-nlp.vercel.app/)**
