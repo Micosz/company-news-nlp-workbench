@@ -1,6 +1,8 @@
 import unittest
 
-from significance import bootstrap_b3_f1, bootstrap_pair_f1, percentile, resample_topics
+from significance import (bootstrap_b3_f1, bootstrap_pair_f1, percentile,
+                          permutation_b3_f1, permutation_pair_f1, permutation_test,
+                          pooled_pair_f1, resample_topics)
 
 
 def two_topic_rows():
@@ -75,6 +77,46 @@ class B3BootstrapTest(unittest.TestCase):
         p = (5 / 3 + 3) / 6
         self.assertAlmostEqual(result['delta'], 2 * p / (p + 1) - 1)
         self.assertLessEqual(result['high'], 0)
+
+
+def same_mistake_everywhere(topics):
+    """In every topic OR is perfect and OR_TFIDF merges one wrong mention."""
+    rows = []
+    for topic in topics:
+        for gold, old, new in [('a', 0, 0), ('a', 0, 0), ('b', 1, 0)]:
+            rows.append({'topic': topic, 'gold_cluster': topic + gold,
+                         'OR': topic + str(old), 'OR_TFIDF': topic + str(new)})
+    return rows
+
+
+class PermutationTest(unittest.TestCase):
+    def test_same_system_gives_p_one(self):
+        rows = two_topic_rows()
+        self.assertEqual(permutation_pair_f1(rows, 'OR', 'OR')['p'], 1.0)
+        self.assertEqual(permutation_b3_f1(rows, 'OR', 'OR')['p'], 1.0)
+
+    def test_tries_every_swap(self):
+        self.assertEqual(permutation_pair_f1(two_topic_rows(), 'OR_TFIDF')['swaps'], 4)
+
+    def test_worse_in_every_topic_gets_smallest_p(self):
+        # Only "swap nothing" and "swap everything" are as extreme as the
+        # real result, so p = 2 / 2**4.
+        rows = same_mistake_everywhere(['1', '2', '3', '4'])
+        for test in (permutation_pair_f1, permutation_b3_f1):
+            result = test(rows, 'OR_TFIDF')
+            self.assertLess(result['delta'], 0)
+            self.assertAlmostEqual(result['p'], 2 / 16)
+
+    def test_one_bad_topic_is_not_enough(self):
+        # Same as above but three topics where both systems agree.
+        rows = same_mistake_everywhere(['1']) + [
+            row | {'OR_TFIDF': row['OR']} for row in same_mistake_everywhere(['2', '3', '4'])]
+        self.assertGreaterEqual(permutation_pair_f1(rows, 'OR_TFIDF')['p'], 0.5)
+
+    def test_too_many_topics(self):
+        counts = {str(t): {'tp': 1, 'fp': 0, 'fn': 0} for t in range(21)}
+        with self.assertRaises(ValueError):
+            permutation_test(counts, counts, pooled_pair_f1)
 
 
 if __name__ == '__main__':
