@@ -29,3 +29,6 @@ Ann1/Ann2 เป็นสอง semantic input versions บน ECB+ เดีย
 ## ภาพอ้างอิง
 
 ใช้แนวคิดภาพรวมสี่สถานีเชื่อมด้วยถนนแสงสีฟ้าและการซูมตามหัวข้อ ตามคำขอผู้ใช้ งานนี้สร้าง HTML/CSS/SVG ใหม่ ไม่คัดลอก assets ของ Prezi
+
+### Typography
+Thai reading text uses locally hosted **Sarabun** Regular (400) and SemiBold (600), from Google Fonts. This is Sarabun, not TH Sarabun PSK. Distributed under SIL Open Font License 1.1; see `assets/Sarabun-OFL.txt`. Source: https://github.com/google/fonts/tree/main/ofl/sarabun . Thai wraps at normal word boundaries; no forced word-breaking or text clipping is used.
