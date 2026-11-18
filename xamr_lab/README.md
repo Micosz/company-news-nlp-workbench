@@ -80,6 +80,8 @@ Proposed: annotations -> same EIDs -> same OR edges -> greedy merging with clust
 
 ยังไม่พร้อมอ้างผลวิจัยขั้นสุดท้ายเพียงเพราะเว็บพร้อม: ต้องล็อก protocol, ประเมิน held-out ที่ไม่ใช้ปรับวิธี, วิเคราะห์ error, แยก human/predicted, และประเมินความไม่แน่นอนของผลหากจะอ้าง statistical significance เว็บไม่สร้างค่า p-value หรือ CI ปลอม ไม่มีการทดลองซ้ำ random seeds สำหรับขั้น deterministic
 
+ช่วงความเชื่อมั่นและค่า p ระดับหัวข้อคำนวณแยกจากเว็บด้วย `analyze.py significance` (ดูหัวข้อถัดไป)
+
 ## Tests
 
 ```sh
@@ -96,3 +98,22 @@ Evidence of the initial development runs is in `verification.json` (aggregate re
 ```
 
 Replay ใช้ input/config เดิมกับโค้ด checkout ปัจจุบัน หากต้องการโค้ดเดียวกับรอบเดิม ให้ตรวจ source SHA-256 เทียบ snapshot ใน ZIP ก่อน ตัวเลขเวลารันและ ID รอบย่อมต่างกัน
+
+## วิเคราะห์ run ที่รันแล้ว
+
+`analyze.py` อ่านไฟล์ใน run folder หรือไฟล์ข้อมูลโดยไม่รันโมเดลใหม่ รันจาก `xamr_lab`
+
+```sh
+../.venv-xamr/bin/python analyze.py topics runs/<run_id>          # FP/FN, Pair F1, B³ รายหัวข้อเทียบ OR
+../.venv-xamr/bin/python analyze.py significance runs/<run_id>    # bootstrap CI และ permutation p ระดับหัวข้อ
+../.venv-xamr/bin/python analyze.py date-audit --out runs/date_audit.md   # parser อ่าน argT ได้แค่ไหน
+```
+
+| คำสั่ง | โค้ด | เอกสาร |
+|---|---|---|
+| `topics` | `analysis.py` | [`docs/XAMR_TOPIC_ANALYSIS_TH.md`](../docs/XAMR_TOPIC_ANALYSIS_TH.md) |
+| `significance` | `significance.py` | [`docs/XAMR_SIGNIFICANCE_TH.md`](../docs/XAMR_SIGNIFICANCE_TH.md) |
+| `date-audit` | `date_audit.py` | [`docs/XAMR_DATE_AUDIT_TH.md`](../docs/XAMR_DATE_AUDIT_TH.md) |
+
+Test ของส่วนนี้คือ `test_analysis.py`, `test_analyze.py`, `test_significance.py` และ `test_date_audit.py`
+ทั้งสี่ไฟล์ใช้แค่ standard library ส่วนคำสั่ง `date-audit` ตอนใช้งานจริงต้อง import `engine.py`
