@@ -86,3 +86,105 @@ table{border-collapse:collapse;width:100%;font-size:23px;font-variant-numeric:ta
 .resultrow{min-height:44px;padding:4px 0}.resultbar{height:13px;margin:2px 0}.resultbar b{font-size:13px;line-height:15px}.resultpanel{padding:10px 16px}.resultname{font-size:16px}.resultname small{font-size:11px}.resultpanel h3{font-size:20px}
 
 .eventmotion{height:190px;margin:0 0 8px}.eventhalo{top:16px}.mention{top:72px}.separate .one,.separate .two{top:25px}.caption strong{color:#bcefff;font-weight:600}
+
+/* Title slide: project name and members, no chapter label or footer. */
+.titleslide{flex-direction:row;align-items:center;gap:40px;padding:60px 64px}
+.titlecopy{flex:1;min-width:0}
+.titleslide h1{font-size:42px;line-height:1.45;margin:0 0 18px}
+.titleslide h1 span{display:block;white-space:nowrap}
+.titleen{font:400 21px/1.5 system-ui;color:#8fb0c8;margin:0 0 40px;max-width:640px}
+.memberlist{display:grid;gap:12px;max-width:560px;padding-top:26px;border-top:1px solid #2c5470}
+.memberlist div{display:flex;justify-content:space-between;gap:24px;font-size:26px;color:#e3f2ff}
+.memberlist span:last-child{font:500 24px system-ui;color:#9fc4da;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.course{margin:30px 0 0;font-size:21px;color:#8fb0c8}
+.titleart{width:250px;flex-shrink:0;align-self:center}
+.titleart>circle{fill:#10314744;stroke:#4fb9de;stroke-dasharray:6 8}
+.titleart>circle.warm{fill:#58382b26;stroke:#e59c80}
+.titleart path{fill:none;stroke:#5f8fae;stroke-width:2}
+.titleart .dots circle{fill:#79edff;filter:drop-shadow(0 0 8px #3fc6ff88)}
+.titleart .dots circle.warm{fill:#ffb59a;filter:drop-shadow(0 0 8px #ff9a7a66)}
+
+/* No chapter label or footer on content slides; a quiet page number instead. */
+.slide{position:relative;padding:44px 56px 40px}
+.slide>h1{margin-top:0}
+.pagenum{position:absolute;right:30px;bottom:18px;font:500 15px system-ui;color:#5f7f98;font-variant-numeric:tabular-nums}
+.cover h2{margin-top:150px}
+
+/* Proposal comparison: one row per decision, old on the left and actual work on the right. */
+.compare{display:grid;grid-template-columns:230px 1fr 34px 1.25fr;column-gap:16px;align-items:start;flex-shrink:0}
+.compare>b{font-size:20px;font-weight:600;color:#8fb0c8;padding:0 0 8px}
+.compare>b.accent{color:var(--cyan)}
+.compare>.rowname,.compare>.was,.compare>.now,.compare>.arrow{border-top:1px solid #24465e;padding:11px 0}
+.compare>.rowname{font-size:19px;color:#8fb0c8;line-height:1.4}
+.compare>.was{font-size:21px;color:#9fb3c5;line-height:1.4}
+.compare>.now{font-size:21px;color:#e6f4ff;line-height:1.4}
+.compare>.now small{display:block;font-size:17px;color:#93b4c9;margin-top:4px;line-height:1.4}
+.compare>.arrow{color:var(--cyan);font-size:20px;text-align:center}
+
+/* Results chart: fill the panels and keep every number readable from the back of a room. */
+.resultlegend{font-size:18px}.resultlegend i{width:24px;height:10px}
+.resultpanel{padding:14px 18px;display:flex;flex-direction:column}
+.resultpanel h3{font-size:24px;margin-bottom:4px}
+.resultaxis{font-size:14px;margin:0 60px 6px 185px}
+.resultrow{grid-template-columns:175px 1fr;flex:1;min-height:0;padding:6px 0}
+.resultname{font-size:19px;line-height:1.25}.resultname small{font-size:14px;color:#9fbdd0;margin-top:2px}
+.resultbars{padding-right:60px}
+.resultbar{height:17px;margin:4px 0}
+.resultbar b{font-size:16px;line-height:17px}
+
+/* Significance slide: interval plot on a shared axis around zero. */
+.cols.sig{grid-template-columns:1.55fr 1fr}
+.forest{display:grid;gap:6px;margin-top:6px}
+.forestaxis,.forestrow{display:grid;grid-template-columns:150px 1fr 150px 56px;gap:14px;align-items:center}
+.forestaxis{font-size:15px;color:#7f9cb4}.forestaxis>span:nth-child(n+3){text-align:right}
+.forestaxis .foresttrack{height:20px}.forestaxis .foresttrack span{position:absolute;transform:translateX(-50%)}
+.foresttrack{position:relative;height:46px}
+.forestrow{border-top:1px solid #213d53;padding:4px 0}
+.forestname{font-size:19px;color:#e3f2ff}.forestname em{font-style:normal;color:#9fbdd0}
+.foresttrack .zero{position:absolute;top:-6px;bottom:-6px;width:2px;margin-left:-1px;background:#e9f6ff66}
+.foresttrack .ci{position:absolute;top:21px;height:5px;border-radius:3px;background:#79edff99}
+.foresttrack .point{position:absolute;top:15px;width:17px;height:17px;margin-left:-8px;border-radius:50%;background:#79edff;box-shadow:0 0 12px #3fc6ff88}
+.forestnum{font:500 19px system-ui;text-align:right;font-variant-numeric:tabular-nums;color:#e3f2ff}
+.forestnum small{display:block;font-size:14px;color:#8fb0c8;font-weight:400}
+.forestp{font:500 19px system-ui;text-align:right;font-variant-numeric:tabular-nums;color:#ffcf9e}
+.sigread{font-size:18px!important;color:#9fbdd0!important;margin-top:14px!important}
+.cols.sig .big{font-size:62px}
+
+/* Error analysis: one merge of two groups multiplies into many wrong pairs. */
+.mergeviz{display:flex;align-items:center;gap:14px;margin:8px 0 6px}
+.mergeviz .blob{display:grid;place-items:center;width:78px;height:78px;border-radius:50%;border:1px dashed #6dd9f3;background:#123a5066;font:600 28px system-ui;color:#c9f6ff}
+.mergeviz .blob.warm{border-color:#ffb59a;background:#58382b44;color:#ffd8c8}
+.mergeviz .op{font:400 30px system-ui;color:#8fb0c8}
+.mergeviz b{font:600 44px system-ui;color:#ffcf9e;letter-spacing:-.02em}
+
+/* Date audit: parser coverage per split and the month/day evidence. */
+.cols.dates{grid-template-columns:1.35fr 1fr}
+.coverage{display:grid;gap:14px;margin-top:10px}
+.covrow{display:grid;grid-template-columns:170px 1fr 130px;gap:14px;align-items:center;font-size:19px;color:#e3f2ff}
+.covrow b{font:500 18px system-ui;text-align:right;font-variant-numeric:tabular-nums;color:#c9e6f5}
+.covtrack{height:18px;border-radius:9px;background:#14293a;overflow:hidden}
+.covtrack i{display:block;height:100%;background:#79edff}
+.covrow.none span,.covrow.none b{color:#ffcf9e}
+.covrow.none .covtrack{background:repeating-linear-gradient(135deg,#3a2a24 0 8px,#2a201c 8px 16px)}
+.order{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:8px 0 6px}
+.order b{display:block;font:500 64px/1.1 system-ui;color:var(--cyan);letter-spacing:-.03em}
+.order .no b{color:#6f8aa0}
+.order span{font-size:18px;line-height:1.4;color:#afc6d9}
+.cols.dates>.panel{display:flex;flex-direction:column}
+.cols.dates .coverage{flex:1;align-content:center;gap:26px}
+.cols.dates .covrow{font-size:21px;grid-template-columns:190px 1fr 140px}.cols.dates .covrow b{font-size:20px}.cols.dates .covtrack{height:24px;border-radius:12px}
+.cols.dates .order{flex:1;align-content:center}.cols.dates .order b{font-size:84px}.cols.dates .order span{display:block;margin-top:8px;font-size:19px}
+
+/* Final readability pass: larger body text so panels read from the back of the room. */
+.slidebody>.cols>.panel h3{font-size:28px;margin-bottom:18px}
+.slidebody>.cols>.panel p{font-size:25px;line-height:1.5;margin:0 0 16px}
+.slidebody>.cols>.panel .big{margin:4px 0 14px}
+.slidebody>.cols>.panel .lede{font-size:36px;line-height:1.55}
+.slidebody>.flow .box{font-size:24px}
+.slidebody>.flow .box small{font-size:19px}
+.slidebody>.callout{font-size:24px}
+.cols.sig .panel p,.cols.dates .panel p,.cols.sig .sigread{font-size:20px}
+.goals{list-style:none;counter-reset:goal;margin:0;padding:0;display:grid;gap:10px}
+.goals li{counter-increment:goal;display:grid;grid-template-columns:44px 1fr;gap:10px;font-size:25px;line-height:1.45;color:#c8dceb}
+.goals li::before{content:counter(goal);font:500 30px/1.2 system-ui;color:var(--cyan)}
+.slidebody>.cols>.panel .lede{margin-top:40px}
