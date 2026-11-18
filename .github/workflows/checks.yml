@@ -46,7 +46,7 @@ jobs:
           cache-dependency-path: xamr_lab/requirements.txt
       - run: pip install -r requirements-test.txt
       - run: python setup_data.py
-      - run: python -m unittest test_engine test_cloud test_tfidf_nb test_or_nb_hybrid test_tfidf_only test_research -v
+      - run: python -m unittest test_engine test_cloud test_tfidf_nb test_or_nb_hybrid test_tfidf_only test_research test_analysis test_analyze test_significance test_date_audit -v
       - run: node --check static/cloud.js
       - run: node --check static/research.js
       - run: python -m compileall -q .
