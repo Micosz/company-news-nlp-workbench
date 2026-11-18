@@ -29,7 +29,10 @@ def pick_methods(methods, chosen, baseline):
 
 
 def topics(args):
-    rows, methods = load_predictions(args.run)
+    try:
+        rows, methods = load_predictions(args.run)
+    except ValueError as err:
+        sys.exit(str(err))
     chosen = pick_methods(methods, args.method, args.baseline)
     if not chosen:
         sys.exit('Nothing to compare: the run only has the baseline.')

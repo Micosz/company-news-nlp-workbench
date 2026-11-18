@@ -58,6 +58,11 @@ class TopicsCommandTest(unittest.TestCase):
         with self.assertRaises(SystemExit):
             run('topics', self.folder, '--method', 'AND')
 
+    def test_missing_run_exits(self):
+        with self.assertRaises(SystemExit) as stop:
+            run('topics', str(Path(self.folder) / 'runs' / 'typo'))
+        self.assertIn('not found', str(stop.exception.code))
+
     def test_out_needs_method(self):
         write(self.folder, THREE_METHODS)
         with self.assertRaises(SystemExit):

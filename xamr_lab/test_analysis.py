@@ -21,6 +21,10 @@ def write(folder, text):
 
 
 class LoadPredictionsTest(unittest.TestCase):
+    def test_missing_run_folder(self):
+        with self.assertRaisesRegex(ValueError, 'not found'):
+            load_predictions(Path(tempfile.mkdtemp()) / 'no-such-run')
+
     def test_reads_run_folder(self):
         with tempfile.TemporaryDirectory() as folder:
             write(folder, SMALL_RUN)

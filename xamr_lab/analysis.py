@@ -15,6 +15,8 @@ def load_predictions(path):
     path = Path(path)
     if path.is_dir():
         path = path / 'predictions.csv'
+    if not path.is_file():
+        raise ValueError(f'{path} not found (give a run folder or its predictions.csv)')
     with path.open(encoding='utf-8', newline='') as f:
         rows = list(csv.DictReader(f))
     if not rows:
