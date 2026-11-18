@@ -1,6 +1,6 @@
 import unittest
 
-from significance import bootstrap_pair_f1, percentile, resample_topics
+from significance import bootstrap_b3_f1, bootstrap_pair_f1, percentile, resample_topics
 
 
 def two_topic_rows():
@@ -61,6 +61,20 @@ class PairBootstrapTest(unittest.TestCase):
         self.assertLess(result['delta'], 0)
         self.assertLessEqual(result['high'], 0)
         self.assertLessEqual(result['low'], result['delta'])
+
+
+class B3BootstrapTest(unittest.TestCase):
+    def test_same_system_gives_zero(self):
+        result = bootstrap_b3_f1(two_topic_rows(), 'OR', 'OR', rounds=200)
+        self.assertEqual((result['delta'], result['low'], result['high']), (0, 0, 0))
+
+    def test_observed_gain_matches_direct_score(self):
+        # Topic 1 for OR_TFIDF is the "all merged" case: B3 F1 = 5/7.
+        # Topic 2 is perfect. Pooled over 6 mentions: P = (5/3 + 3) / 6, R = 1.
+        result = bootstrap_b3_f1(two_topic_rows(), 'OR_TFIDF', rounds=50)
+        p = (5 / 3 + 3) / 6
+        self.assertAlmostEqual(result['delta'], 2 * p / (p + 1) - 1)
+        self.assertLessEqual(result['high'], 0)
 
 
 if __name__ == '__main__':

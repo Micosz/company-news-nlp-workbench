@@ -6,7 +6,7 @@ bootstrap sample is a list of topics drawn with replacement.
 """
 import random
 
-from analysis import pair_f1, topic_pair_counts
+from analysis import b3_f1, pair_f1, topic_b3, topic_pair_counts
 
 SEED = 374
 
@@ -42,6 +42,11 @@ def pooled_pair_f1(counts, topics):
     return pair_f1(tp, fp, fn)
 
 
+def pooled_b3_f1(sums, topics):
+    """B3 F1 after adding up the per-topic sums of the listed topics."""
+    return b3_f1([sums[t] for t in topics])
+
+
 def paired_bootstrap(base, new, score, rounds=1000, seed=SEED):
     """95% interval for score(new) - score(base) over resampled topics.
 
@@ -65,3 +70,9 @@ def bootstrap_pair_f1(rows, method, baseline='OR', rounds=1000, seed=SEED):
     return paired_bootstrap(topic_pair_counts(rows, baseline),
                             topic_pair_counts(rows, method),
                             pooled_pair_f1, rounds, seed)
+
+
+def bootstrap_b3_f1(rows, method, baseline='OR', rounds=1000, seed=SEED):
+    """Paired bootstrap of the B3 F1 gain of `method` over `baseline`."""
+    return paired_bootstrap(topic_b3(rows, baseline), topic_b3(rows, method),
+                            pooled_b3_f1, rounds, seed)
