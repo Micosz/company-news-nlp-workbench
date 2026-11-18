@@ -110,6 +110,7 @@ def paper_page():
     html = (BASE / 'static/paper.html').read_text()
     return html.replace('<script>', '<script>window.CLOUD_MODE=true;</script><script src="/cloud.js"></script><script>', 1)
 
+@app.get('/orbit-motion.js')
 @app.get('/research.js')
 @app.get('/research.css')
 def research_asset(request: Request):

@@ -4,6 +4,13 @@ const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;',
 const percent = value => (100 * value).toFixed(4);
 const labels = {OR:'Original OR',TFIDF:'TF-IDF only',OR_TFIDF:'OR + TF-IDF',OR_TFIDF_NB:'OR + TF-IDF + NB'};
 let catalog, current, busy = false;
+const orbitMotion = createOrbitMotion($('orbitScene'));
+function showOrbit(active) {
+  $('empty').classList.toggle('in-flight', active);
+  $('orbitCaption').hidden = !active;
+  $('empty').hidden = !active && Boolean(current);
+  $('output').hidden = active || !current;
+}
 const downloadURLs = [];
 let database;
 function openDB() {
@@ -103,15 +110,20 @@ $('dataset').onchange = () => { $('testAck').checked=false; update(); };
 $('algorithm').onchange = update;
 $('refresh').onclick = history;
 $('run').onclick = async () => {
+  if (busy) return;
   const body = {dataset:$('dataset').value,algorithm:$('algorithm').value,acknowledge_test:$('testAck').checked};
   if (body.dataset.includes('test_common') && !body.acknowledge_test) { status('Acknowledge the previously viewed test subset before running.',true); $('testAck').focus(); return; }
   busy=true;
+  showOrbit(true);
+  orbitMotion.start();
   $('run').disabled=true; $('dataset').disabled=true; $('algorithm').disabled=true; $('results').setAttribute('aria-busy','true');
   $('run').firstElementChild.textContent='Running…';
   status('Verifying the dataset, computing links and scoring clusters…');
   try {
     const value = await api('/api/workbench/run',{method:'POST',headers:{'Content-Type':'application/json','X-Access-Key':$('accessKey').value},body:JSON.stringify(body)});
     const item = {id:value.report.id,report:value.report,archive_base64:value.archive_base64};
+    status('Computation complete. Preparing the evidence view…');
+    await orbitMotion.complete();
     render(item);
     let saved = true;
     try { await storage('put',item); } catch { saved=false; }
@@ -119,7 +131,7 @@ $('run').onclick = async () => {
     status(saved ? 'Complete. Evidence saved in this browser; download ZIP for your presentation or paper.' : 'Complete. Storage unavailable—download evidence before closing the page.', !saved);
     $('results').scrollIntoView({behavior:'smooth'});
   } catch(error) { status(error.message+' Your previous evidence is still available.',true); }
-  finally { busy=false; $('run').disabled=false; $('dataset').disabled=false; $('algorithm').disabled=false; $('results').setAttribute('aria-busy','false'); $('run').firstElementChild.textContent='Run experiment'; $('status').classList.remove('running'); }
+  finally { orbitMotion.reset(); showOrbit(false); busy=false; $('run').disabled=false; $('dataset').disabled=false; $('algorithm').disabled=false; $('results').setAttribute('aria-busy','false'); $('run').firstElementChild.textContent='Run experiment'; $('status').classList.remove('running'); }
 };
 (async () => {
   try {
