@@ -3,6 +3,7 @@
     python analyze.py topics runs/<run_id>
     python analyze.py topics runs/<run_id> --method OR_TFIDF --out or_tfidf_topics.csv
     python analyze.py significance runs/<run_id>
+    python analyze.py date-audit --out date_audit.md
 """
 import argparse
 import csv
@@ -78,6 +79,19 @@ def significance(args):
     print(f'\nwrote {folder / "significance.csv"} and significance.md')
 
 
+def date_audit(args):
+    from date_audit import report
+    from engine import interval
+    try:
+        text = report(args.data, interval)
+    except ValueError as err:
+        sys.exit(str(err))
+    print(text)
+    if args.out:
+        Path(args.out).write_text(text, encoding='utf-8')
+        print(f'wrote {args.out}')
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     commands = parser.add_subparsers(dest='command', required=True)
@@ -95,6 +109,11 @@ def main(argv=None):
     p.add_argument('--rounds', type=int, default=1000, help='bootstrap rounds (default: 1000)')
     p.add_argument('--seed', type=int, default=SEED)
     p.set_defaults(func=significance)
+
+    p = commands.add_parser('date-audit', help='how many argT values the date parser can read')
+    p.add_argument('--data', default=str(Path(__file__).parent / 'data'), help='folder of split json files')
+    p.add_argument('--out', help='also save the markdown report here')
+    p.set_defaults(func=date_audit)
     args = parser.parse_args(argv)
     args.func(args)
 
