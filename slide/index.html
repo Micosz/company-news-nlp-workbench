@@ -1,15 +1,54 @@
 <!doctype html>
-<html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>X-AMR · NLP Final Presentation</title><link rel="stylesheet" href="./style.css"></head>
-<body>
-<main id="viewport" aria-label="พื้นที่สไลด์"><div class="stars"></div><div id="world">
-<svg class="road" viewBox="0 0 3000 1800" aria-hidden="true"><defs><filter id="glow"><feGaussianBlur stdDeviation="14"/></filter><linearGradient id="beam"><stop stop-color="#1a6cff"/><stop offset=".5" stop-color="#4af7ff"/><stop offset="1" stop-color="#056eff"/></linearGradient><pattern id="grid" width="70" height="70" patternUnits="userSpaceOnUse"><path d="M70 0H0V70" fill="none" stroke="#287aae" stroke-opacity=".12"/></pattern></defs><rect width="3000" height="1800" fill="url(#grid)"/><path class="roadglow" d="M600 720V1060M2380 720V1060M600 900H2380M600 845Q600 900 655 900M600 955Q600 900 655 900M2380 845Q2380 900 2325 900M2380 955Q2380 900 2325 900" fill="none" stroke="#16aaff" stroke-width="50" filter="url(#glow)"/><path d="M600 720V1060M2380 720V1060M600 900H2380M600 845Q600 900 655 900M600 955Q600 900 655 900M2380 845Q2380 900 2325 900M2380 955Q2380 900 2325 900" fill="none" stroke="#083e70" stroke-width="30"/><path class="roadline" d="M600 720V1060M2380 720V1060M600 900H2380" fill="none" stroke="url(#beam)" stroke-width="5"/><path d="M780 917H2150" stroke="#76faff" stroke-opacity=".6" stroke-dasharray="20 50" stroke-width="3"/><path class="roadpulse" d="M600 720V1060M2380 720V1060M600 900H2380" fill="none"/></svg>
-<section class="station" data-group="0" style="left:80px;top:80px" aria-label="Introduction"></section>
-<section class="station" data-group="1" style="left:1740px;top:80px" aria-label="Approach"></section>
-<section class="station" data-group="2" style="left:1740px;top:1040px" aria-label="Data and Methods"></section>
-<section class="station" data-group="3" style="left:80px;top:1040px" aria-label="Results and Wrap"></section>
-</div><div id="live" class="sr" aria-live="polite"></div></main>
-<nav class="controls" aria-label="ควบคุมสไลด์"><button id="prev" aria-label="สไลด์ก่อนหน้า" title="สไลด์ก่อนหน้า">←</button><button id="map" aria-label="ภาพรวม" title="ภาพรวม">◈ <span>ภาพรวม</span></button><button id="contents" aria-label="สารบัญ" title="สารบัญ">☷ <span>สารบัญ</span></button><div class="progress"><span id="position">ภาพรวม</span><div><i id="progressFill"></i></div></div><button id="notesButton" aria-label="เปิดบทพูด" title="เปิดบทพูด" aria-expanded="false">N <span>บทพูด</span></button><button id="full" aria-label="เต็มจอ" title="เต็มจอ">⛶</button><button id="next" class="next" aria-label="สไลด์ถัดไป" title="สไลด์ถัดไป">เริ่ม <b>→</b></button></nav>
-<dialog id="toc"><div class="dialoghead"><h2>เส้นทางการนำเสนอ</h2><button data-close="toc" aria-label="ปิดสารบัญ" title="ปิดสารบัญ">×</button></div><div id="tocItems"></div></dialog>
-<dialog id="help"><div class="dialoghead"><h2>ควบคุมด้วยแป้นพิมพ์</h2><button data-close="help" aria-label="ปิดวิธีใช้" title="ปิดวิธีใช้">×</button></div><p>→ / Space ถัดไป · ← ย้อนกลับ</p><p>Esc / O ภาพรวม · Home หน้าแรก · End หน้าสุดท้าย</p><p>N บทพูด · F เต็มจอ · ? วิธีใช้</p><p>ตั้งค่า “ลดการเคลื่อนไหว” ของระบบเพื่อเปลี่ยนหน้าโดยไม่ซูม</p></dialog>
-<aside id="notes" hidden><button id="closeNotes" aria-label="ปิดบทพูด" title="ปิดบทพูด">×</button><h2 id="noteTitle"></h2><p id="noteText"></p></aside>
+<html lang="th"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#ffffff"><title>X-AMR · NLP Final Presentation</title>
+<link rel="stylesheet" href="./style.css"><link rel="stylesheet" href="./editorial.css"><link rel="stylesheet" href="./hero.css"><link rel="stylesheet" href="./shell.css">
+</head><body>
+<svg class="symbols" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+<defs>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="m3.5 10 8.5-7 8.5 7v10.5h-6.2v-7.2H9.7v7.2H3.5z"/></symbol>
+  <symbol id="i-intro" viewBox="0 0 24 24"><rect x="3.5" y="4" width="17" height="16" rx="3"/><path d="M8 9h8M8 13h4"/></symbol>
+  <symbol id="i-method" viewBox="0 0 24 24"><path d="M9 3h6M10.2 3v6L4.9 17.7c-.9 1.4.1 3.3 1.8 3.3h10.6c1.7 0 2.7-1.9 1.8-3.3L13.8 9V3M8 15h8"/></symbol>
+  <symbol id="i-data" viewBox="0 0 24 24"><path d="m2.5 8 9.5-5.2L21.5 8 12 13.2zM3 12.5l9 5 9-5M3 17l9 5 9-5"/></symbol>
+  <symbol id="i-results" viewBox="0 0 24 24"><path d="M4 4v16h17M8 15v-3m5 3V7m5 8V9"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></symbol>
+  <symbol id="i-notes" viewBox="0 0 24 24"><path d="M5 3.5h14a1 1 0 0 1 1 1v11l-5 5H5a1 1 0 0 1-1-1v-15a1 1 0 0 1 1-1zM15 20v-5h5M8 8h8M8 12h5"/></symbol>
+  <symbol id="i-full" viewBox="0 0 24 24"><path d="M9 4H4v5m11-5h5v5M4 15v5h5m11-5v5h-5"/></symbol>
+  <symbol id="i-link" viewBox="0 0 24 24"><path d="M14 4h6v6m0-6-9 9M10 5H5a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1v-5"/></symbol>
+  <symbol id="i-left" viewBox="0 0 24 24"><path d="m10 5-7 7 7 7M4 12h17"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="m14 5 7 7-7 7M20 12H3"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20.2 14a8 8 0 0 1-10-10 8.5 8.5 0 1 0 10 10z"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.4 1.4m11.2 11.2L19 19M5 19l1.4-1.4M17.6 6.4 19 5"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+  <symbol id="i-dots" viewBox="0 0 24 24"><g fill="currentColor" stroke="none"><circle cx="6" cy="3.5" r="1.9"/><circle cx="11.5" cy="7.7" r="1.9"/><circle cx="17" cy="12" r="1.9"/><circle cx="11.5" cy="16.3" r="1.9"/><circle cx="6" cy="20.5" r="1.9"/></g></symbol>
+</defs></svg>
+<header class="mast">
+<nav aria-label="ข้ามไปยังหมวด" class="chapter-nav">
+<div class="capsule" id="chapters"></div>
+<button id="contents" class="directory" aria-haspopup="dialog" aria-controls="toc" title="สารบัญ 19 สไลด์"><i><svg class="icon"><use href="#i-dots"/></svg></i><span>สารบัญ</span></button>
+</nav>
+<button id="theme" class="theme" aria-label="โหมดมืด" aria-pressed="false" title="เปิดโหมดมืด"><svg class="icon"><use href="#i-moon"/></svg></button>
+</header>
+<main id="viewport" aria-label="พื้นที่สไลด์" tabindex="-1">
+<div id="world">
+<div class="maphead"><h1>ภาพรวม<span>.</span></h1><p>เลือกหมวดเพื่อเริ่มนำเสนอ</p></div>
+<section class="station" data-group="0" aria-label="Introduction"></section>
+<section class="station" data-group="1" aria-label="Approach"></section>
+<section class="station" data-group="2" aria-label="Data and Methods"></section>
+<section class="station" data-group="3" aria-label="Results and Wrap"></section>
+</div></main>
+<div id="live" class="sr" aria-live="polite" aria-atomic="true"></div>
+<nav class="controls" aria-label="ควบคุมสไลด์">
+<button id="prev" aria-label="สไลด์ก่อนหน้า" title="สไลด์ก่อนหน้า (←)"><svg class="icon"><use href="#i-left"/></svg></button>
+<div class="progress"><span id="position">01 / 19</span><div><i id="progressFill"></i></div></div>
+<button id="next" class="next" aria-label="สไลด์ถัดไป" title="สไลด์ถัดไป (→)"><svg class="icon"><use href="#i-right"/></svg></button>
+<i class="divider" aria-hidden="true"></i>
+<button id="map" aria-label="ภาพรวม" title="ภาพรวม (O)"><svg class="icon"><use href="#i-grid"/></svg></button>
+<button id="notesButton" aria-label="บทพูด" title="บทพูด (N)" aria-expanded="false" aria-controls="notes"><svg class="icon"><use href="#i-notes"/></svg></button>
+<button id="full" aria-label="เต็มจอ" title="เต็มจอ (F)"><svg class="icon"><use href="#i-full"/></svg></button>
+<a id="workbench" href="https://xamrlab-nlp.vercel.app/" target="_blank" rel="noopener" aria-label="เปิด Research Workbench ในแท็บใหม่" title="เปิด Research Workbench ในแท็บใหม่"><svg class="icon"><use href="#i-link"/></svg><span>Workbench</span></a>
+</nav>
+<dialog id="toc" aria-labelledby="tocTitle"><div class="dialoghead"><h2 id="tocTitle">สารบัญ</h2><button data-close="toc" aria-label="ปิดสารบัญ">×</button></div><div id="tocItems"></div></dialog>
+<dialog id="help" aria-labelledby="helpTitle"><div class="dialoghead"><h2 id="helpTitle">ควบคุมด้วยแป้นพิมพ์</h2><button data-close="help" aria-label="ปิดวิธีใช้">×</button></div><p>→ / Space ถัดไป · ← ย้อนกลับ</p><p>Esc / O ภาพรวม · Home หน้าแรก · End หน้าสุดท้าย</p><p>N บทพูด · F เต็มจอ · ? วิธีใช้</p><p>ตั้งค่า “ลดการเคลื่อนไหว” ของระบบเพื่อเปลี่ยนหน้าโดยไม่ซูม</p></dialog>
+<aside id="notes" hidden aria-labelledby="noteTitle"><button id="closeNotes" aria-label="ปิดบทพูด">×</button><h2 id="noteTitle"></h2><p id="noteText"></p></aside>
 <script src="./deck.js"></script></body></html>
