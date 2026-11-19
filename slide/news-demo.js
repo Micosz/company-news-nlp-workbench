@@ -11,8 +11,36 @@ const newsDemoSlide = (() => {
   '<strong>คำคล้ายกัน แต่คนละคนและคนละวัน</strong><span>ทั้งคู่มีบทบาทผู้จับเป็นตำรวจทางหลวงแคลิฟอร์เนีย และใช้ถ้อยคำคล้ายกัน แต่ผู้ถูกจับต่างกัน</span>',
   '<strong>22 × 19 = 418 คู่ใหม่</strong><span>เมื่อเพิ่มเส้นเดียว กลุ่มเดิมที่มี 22 และ 19 การกล่าวถึงถูกรวมเข้าด้วยกัน ทุกคู่ข้ามสองกลุ่มจึงถูกนับว่าเป็นเหตุการณ์เดียวกัน</span>'
  ];
+ const unsupported = '<strong>ยังไม่มีคำตอบจากหลักฐานสองข่าวนี้</strong><span>ลองถามว่า “Jamal Williams ถูกจับวันไหน?” หรือ “ทำไม OR + TF-IDF ถึงรวมผิด?”</span>';
+ const answerFor = raw => {
+  const q = raw.normalize('NFC').toLowerCase().trim();
+  const compact = q.replace(/[^\p{L}\p{M}\p{N}]+/gu,'');
+  const jackson = /jackson|vincent|แจ็กสัน|แจ็คสัน|แจคสัน|แจ๊คสัน|วินเซนต์/.test(compact);
+  const williams = /williams|jamal|วิลเลียม|จามาล|จาเมล/.test(compact);
+  const person = jackson === williams ? null : stories[jackson ? 0 : 1];
+  const inCase = jackson || williams || /สองข่าว|ทั้งสอง|สองคน|การจับ|ตำรวจ|topic35|ข่าวนี้|คู่นี้|dui/.test(compact);
+  const tfidf = /tfidf/.test(compact);
+  const hasOr = /\bor\b|โออาร์/.test(q) || /ortfidf/.test(compact);
+  const why = /ทำไม|เหตุผล|เพราะอะไร|อย่างไร|ยังไง|why|howdoes|howdid/.test(compact);
+  if (!compact || /jensen|huang|nvidia|เจนเซน|เจนเซ่น|อินวิเดีย|เอ็นวิเดีย/.test(compact)) return unsupported;
+  if (/อายุ|ส่วนสูง|เงินเดือน|โทษ|ตัดสิน|ประกันตัวเท่า|ค่าปรับ|เบอร์โทร|บ้านเลขที่|salary|howold|verdict|phone|networth/.test(compact)) return unsupported;
+  if (tfidf && !hasOr && /อย่างเดียว|ล้วน|เดี่ยว|standalone|only/.test(compact)) return '<strong>เดโมไม่ได้แสดงผล TF-IDF อย่างเดียว</strong><span>หน้า 19 แสดงผลของ OR และ OR + TF-IDF สำหรับคู่นี้ ส่วนคะแนนรวมของ TF-IDF อย่างเดียวอยู่หน้า 13</span>';
+  if ((inCase || hasOr || tfidf || /418|เส้นเดียว|oneedge/.test(compact)) && /418|กี่คู่|จำนวนคู่|เส้นเดียว|oneedge|howmanypairs/.test(compact) && !/ทั้งชุด|ทั้งหมดใน|ทั้งtopic|fpทั้งหมด/.test(compact)) return answers[2];
+  if ((inCase || hasOr || tfidf) && /ใครจับ|จับโดยใคร|ผู้จับ|หน่วยงาน|whoarrested/.test(compact)) return '<strong>ตำรวจทางหลวงแคลิฟอร์เนีย</strong><span>ในคำกำกับ Ann1 ตำรวจหน่วยเดียวกันเป็นผู้จับกุมทั้งสองกรณี แต่ผู้ถูกจับคนละคน</span>';
+  if ((inCase || person) && /วันไหน|วันที่|เมื่อไร|เมื่อไหร่|ตอนไหน|when|whatdate/.test(compact)) return person ? '<strong>'+person.name+' · '+person.date+'</strong><span>วันที่ตามคำกำกับ Ann1 ของ ECB+ ไม่ใช่วันเผยแพร่ข่าว</span>' : '<strong>Jackson: 6 ม.ค. 2009 · Williams: 1 ก.พ. 2009</strong><span>วันที่ตามคำกำกับ Ann1 ของ ECB+</span>';
+  if (inCase && /ที่ไหน|สถานที่|where/.test(compact)) return '<strong>ซานดิเอโก รัฐแคลิฟอร์เนีย สหรัฐฯ</strong><span>สถานที่ตามคำกำกับ Ann1 ทั้งสองกรณี</span>';
+  if ((hasOr || tfidf || inCase || /เหตุการณ์เดียวกัน|รวมผิด/.test(compact)) && /รวม|แยก|จัดกลุ่ม|เหตุการณ์เดียวกัน|sameevent|merge|cluster/.test(compact)) return why && !/ทำไมorแยก|whydoesorseparate/.test(compact) ? answers[0]+'<span>สองข้อความใช้คำคล้ายกันและผู้จับเป็นหน่วยเดียวกัน แม้ว่าผู้ถูกจับจะคนละคน</span>' : answers[0];
+  if ((inCase || tfidf) && /คล้าย|เหมือน|similar|ต่างกัน/.test(compact)) return answers[1];
+  if (person && (compact.length < 27 || /เกิดอะไร|ทำอะไร|ข้อหา|ทำไม.*จับ|สรุป|เล่า|whois|whathappened|arrest/.test(compact))) return '<strong>'+person.name+'</strong><span>'+person.summary+'</span>';
+  if (inCase && /ใครถูกจับ|ใครโดนจับ|ผู้ถูกจับ|who.*arrested/.test(compact)) return '<strong>Vincent Jackson และ Jamal Williams</strong><span>ทั้งสองเป็นผู้เล่น San Diego Chargers แต่เป็นการจับกุมคนละเหตุการณ์</span>';
+  return unsupported;
+ };
  const body = `<section class="news-demo" aria-label="เดโมข่าว ECB+">
   <div class="nd-caption">ECB+ · Ann1 dev · Topic 35 · ผลทดลองที่บันทึกไว้</div>
+  <form class="nd-ask" aria-label="ถามเกี่ยวกับข่าวสองชิ้นนี้">
+   <input type="search" required maxlength="200" enterkeyhint="send" autocomplete="off" aria-label="พิมพ์คำถามเกี่ยวกับข่าวสองชิ้นนี้" placeholder="เช่น Jamal Williams ถูกจับวันไหน?" data-news-query>
+   <button type="submit">ถาม</button>
+  </form>
   <div class="nd-questions" role="group" aria-label="เลือกคำถาม">
    <button type="button" data-news-question="0" aria-pressed="true">ระบบแยกข่าวถูกไหม?</button>
    <button type="button" data-news-question="1" aria-pressed="false">หลักฐานบอกอะไร?</button>
@@ -90,6 +118,15 @@ const newsDemoSlide = (() => {
    if(importVersion.get(demo)===request) input.value='';
   }
  }
+ document.addEventListener('submit',e=>{
+  const form=e.target.closest?.('.nd-ask');
+  if(!form) return;
+  e.preventDefault();
+  const demo=form.closest('.news-demo');
+  const q=form.querySelector('[data-news-query]').value;
+  demo.querySelectorAll('[data-news-question]').forEach(b=>b.setAttribute('aria-pressed','false'));
+  demo.querySelector('.nd-answer').innerHTML=answerFor(q);
+ });
  document.addEventListener('click',choose);
  document.addEventListener('change',importNews);
  // Scroll keys stay local when an evidence passage has keyboard focus.
