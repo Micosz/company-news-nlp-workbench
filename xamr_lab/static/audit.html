@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="th"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f5efdf">
+<meta name="description" content="อ่านข่าวจริงจาก ECB+ และตรวจว่าผลจัดกลุ่มเหตุการณ์ของ X-AMR สอดคล้องกับหลักฐานหรือไม่">
+<title>รอยข่าว | X-AMR News Audit</title>
+<link rel="stylesheet" href="/audit.css"><script defer src="/audit.js"></script>
+</head><body>
+<a class="skip" href="#news">ข้ามไปค้นข่าว</a>
+<header class="audit-nav"><div class="wrap nav-inner">
+<a class="brand" href="/audit"><span>รอยข่าว</span><small>X / AMR</small></a>
+<nav aria-label="เมนูหลัก"><a href="#news">หน้าข่าว</a><a href="/audit-analysis">กราฟและตาราง</a><a href="/#workbench">Workbench ↗</a></nav>
+</div></header>
+<main>
+<section class="ink-hero wrap" aria-labelledby="hero-title">
+ <div class="ink-copy"><p class="eyebrow">X-AMR RESEARCH / FIELD NOTES 01</p><h1 id="hero-title">ตามรอย<span>ข่าว</span></h1><p class="hero-intro">จากข่าวหนึ่งชิ้น ไปถึงเหตุการณ์ที่ระบบมองเห็น</p><p>ค้นข่าวจริงจาก ECB+ อ่านหลักฐาน แล้วดูว่า OR กับ OR + TF-IDF จัดไว้กลุ่มเดียวกันหรือไม่</p><a class="ink-link" href="#news">เปิดหน้าข่าว <span aria-hidden="true">↓</span></a></div>
+ <div class="ink-figure" aria-hidden="true">
+ <svg viewBox="0 0 560 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+ <defs><pattern id="dotprint" width="8" height="8" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.15" fill="#f5efdf"/></pattern><clipPath id="sun"><circle cx="336" cy="194" r="152"/></clipPath></defs>
+ <circle cx="336" cy="194" r="152" fill="currentColor"/>
+ <path d="M168 184c77-72 172-119 335-125v290H162Z" clip-path="url(#sun)" fill="url(#dotprint)" opacity=".36"/>
+ <g stroke="#f5efdf" stroke-linecap="round" clip-path="url(#sun)"><path d="M146 284c103-12 158-118 327-129M143 300c151-14 201-114 349-118M157 315c114-2 172-83 332-98" stroke-width="8"/><path d="M132 333c175 1 206-79 365-88M121 270c161-30 210-129 363-134" stroke-width="3"/></g>
+ <g fill="currentColor"><circle cx="132" cy="281" r="6"/><circle cx="109" cy="307" r="3"/><circle cx="83" cy="298" r="2"/><circle cx="145" cy="336" r="4"/><circle cx="501" cy="121" r="3"/><circle cx="516" cy="102" r="2"/><circle cx="510" cy="223" r="4"/><circle cx="526" cy="254" r="2"/><circle cx="154" cy="250" r="2"/><circle cx="177" cy="215" r="4"/></g>
+ <path d="M36 344c35 3 78 2 107-8m-79-7 51-7M491 77l36-13m-24 33 31-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+ </svg><span class="figure-caption">FIG. 01 / FROM INK TO EVIDENCE</span></div>
+</section>
+<section id="news" class="wrap audit-section" aria-labelledby="news-title">
+ <div class="section-head"><div><p class="eyebrow">01 / NEWSROOM</p><h2 id="news-title">หน้าข่าว</h2></div><p>ค้นด้วยคำในข่าว ชื่อคน หรือรหัสเอกสาร แล้วเปิดอ่านได้เลย</p></div>
+ <form id="search-form" class="search-row" role="search"><label class="sr" for="query">ค้นข่าว</label><input id="query" type="search" placeholder="ลองค้น Jackson, arrest, หรือ 35_10ecb" autocomplete="off"><button type="submit">ค้นข่าว</button></form>
+ <div class="filter-row"><label>ชุดคำกำกับ <select id="ann"><option value="Ann1">Ann1</option><option value="Ann2">Ann2</option></select></label><label>หัวข้อ <select id="topic"><option value="">ทุกหัวข้อ</option></select></label><button type="button" id="clear-filters" class="quiet">ล้างตัวกรอง</button></div>
+ <p id="news-status" class="status" aria-live="polite">กำลังเปิดดัชนีข่าว ECB+…</p>
+ <div id="source-recovery" hidden><p>ถ้าเปิดข้อมูลต้นทางจากเครือข่ายไม่ได้ ให้ <a id="manual-source" href="#" target="_blank" rel="noreferrer">ดาวน์โหลดไฟล์จากต้นทาง</a> แล้วเปิดไฟล์ในเครื่อง</p><label>เปิดไฟล์ JSON <input type="file" accept=".json,application/json" id="source-file"></label><button type="button" id="retry-source">ลองโหลดอีกครั้ง</button></div>
+ <div class="listing-head"><h3 id="listing-title">ข่าวแนะนำ</h3><a id="browse-all" href="#browse">ดูข่าวทั้งหมด ↓</a></div>
+ <div id="news-grid" class="news-grid"></div><div id="browse"></div><button type="button" id="more-news" hidden>แสดงข่าวเพิ่ม</button>
+</section>
+<section class="wrap audit-section"><div class="section-head"><div><p class="eyebrow">02 / ANALYSIS</p><h2>จากข่าวสู่ผลทดลอง</h2></div><a href="/audit-analysis">เปิดหน้ากราฟและตารางวิจัย ↗</a></div></section>
+</main>
+<dialog class="modal" id="article" aria-labelledby="article-title">
+ <div class="modal-bar"><span class="eyebrow">X-AMR / NEWS EVIDENCE</span><button type="button" id="close-article" aria-label="ปิดข่าว">ปิด ×</button></div>
+ <div id="article-body"></div>
+</dialog>
+<footer class="wrap"><strong>รอยข่าว / X-AMR</strong><p>ECB+ dev · คัดกรองและอ่านเพื่อวิเคราะห์ข้อผิดพลาด ไม่ใช่การประเมินอิสระหรือการรันกับข่าวใหม่</p><a href="https://github.com/Micosz/company-news-nlp-workbench/issues/9" target="_blank" rel="noopener">ที่มางาน #9 ↗</a><a href="https://aclanthology.org/2024.lrec-main.920/" target="_blank" rel="noopener">งานวิจัยต้นทาง ↗</a></footer>
+<noscript><p>เปิด JavaScript เพื่ออ่านข่าว ค้นหา และเปิดกราฟผลรายหัวข้อ</p></noscript>
+</body></html>

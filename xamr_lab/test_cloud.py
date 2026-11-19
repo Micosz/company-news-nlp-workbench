@@ -10,6 +10,17 @@ class CloudTests(unittest.TestCase):
   self.assertIn('window.CLOUD_MODE=true',self.client.get('/').text)
   self.assertTrue(any(not d['ready'] for d in self.client.get('/api/datasets').json()))
   r=self.client.post('/api/run',json={'tasks':[{}]*2001});self.assertEqual(r.status_code,400)
+ def test_audit_pages_and_real_topic_data(self):
+  for route, marker in [('/audit', 'news-grid'), ('/audit-analysis', 'metric-table')]:
+   page=self.client.get(route);self.assertEqual(page.status_code,200);self.assertIn(marker,page.text)
+   self.assertIn(f'href="{route}"',self.client.get('/').text)
+  for route, content_type in [('/audit.js','application/javascript'),('/audit.css','text/css'),('/audit-analysis.js','application/javascript'),('/audit-analysis.css','text/css'),('/audit-data.json','application/json')]:
+   asset=self.client.get(route);self.assertEqual(asset.status_code,200);self.assertIn(content_type,asset.headers['content-type'])
+  data=self.client.get('/audit-data.json').json()
+  self.assertEqual(len(data['topics']),16)
+  self.assertGreaterEqual(len(data['pairs']),60)
+  for ann,fp in [('ann1',1547),('ann2',1862)]:
+   self.assertEqual(sum(r['hybridFP'] for r in data['topics'] if r['ann']==ann),fp)
  def test_workbench_navigation(self):
   home=self.client.get('/')
   self.assertIn('X-AMR',home.text)

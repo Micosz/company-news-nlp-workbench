@@ -15,6 +15,19 @@ CATALOG = json.loads((BASE/'dataset_catalog.json').read_text())
 def home():
     return HTMLResponse((BASE/'static/index.html').read_text())
 
+@app.get('/audit', response_class=HTMLResponse)
+def audit_page():
+    return (BASE / 'static/audit.html').read_text(encoding='utf-8')
+
+@app.get('/audit-analysis', response_class=HTMLResponse)
+def audit_analysis_page():
+    return (BASE / 'static/audit-analysis.html').read_text(encoding='utf-8')
+
+@app.get('/audit-data.json')
+def audit_dataset():
+    from fastapi.responses import Response
+    return Response((BASE / 'static/audit-data.json').read_bytes(), media_type='application/json')
+
 @app.get('/demo', response_class=HTMLResponse)
 def demo_page():
     return (BASE / 'static/demo.html').read_text(encoding='utf-8')
@@ -110,6 +123,10 @@ def paper_page():
     html = (BASE / 'static/paper.html').read_text()
     return html.replace('<script>', '<script>window.CLOUD_MODE=true;</script><script src="/cloud.js"></script><script>', 1)
 
+@app.get('/audit.css')
+@app.get('/audit.js')
+@app.get('/audit-analysis.js')
+@app.get('/audit-analysis.css')
 @app.get('/orbit-motion.js')
 @app.get('/research.js')
 @app.get('/research.css')
