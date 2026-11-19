@@ -60,6 +60,8 @@ body:'<div class="cols">'+panel('ผลการดำเนินงาน',p('
 {g:3,title:"เอกสารอ้างอิงและหลักฐานของโครงงาน",sub:"รวบรวมงานวิจัยต้นทาง เอกสารการพัฒนาระบบ และหลักฐานผลการทดลองที่ตรวจสอบย้อนกลับได้",
 body:'<div class="refs"><a class="ref" href="https://aclanthology.org/2024.lrec-main.920/" target="_blank" rel="noopener">X-AMR · งานวิจัยและวิธีอ้างอิง<small>ACL Anthology · LREC-COLING 2024</small></a><a class="ref" href="https://aclanthology.org/2026.acl-long.1345/" target="_blank" rel="noopener">CohTP · แนวคิดเรื่องความสอดคล้องของเวลา<small>ใช้เป็นแรงบันดาลใจ ไม่ใช่การทำซ้ำครบระบบ</small></a><a class="ref" href="'+SOURCE+'NLP_PROJECT_HANDOFF_TH.md" target="_blank" rel="noopener">บันทึกการตัดสินใจและผลทดลองของโครงงาน<small>ตรึงเอกสารที่ commit 598ea069</small></a><a class="ref" href="https://github.com/Micosz/company-news-nlp-workbench/blob/6ba0d56/docs/XAMR_SIGNIFICANCE_TH.md" target="_blank" rel="noopener">การวิเคราะห์รายหัวข้อ ทดสอบนัยสำคัญ และตรวจวันที่<small>XAMR_TOPIC_ANALYSIS_TH, XAMR_SIGNIFICANCE_TH และ XAMR_DATE_AUDIT_TH ใน docs</small></a><a class="ref" href="'+SOURCE+'WEBSITE_RELEASE_2026-11-16.md" target="_blank" rel="noopener">Release, metric values และ protocol สำหรับ replay<small>เชื่อมไปยังรายละเอียด TF-IDF และ NB ใน repository</small></a></div>',note:'แหล่งอ้างอิงแยกเป็นงาน X-AMR และ CohTP ต้นทาง กับเอกสาร implementation ของโครงงานครับ ตัวเลขในสไลด์อ้างผลที่บันทึกไว้ ไม่ได้รัน benchmark ใหม่เพื่อสร้างสไลด์ และข้อจำกัดของแต่ละการทดลองยังคงเดิม',source:'WEBSITE_RELEASE_2026-11-16.md'}
 ];
+const originalSlideCount = slides.length;
+if(typeof newsDemoSlide!=='undefined')slides.push(newsDemoSlide);
 groups.forEach((g,i)=>{g.start=slides.findIndex(s=>s.g===i);});
 const world = document.getElementById('world');
 const viewport = document.getElementById('viewport');
@@ -73,7 +75,7 @@ let current = -1, last = 0, transitionTimer, rendered = false;
 const esc = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const plain = s => s.replace(/<br\s*\/?\s*>/gi,' ').replace(/<[^>]+>/g,'');
 const fmt = n => String(n).padStart(2,'0');
-const range = i => fmt(groups[i].start+1)+' – '+fmt(groups[i+1]?.start ?? slides.length);
+const range = i => fmt(groups[i].start+1)+' – '+fmt(groups[i+1]?.start ?? originalSlideCount);
 function art(i) {
  const lines = [
   '<path d="M7 25h55v38H39L28 75V63H7z"/><path d="M59 39h27v32H73l-8 7v-7H53"/><path d="M17 36h32M17 45h23"/>',
@@ -102,15 +104,15 @@ function render() {
   const s=slides[current];
   el.innerHTML=s.cover?'<article data-page="1" class="slide titleslide">'+s.body+'</article>':'<article data-page="'+(current+1)+'" class="slide"><h1>'+s.title+'</h1><div class="slidebody">'+s.body+'</div><div class="pagenum">'+fmt(current+1)+'</div></article>';
  }
- const label=current<0?'ภาพรวม':fmt(current+1)+' / '+slides.length;
+ const label=current<0?'ภาพรวม':current===originalSlideCount?'เดโม':fmt(current+1)+' / '+originalSlideCount;
  byId('position').textContent=label;
- byId('progressFill').style.width=current<0?'0%':((current+1)/slides.length*100)+'%';
+ byId('progressFill').style.width=current<0?'0%':(Math.min(current+1,originalSlideCount)/originalSlideCount*100)+'%';
  const nextLabel=current<0?'เริ่มนำเสนอ':current===slides.length-1?'กลับภาพรวม':'สไลด์ถัดไป';
  byId('next').setAttribute('aria-label',nextLabel);byId('next').title=nextLabel+' (→)';
  byId('next').innerHTML=icon(current===slides.length-1?'grid':'right');
  byId('noteTitle').textContent=current<0?'ภาพรวมเส้นทาง':plain(slides[current].title);
  byId('noteText').textContent=current<0?'เริ่มจาก Introduction แล้วเดินตามเส้นทางผ่าน Approach, Data & Methods และ Results & Wrap ใช้ลูกศรขวาเพื่อเล่าตามลำดับ หรือเลือกหมวดที่ต้องการ':slides[current].note;
- byId('live').textContent=current<0?'ภาพรวม สี่หมวด':(current+1)+' จาก '+slides.length+' '+plain(slides[current].title);
+ byId('live').textContent=current<0?'ภาพรวม สี่หมวด':(current===originalSlideCount?'เดโม: ':(current+1)+' จาก '+originalSlideCount+' ')+plain(slides[current].title);
  byId('chapters').querySelectorAll('button').forEach(b=>{const i=Number(b.dataset.chapter);if(current>=0&&(current===0?i===-1:i===slides[current].g))b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
  byId('tocItems').querySelectorAll('[data-index]').forEach(b=>{if(Number(b.dataset.index)===current)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
 }
