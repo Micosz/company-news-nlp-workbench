@@ -42,7 +42,7 @@
 .station[data-view="slide-5"] .slidebody>.cols>.panel p{font-size:22px;line-height:1.4;margin-bottom:9px}
 .station[data-view="slide-5"] .slidebody>.flow .box{font-size:21px;padding:10px 14px}
 .station[data-view="slide-5"] .slidebody>.callout{font-size:20px;padding:11px 18px}
-.station[data-view="slide-17"] .slidebody>.cols>.panel p{font-size:23px;line-height:1.45;margin-bottom:12px}
+.station[data-view="slide-16"] .slidebody>.cols>.panel p{font-size:23px;line-height:1.45;margin-bottom:12px}
 /* Comparison table, keeping its row-wise reading order. */
 .slide .compare{column-gap:16px;grid-template-columns:210px 1fr 28px 1.25fr}
 .slide .compare>b{color:#666;font-size:20px}
@@ -105,7 +105,7 @@
  .slide .cols,.slide .cols.three,.slide .cols.sig,.slide .cols.dates,.slide .resultcharts{display:grid;grid-template-columns:1fr;gap:16px;flex:none}
  .slide .slidebody>.cols>.panel{padding:22px}
  .slide .slidebody>.cols>.panel h3{font-size:23px;margin-bottom:14px}
- .slide .slidebody>.cols>.panel p,.slide .panel li,.station[data-view="slide-5"] .slidebody>.cols>.panel p,.station[data-view="slide-17"] .slidebody>.cols>.panel p{font-size:20px;line-height:1.55}
+ .slide .slidebody>.cols>.panel p,.slide .panel li,.station[data-view="slide-5"] .slidebody>.cols>.panel p,.station[data-view="slide-16"] .slidebody>.cols>.panel p{font-size:20px;line-height:1.55}
  .slide .slidebody>.cols>.panel .lede{font-size:27px;margin:16px 0;line-height:1.65}
  .slide .goals li{font-size:20px}
  .slide .big{font-size:62px}
