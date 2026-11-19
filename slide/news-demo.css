@@ -3,6 +3,10 @@
 :root.dark .news-demo{--nd-paper:#222;--nd-line:#555;--nd-ink:#f3f3f3;--nd-muted:#bbb;--nd-accent:#dce6b2}
 .news-demo .nd-caption,.news-demo .nd-label,.news-demo .nd-foot{color:var(--nd-muted);font-size:15px}
 .news-demo .nd-caption{font-weight:650}
+.news-demo .nd-ask{display:flex;align-items:stretch;gap:8px;margin:0}
+.news-demo .nd-ask input{flex:1;min-width:0;color:var(--nd-ink);background:var(--nd-paper);border:1px solid var(--nd-line);border-radius:11px;padding:8px 12px;font:inherit;font-size:17px}
+.news-demo .nd-ask input::placeholder{color:var(--nd-muted);opacity:1}
+.news-demo .nd-ask button{border:1px solid var(--nd-ink);border-radius:11px;background:var(--nd-ink);color:var(--nd-paper);font:inherit;font-size:17px;font-weight:600;padding:6px 15px;cursor:pointer}
 .news-demo .nd-questions{display:flex;gap:8px;flex-wrap:wrap}
 .news-demo .nd-questions button{background:var(--nd-paper);color:var(--nd-ink);border:1px solid var(--nd-line);border-radius:999px;font:inherit;font-size:18px;padding:6px 15px;cursor:pointer;min-height:40px}
 .news-demo .nd-questions button[aria-pressed=true]{background:var(--nd-ink);color:var(--nd-paper);border-color:var(--nd-ink)}
