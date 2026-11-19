@@ -21,8 +21,11 @@ class Handler(BaseHTTPRequestHandler):
   path=urlparse(self.path).path
   try:
    if path=='/':return self.page('index.html')
+   if path=='/audit':return self.page('audit.html')
+   if path=='/audit-analysis':return self.page('audit-analysis.html')
+   if path=='/audit-data.json':return self.send((BASE/'static/audit-data.json').read_bytes())
    if path=='/paper':return self.page('paper.html')
-   if path in ('/research.js','/research.css'):return self.send((BASE/'static'/path[1:]).read_text(),kind='text/css' if path.endswith('.css') else 'application/javascript')
+   if path in ('/research.js','/research.css','/audit.js','/audit.css','/audit-analysis.js','/audit-analysis.css'):return self.send((BASE/'static'/path[1:]).read_text(),kind='text/css' if path.endswith('.css') else 'application/javascript')
    if path=='/api/workbench/catalog':
     from research_runner import catalog
     return self.send(catalog())
