@@ -17,7 +17,7 @@
 .slide .goals{gap:17px}
 .slide .goals li{font-size:23px;line-height:1.45;grid-template-columns:32px 1fr;gap:12px;margin:0;color:#4b4b4b}
 .slide .goals li::before{font:500 19px/32px system-ui,sans-serif;color:#1c1c1c;border:1px solid #ddd;border-radius:50%;text-align:center;width:32px;height:32px}
-.slide .slidebody>.callout{background:#f2f2f2;color:#333;border:0;border-radius:16px;padding:14px 20px;line-height:1.45;font-size:22px;box-shadow:inset 3px 0 0 #292929}
+.slide .slidebody>.slide-footnote{display:grid;grid-template-columns:auto minmax(0,1fr);gap:.45em;align-items:baseline;flex-shrink:0;margin:0;color:var(--dim);font-size:18px;line-height:1.4;overflow-wrap:anywhere}
 .slide .flow{gap:12px}
 .slide .slidebody>.flow .box{border:1px solid #ddd;background:#fff;color:#242424;border-radius:18px;padding:16px;font-size:23px;line-height:1.4;box-shadow:0 5px 15px #00000004}
 .slide .flow .box small{color:#666;font-size:18px;line-height:1.4;margin-top:6px}
@@ -34,14 +34,12 @@
 .slide .separate .two{border:2px solid #999;background:#fff}
 .slide .separate .mb{background:#fff;color:#222;border:2px solid #444;box-shadow:none}
 .slide .eventmotion{margin-bottom:12px}
-.station[data-view="slide-2"] .callout{background:transparent;box-shadow:none;padding:3px 0;font-size:18px;color:#666;text-align:center}
 /* OR has three tiers: make the middle strip fit rather than overlap the panels. */
 .station[data-view="slide-5"] .slidebody{gap:12px}
 .station[data-view="slide-5"] .slidebody>.cols>.panel{padding:16px 22px}
 .station[data-view="slide-5"] .slidebody>.cols>.panel h3{font-size:24px;margin-bottom:12px}
 .station[data-view="slide-5"] .slidebody>.cols>.panel p{font-size:22px;line-height:1.4;margin-bottom:9px}
 .station[data-view="slide-5"] .slidebody>.flow .box{font-size:21px;padding:10px 14px}
-.station[data-view="slide-5"] .slidebody>.callout{font-size:20px;padding:11px 18px}
 .station[data-view="slide-16"] .slidebody>.cols>.panel p{font-size:23px;line-height:1.45;margin-bottom:12px}
 /* Comparison table, keeping its row-wise reading order. */
 .slide .compare{column-gap:16px;grid-template-columns:210px 1fr 28px 1.25fr}
@@ -109,7 +107,7 @@
  .slide .slidebody>.cols>.panel .lede{font-size:27px;margin:16px 0;line-height:1.65}
  .slide .goals li{font-size:20px}
  .slide .big{font-size:62px}
- .slide .slidebody>.callout{font-size:19px;padding:16px 18px}
+ .slide .slidebody>.slide-footnote{font-size:16px;line-height:1.5}
  .slide .flow{flex-direction:column;align-items:stretch;gap:6px}
  .slide .flow .arrow{align-self:center;transform:rotate(90deg);font-size:22px;line-height:1}
  .slide .slidebody>.flow .box{font-size:21px;padding:16px}

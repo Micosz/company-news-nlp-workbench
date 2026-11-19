@@ -8,7 +8,7 @@ const groups=[
 ];
 const panel=(title,body)=>'<div class="panel"><h3>'+title+'</h3>'+body+'</div>';
 const p=t=>'<p>'+t+'</p>';
-const call=t=>'<div class="callout">'+t+'</div>';
+const call=t=>'<div class="slide-footnote" role="note"><span aria-hidden="true">*</span><span>'+t+'</span></div>';
 const flow=items=>'<div class="flow">'+items.map((t,i)=>(i?'<span class="arrow">→</span>':'')+'<div class="box">'+t+'</div>').join('')+'</div>';
 const compare=rows=>'<div class="compare"><span></span><b>proposal</b><span></span><b class="accent">งานที่ทำจริง</b>'+rows.map(r=>'<span class="rowname">'+r[0]+'</span><div class="was">'+r[1]+'</div><span class="arrow">→</span><div class="now">'+r[2]+'</div>').join('')+'</div>';
 function eventMotion(separate){return '<div class="eventmotion '+(separate?'separate':'together')+'" role="img" aria-label="'+(separate?'การกล่าวถึง A และ B เคลื่อนแยกเป็นสองกลุ่ม':'การกล่าวถึง A B และ C เคลื่อนรวมเป็นกลุ่มเดียว')+'"><span class="eventhalo one"></span>'+(separate?'<span class="eventhalo two"></span>':'')+'<span class="mention ma">A</span><span class="mention mb">B</span>'+(separate?'':'<span class="mention mc">C</span>')+'</div>';}
