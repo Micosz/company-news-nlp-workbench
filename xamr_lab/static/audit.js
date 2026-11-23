@@ -1,10 +1,7 @@
-'use strict';
+import {checkedRows, fetchRows, source} from '/audit-source.mjs';
 (() => {
  const $=id=>document.getElementById(id);
  const el=(tag,txt='',cls='')=>{const n=document.createElement(tag);n.textContent=txt;if(cls)n.className=cls;return n;};
- const pinned='5639eb84f9cd32c360ff2ee715eb937ed2cc3c8e';
- const checks={Ann1:'a39c855868a0faac3ea223b2e7d4a864b2bf557d7bba3d7cbb759908d5345575',Ann2:'3fe1164306c4f9600427571b450a5fc4e427789b651e8a6cdcddfeaf0d0c4d32'};
- const source=ann=>'https://raw.githubusercontent.com/ahmeshaf/gpt_coref/'+pinned+'/project/annotations/ecb/'+ann.toLowerCase()+'/dev_xamr.json';
  const sourceRequests={}, datasets={};
  const suggested=['35_10ecb.xml','35_4ecbplus.xml','12_10ecb.xml'];
  const removeMarkup=s=>String(s??'').replace(/<\/?mark\b[^>]*>/gi,'').trim();
@@ -16,11 +13,6 @@
  const terms=s=>{let out=normalize(s);for(const [re,value] of alias)out=out.replace(re,value);return out.split(/\s+/).filter(Boolean);};
  let annotations=null, listLimit=12, viewAll=false, activeArticle=null, lastTrigger=null, lastHash=null;
  let selected='';
- async function checkedRows(bytes,ann) {
-  const sum=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),b=>b.toString(16).padStart(2,'0')).join('');
-  if(sum!==checks[ann])throw Error('version');
-  return JSON.parse(new TextDecoder().decode(bytes));
- }
  function catalogFor(rows) {
   const byDoc=new Map(), byId=new Map();
   for(const row of rows){
@@ -41,9 +33,7 @@
  async function ensure(ann) {
   if(datasets[ann])return datasets[ann];
   if(!sourceRequests[ann])sourceRequests[ann]=(async()=>{
-   const res=await fetch(source(ann),{credentials:'omit'});
-   if(!res.ok)throw Error('network');
-   return useRows(await res.arrayBuffer(),ann);
+   const d=catalogFor(await fetchRows(ann));datasets[ann]=d;return d;
   })().finally(()=>{delete sourceRequests[ann];});
   return sourceRequests[ann];
  }
@@ -106,9 +96,10 @@
    article.append(note);
   }
   const text=el('div','','article-text');
-  for(const line of doc.text){
+  const lines=mention?.marked_doc ? paragraphs(mention.marked_doc).filter(x=>!urlLine(x)) : doc.text;
+  for(const line of lines){
    const p=el('p');
-   for(const [i,s] of line.split(/<\/?mark\b[^>]*>/gi).entries())p.append(mention&&i%2&&removeMarkup(line)===removeMarkup(mention.text)?el('mark',s):document.createTextNode(s));
+   for(const [i,s] of line.split(/<\/?mark\b[^>]*>/gi).entries())p.append(mention&&i%2?el('mark',s):document.createTextNode(s));
    text.append(p);
   }
   if(!doc.text.length)text.append(el('p','ชุดคำกำกับไม่มีเนื้อหาข่าวฉบับยาวสำหรับเอกสารนี้'));
@@ -129,6 +120,8 @@
  }
  function configureComparison(mount,doc,d,ann,pairs){
   mount.append(el('h3','เทียบการจัดกลุ่ม'));
+  const randomLink=el('a','สุ่มจากทุกคู่ข้ามข่าวในหัวข้อนี้ →');randomLink.href='/audit-review?'+new URLSearchParams({ann:ann.toLowerCase(),topic:doc.topic});
+  mount.append(el('p','คู่ในรายการนี้คัดไว้เป็นตัวอย่าง'),randomLink);
   if(!pairs.length){mount.append(el('p',annotations?'เอกสารนี้ยังไม่มีคู่ในชุดตรวจที่เตรียมไว้ แต่ยังอ่านและค้นข่าวได้':'ยังโหลดชุดเปรียบเทียบไม่สำเร็จ'),el('p','เลือกข่าวแนะนำ เช่น Vincent Jackson หรือ Jamal Williams เพื่อดูตัวอย่าง'));return;}
   const choose=el('select');choose.setAttribute('aria-label','เลือกข่าวอีกชิ้นเพื่อเปรียบเทียบ');choose.append(new Option('เลือกข่าวที่ต้องการเทียบ',''));
   for(const pair of pairs){const other=pair.mentions.find(m=>m.doc!==doc.id);if(!other)continue;const article=d.byDoc.get(other.doc);choose.append(new Option(article?.title||other.doc,String(pair.id)));}

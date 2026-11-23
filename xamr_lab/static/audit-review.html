@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="th"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>สุ่มตรวจคู่ข่าว | X-AMR</title>
+<link rel="stylesheet" href="/audit.css"><link rel="stylesheet" href="/evidence.css">
+<script type="module" src="/audit-review.mjs"></script>
+</head><body class="evidence-page">
+<a class="skip" href="#main">ข้ามไปตรวจคู่ข่าว</a>
+<header class="audit-nav"><div class="wrap nav-inner">
+<a class="brand" href="/audit"><span>รอยข่าว</span><small>X / AMR</small></a>
+<nav aria-label="เมนูหลัก"><a href="/audit-analysis#topics">กราฟรายหัวข้อ</a><a href="/audit">ค้นข่าว</a><a href="/">Workbench ↗</a></nav>
+</div></header>
+<main id="main" class="wrap reviewer">
+<section class="review-heading"><p class="eyebrow">ECB+ / DEVELOPMENT SET</p>
+<h1 id="page-title">สุ่มตรวจคู่ข่าว</h1><p id="intro">อ่านคำที่ไฮไลต์ในข่าวสองชิ้น แล้วตัดสินว่าทั้งสองคำกล่าวถึงเหตุการณ์ครั้งเดียวกันหรือไม่</p></section>
+<section class="draw-box" aria-label="เลือกกลุ่มที่จะสุ่ม">
+<div id="sample-filters" class="evidence-controls">
+<label>ชุดคำกำกับ<select id="sample-ann"><option value="ann1">Ann1</option><option value="ann2">Ann2</option></select></label>
+<label>หัวข้อ<select id="sample-topic"><option value="">ทุกหัวข้อ</option></select></label>
+<label>สุ่มจาก<select id="sample-kind"><option value="all">ทุกคู่ข้ามข่าว</option><option value="merged">คู่ที่ OR + TF-IDF รวม</option><option value="separate">คู่ที่ OR + TF-IDF แยก</option><option value="added">คู่ที่เพิ่งรวมหลังเติม TF-IDF</option></select></label>
+</div>
+<div id="trace-controls" hidden><a id="back-to-counts" href="/audit-analysis#pair-inspector">← กลับไปที่ตัวเลข</a> · <a href="/audit-review">เริ่มสุ่มแบบปิดเฉลย</a></div>
+<p class="frame-note" id="frame-note"></p>
+<details id="sampling-details"><summary>เว็บสุ่มอย่างไร</summary><p class="frame-note">แต่ละคู่ในกลุ่มที่เลือกมีโอกาสเท่ากัน สุ่มเฉพาะตำแหน่งเหตุการณ์ในสองเอกสารของหัวข้อเดียวกัน ข้ามคู่ที่เพิ่งเปิดในหน้านี้และคู่ที่เคยบันทึกหรือเปิดเฉลยในเครื่อง จำนวนที่ตรวจแสดงเฉพาะคู่ที่บันทึกความเห็นแล้ว</p></details>
+<div class="draw-action"><button type="button" class="ink-button" id="draw" disabled>สุ่มคู่ข่าว</button><span id="frame-size" role="status">กำลังเปิดดัชนี…</span></div>
+</section>
+<section id="pair-panel" hidden aria-labelledby="pair-title">
+<div class="pair-heading"><div><p class="eyebrow" id="pair-location"></p><h2 id="pair-title" tabindex="-1">หลักฐานสองฝั่ง</h2></div><a id="permalink" href="#">ลิงก์คู่นี้ ↗</a></div>
+<p id="article-state" role="status"></p>
+<div id="source-repair" class="repair-panel" hidden><p>เปิดไฟล์ต้นทางของชุดที่เลือกจากเครื่องได้ เว็บจะตรวจ SHA-256 ก่อนแสดงข้อความ</p><a id="raw-link" target="_blank" rel="noopener">ไฟล์ต้นทาง ↗</a><label>เปิดไฟล์ JSON <input id="manual-json" type="file" accept=".json,application/json"></label><button id="retry" type="button">ลองโหลดอีกครั้ง</button></div>
+<div class="evidence-spread" id="evidence"></div>
+<form id="judgement" class="decision-box" hidden>
+<fieldset><legend>สองคำที่ไฮไลต์กล่าวถึงเหตุการณ์เดียวกันไหม?</legend>
+<p>ดูว่าใครทำอะไร กับใคร เมื่อใด ข่าวชิ้นเดียวอาจกล่าวถึงเหตุการณ์อื่นย้อนหลังด้วย</p>
+<div class="choices">
+<label><input type="radio" name="decision" value="same" required> เหตุการณ์เดียวกัน</label>
+<label><input type="radio" name="decision" value="different"> คนละเหตุการณ์</label>
+<label><input type="radio" name="decision" value="unclear"> หลักฐานไม่พอ</label>
+</div></fieldset>
+<label for="reason">คำหรือรายละเอียดที่ใช้ตัดสิน</label><textarea id="reason" rows="2" required maxlength="800" placeholder="เช่น ชื่อผู้ถูกจับในข่าวสองชิ้นต่างกัน"></textarea>
+<button class="ink-button" id="save" type="submit">บันทึกแล้วเปิดผลเทียบ</button>
+</form>
+<p id="decision-state" class="frame-note" role="status"></p>
+<section class="verdict-box" id="verdict" aria-label="ผลเทียบของคู่นี้" hidden></section>
+</section>
+<section class="audit-log" aria-labelledby="log-title"><h2 id="log-title">ผลที่ตรวจในเบราว์เซอร์นี้</h2>
+<p id="log-summary"></p><div id="review-tally"></div><button id="export" type="button" disabled>ดาวน์โหลดบันทึก JSON</button>
+<p class="frame-note">บันทึกระบุรหัสคู่ กลุ่มที่สุ่ม ขนาดกลุ่ม ลำดับที่จับได้ คำตัดสินและเหตุผล ใช้ลิงก์ของคู่เดิมให้ผู้ตรวจอีกคนเปิดในเบราว์เซอร์ของตนเองได้</p>
+</section>
+</main><noscript>กรุณาเปิด JavaScript เพื่อสุ่มและตรวจข้อความ</noscript></body></html>

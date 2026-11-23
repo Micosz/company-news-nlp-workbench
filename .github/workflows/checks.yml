@@ -49,4 +49,5 @@ jobs:
       - run: python -m unittest test_engine test_cloud test_tfidf_nb test_or_nb_hybrid test_tfidf_only test_research test_analysis test_analyze test_significance test_date_audit -v
       - run: node --check static/cloud.js
       - run: node --check static/research.js
+      - run: node --test ../tools/audit/evidence.test.mjs
       - run: python -m compileall -q .

@@ -20,3 +20,14 @@ No article prose, marked sentence, marked document, or full headline is included
 Deterministic outputs record source hashes, model hashes, data hashes, source commit, and installed sklearn version. Current test environment differs from the original sklearn version; matching the original aggregate results is checked, not assumed. Prefer the repository-pinned dependency versions for archival reproduction.
 
 Deployed routes: /audit (newsroom, search and comparison) and /audit-analysis (research tables and plots). The newsroom reads pinned article text directly in the browser with checksum verification. Reviewer choices stay local unless the reader explicitly exports a file. No prior slide files are changed.
+
+
+### Inspecting the published counts and news evidence
+
+In [the analysis view](https://xamrlab-nlp.vercel.app/audit-analysis#pair-inspector), click a topic, a TP/FP/FN count, or a segment legend for newly co-clustered pairs. The view enumerates distinct mention pairs from the saved partitions within the selected topic, including mentions in one document. It checks the counts and Pair F1 against the frozen topic table. The hand-count worksheet is an illustrative subset.
+
+[Random review](https://xamrlab-nlp.vercel.app/audit-review) samples only **different-document, same-topic mention pairs**. The default draws uniformly across eligible pairs from the selected annotation, without replacement within the session, excluding previously stored decisions and revealed cases in this browser. A one-based rank identifies the exact pair in the unmodified frame ordered by numeric topic then ASCII mention ID. The narrower sampling frames disclose whether the hybrid merged, separated, or newly merged a pair. Click-throughs from a known score are diagnostic and do not create a blind review record.
+
+The reviewer reads the marked English sentence, surrounding context and source article, then saves a judgement and reason before labels are displayed. The browser checks the source file hash. Local export records the frame, annotation, sample size, original rank, selection method, two mention IDs, source hash, human decision and system/gold labels. Unknown judgements remain separate. These are completed reviews of explored dev data. A claim about generalization requires an independently labelled, previously unseen news set.
+
+Regenerate the published index by copying the generator's `cluster-memberships.json` to `xamr_lab/static/`. Run `node --test tools/audit/evidence.test.mjs` to check every topic against its saved run and verify the sampling frames.

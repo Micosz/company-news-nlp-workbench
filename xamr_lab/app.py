@@ -23,6 +23,15 @@ def audit_page():
 def audit_analysis_page():
     return (BASE / 'static/audit-analysis.html').read_text(encoding='utf-8')
 
+@app.get('/audit-review', response_class=HTMLResponse)
+def audit_review_page():
+    return (BASE / 'static/audit-review.html').read_text(encoding='utf-8')
+
+@app.get('/cluster-memberships.json')
+def audit_memberships():
+    from fastapi.responses import Response
+    return Response((BASE / 'static/cluster-memberships.json').read_bytes(), media_type='application/json')
+
 @app.get('/audit-data.json')
 def audit_dataset():
     from fastapi.responses import Response
@@ -123,6 +132,11 @@ def paper_page():
     html = (BASE / 'static/paper.html').read_text()
     return html.replace('<script>', '<script>window.CLOUD_MODE=true;</script><script src="/cloud.js"></script><script>', 1)
 
+@app.get('/evidence.css')
+@app.get('/evidence-core.mjs')
+@app.get('/evidence-inspector.mjs')
+@app.get('/audit-source.mjs')
+@app.get('/audit-review.mjs')
 @app.get('/audit.css')
 @app.get('/audit.js')
 @app.get('/audit-analysis.js')
